@@ -18,17 +18,23 @@ import Card from '../../components/common/Card';
 import { colors } from '../../constants/designTokens';
 
 const AVATAR_COLORS = [
-  colors.cyan, colors.royal, colors.gold, colors.success,
-  '#8B5CF6', '#EC4899', '#F97316', '#06B6D4',
+  colors.cyan,
+  colors.royal,
+  colors.gold,
+  colors.success,
+  '#8B5CF6',
+  '#EC4899',
+  '#F97316',
+  '#06B6D4',
 ];
 
 const GOALS_LIST = [
-  { id: 'sleep',        label: 'Uyku',      emoji: '😴' },
-  { id: 'fitness',      label: 'Fitness',   emoji: '💪' },
-  { id: 'mindfulness',  label: 'Zihin',     emoji: '🧘' },
-  { id: 'nutrition',    label: 'Beslenme',  emoji: '🥗' },
-  { id: 'community',    label: 'Topluluk',  emoji: '🤝' },
-  { id: 'stress',       label: 'Stres',     emoji: '🌿' },
+  { id: 'sleep', label: 'Uyku', emoji: '😴' },
+  { id: 'fitness', label: 'Fitness', emoji: '💪' },
+  { id: 'mindfulness', label: 'Zihin', emoji: '🧘' },
+  { id: 'nutrition', label: 'Beslenme', emoji: '🥗' },
+  { id: 'community', label: 'Topluluk', emoji: '🤝' },
+  { id: 'stress', label: 'Stres', emoji: '🌿' },
 ];
 
 export default function EditProfileScreen({ navigation }) {
@@ -46,13 +52,16 @@ export default function EditProfileScreen({ navigation }) {
   const [saving, setSaving] = useState(false);
 
   const initials = displayName
-    ? displayName.split(' ').map((w) => w[0]).join('').toUpperCase().slice(0, 2)
+    ? displayName
+        .split(' ')
+        .map((w) => w[0])
+        .join('')
+        .toUpperCase()
+        .slice(0, 2)
     : '?';
 
   const toggleGoal = (id) =>
-    setSelectedGoals((prev) =>
-      prev.includes(id) ? prev.filter((g) => g !== id) : [...prev, id]
-    );
+    setSelectedGoals((prev) => (prev.includes(id) ? prev.filter((g) => g !== id) : [...prev, id]));
 
   const validate = () => {
     const e = {};
@@ -65,7 +74,9 @@ export default function EditProfileScreen({ navigation }) {
     if (!validate()) return;
     setSaving(true);
     try {
-      dispatch(updateProfile({ displayName: displayName.trim(), bio: bio.trim(), goals: selectedGoals }));
+      dispatch(
+        updateProfile({ displayName: displayName.trim(), bio: bio.trim(), goals: selectedGoals })
+      );
       // TODO: sync to Firestore when connected
       navigation.goBack();
     } catch {
@@ -103,7 +114,11 @@ export default function EditProfileScreen({ navigation }) {
               {AVATAR_COLORS.map((c) => (
                 <TouchableOpacity
                   key={c}
-                  style={[styles.colorDot, { backgroundColor: c }, avatarColor === c && styles.colorDotSelected]}
+                  style={[
+                    styles.colorDot,
+                    { backgroundColor: c },
+                    avatarColor === c && styles.colorDotSelected,
+                  ]}
                   onPress={() => setAvatarColor(c)}
                 />
               ))}
@@ -153,12 +168,7 @@ export default function EditProfileScreen({ navigation }) {
             })}
           </View>
 
-          <Button
-            title="Kaydet"
-            onPress={handleSave}
-            loading={saving}
-            style={styles.saveBtn}
-          />
+          <Button title="Kaydet" onPress={handleSave} loading={saving} style={styles.saveBtn} />
 
           <View style={{ height: 32 }} />
         </ScrollView>

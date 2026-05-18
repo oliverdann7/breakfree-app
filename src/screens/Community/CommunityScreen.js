@@ -1,12 +1,5 @@
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  FlatList,
-  TouchableOpacity,
-  StyleSheet,
-  SafeAreaView,
-} from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, SafeAreaView } from 'react-native';
 import Card from '../../components/common/Card';
 import { colors } from '../../constants/designTokens';
 
@@ -16,7 +9,7 @@ const MOCK_POSTS = [
     userId: 'u1',
     userName: 'Burak Yılmaz',
     avatar: 'B',
-    text: 'Sabah 06:30\'da 10K koşuyu bitirdim! Haftaya yarışmaya hazırım 💪🏃',
+    text: "Sabah 06:30'da 10K koşuyu bitirdim! Haftaya yarışmaya hazırım 💪🏃",
     stats: { distance: '10.2 km', duration: '48:32', avgHeartRate: 142 },
     likes: 47,
     comments: 12,
@@ -28,7 +21,7 @@ const MOCK_POSTS = [
     userId: 'u2',
     userName: 'Elif Kaya',
     avatar: 'E',
-    text: 'Dr. Ayşe\'nin anksiyete talk\'ı muhteşemdi. Günlük farkındalık egzersizlerini hayatıma katmaya başladım 🧘‍♀️',
+    text: "Dr. Ayşe'nin anksiyete talk'ı muhteşemdi. Günlük farkındalık egzersizlerini hayatıma katmaya başladım 🧘‍♀️",
     stats: null,
     likes: 32,
     comments: 8,
@@ -172,9 +165,7 @@ export default function CommunityScreen() {
         contentContainerStyle={{ paddingBottom: 24 }}
         showsVerticalScrollIndicator={false}
         ListHeaderComponent={<ListHeader />}
-        renderItem={({ item }) => (
-          <PostCard post={item} onLike={() => handleLike(item.postId)} />
-        )}
+        renderItem={({ item }) => <PostCard post={item} onLike={() => handleLike(item.postId)} />}
       />
     </SafeAreaView>
   );

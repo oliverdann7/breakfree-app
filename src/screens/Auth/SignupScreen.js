@@ -115,7 +115,7 @@ export default function SignupScreen({ navigation }) {
             </View>
             <Text style={styles.termsText}>
               <Text style={styles.termsLink}>Kullanım Koşulları</Text> ve{' '}
-              <Text style={styles.termsLink}>Gizlilik Politikası</Text>'nı kabul ediyorum
+              <Text style={styles.termsLink}>Gizlilik Politikası</Text>&apos;nı kabul ediyorum
             </Text>
           </TouchableOpacity>
           {errors.terms && <Text style={styles.errorSmall}>{errors.terms}</Text>}

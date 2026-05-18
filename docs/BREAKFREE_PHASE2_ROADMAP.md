@@ -9,11 +9,13 @@ Phase 2 expands from MVP to a feature-rich platform with real-time functionality
 ## Phase 2 Goals (Q4 2026, 3 months)
 
 ### User Growth
+
 - MVP: 1K DAU → Phase 2 End: 5K DAU
 - MAU: 5K → 25K
 - Retention: D7 >40% → D30 >25%
 
 ### Feature Completeness
+
 - [ ] Wearable API integration (Apple Health, Google Fit, Garmin)
 - [ ] Live audio streaming for talks (Agora SDK)
 - [ ] Real-time chat (Socket.io)
@@ -23,6 +25,7 @@ Phase 2 expands from MVP to a feature-rich platform with real-time functionality
 - [ ] Push notifications (full implementation)
 
 ### Technical Excellence
+
 - [ ] Offline-first architecture (SQLite)
 - [ ] Advanced caching strategy
 - [ ] API rate limiting
@@ -30,6 +33,7 @@ Phase 2 expands from MVP to a feature-rich platform with real-time functionality
 - [ ] Monitoring & alerting setup
 
 ### Revenue Foundation
+
 - [ ] Payment infrastructure (Stripe)
 - [ ] Premium subscription model
 - [ ] In-app purchase setup
@@ -40,9 +44,11 @@ Phase 2 expands from MVP to a feature-rich platform with real-time functionality
 ## Sprint-by-Sprint Breakdown (Q4 2026)
 
 ### Sprint 8: Wearable Integration (Weeks 1–2)
+
 **Goal**: Sync real health data from devices
 
 #### Apple HealthKit (iOS)
+
 ```javascript
 // app/services/healthKit.js
 import { AppleHealthKit } from 'rn-apple-healthkit';
@@ -75,16 +81,19 @@ export default { getHealthData };
 ```
 
 #### Google Fit (Android)
+
 ```javascript
 // Similar implementation using react-native-google-fit
 ```
 
 #### Garmin Connect API
+
 - OAuth integration
 - Periodic data sync (hourly)
 - Store sync status in Redux
 
 #### Tasks
+
 - [ ] HealthKit permission flow
 - [ ] Background sync (native modules)
 - [ ] Data normalization (different sources)
@@ -97,9 +106,11 @@ export default { getHealthData };
 ---
 
 ### Sprint 9: Live Audio Talks (Weeks 3–4)
+
 **Goal**: Real-time audio streaming + chat
 
 #### Audio Streaming (Agora SDK)
+
 ```javascript
 // app/services/talks/audio.js
 import { RtcEngine, RtcEngineEvent } from 'agora-react-native-sdk';
@@ -133,7 +144,6 @@ const joinTalk = async (talkId, userRole = 'audience') => {
     engine.addListener(RtcEngineEvent.UserOffline, (data) => {
       console.log('User offline:', data);
     });
-
   } catch (error) {
     console.error('Join talk error:', error);
   }
@@ -151,6 +161,7 @@ export { joinTalk, leaveTalk };
 ```
 
 #### Real-time Chat (Socket.io)
+
 ```javascript
 // app/services/talks/chat.js
 import io from 'socket.io-client';
@@ -187,12 +198,14 @@ export { joinChat, sendMessage };
 ```
 
 #### Host Controls
+
 - [ ] Mute individual listeners
 - [ ] Remove disruptive users
 - [ ] Recording controls
 - [ ] End session
 
 #### Tasks
+
 - [ ] Agora setup + token generation
 - [ ] Socket.io real-time chat
 - [ ] Host/listener permissions
@@ -205,9 +218,11 @@ export { joinChat, sendMessage };
 ---
 
 ### Sprint 10: Mentorship Feature (Weeks 5–6)
+
 **Goal**: Book, message, and track mentorship progress
 
 #### Mentor Booking System
+
 ```javascript
 // app/screens/Mentorship/MentorDetailScreen.js
 import React, { useState } from 'react';
@@ -224,10 +239,12 @@ const MentorDetailScreen = ({ route }) => {
 
   const handleBook = async () => {
     try {
-      await dispatch(bookMentorSession({
-        mentorId,
-        timeSlot: selectedSlot,
-      })).unwrap();
+      await dispatch(
+        bookMentorSession({
+          mentorId,
+          timeSlot: selectedSlot,
+        })
+      ).unwrap();
       // Navigate to confirmation
     } catch (error) {
       console.error('Booking failed:', error);
@@ -238,22 +255,15 @@ const MentorDetailScreen = ({ route }) => {
     <ScrollView style={styles.container}>
       {/* Mentor info */}
       <MentorCard mentor={mentor} />
-      
+
       {/* Calendar for availability */}
-      <Calendar
-        availableSlots={mentor.availability}
-        onSelectSlot={setSelectedSlot}
-      />
-      
+      <Calendar availableSlots={mentor.availability} onSelectSlot={setSelectedSlot} />
+
       {/* Weekly focus (what to work on) */}
       <WeeklyFocusForm />
-      
+
       {/* Booking button */}
-      <Button
-        label="Book Session"
-        onPress={handleBook}
-        disabled={!selectedSlot}
-      />
+      <Button label="Book Session" onPress={handleBook} disabled={!selectedSlot} />
     </ScrollView>
   );
 };
@@ -262,6 +272,7 @@ export default MentorDetailScreen;
 ```
 
 #### In-app Messaging
+
 ```javascript
 // app/screens/Mentorship/ChatScreen.js
 import React, { useEffect } from 'react';
@@ -273,7 +284,7 @@ import { subscribeToMentorChat } from '../../services/mentorship';
 
 const ChatScreen = ({ mentorId }) => {
   const dispatch = useDispatch();
-  const messages = useSelector(state => state.mentorship.chatMessages);
+  const messages = useSelector((state) => state.mentorship.chatMessages);
   const [newMessage, setNewMessage] = React.useState('');
 
   useEffect(() => {
@@ -287,10 +298,12 @@ const ChatScreen = ({ mentorId }) => {
 
   const sendMessage = () => {
     if (newMessage.trim()) {
-      dispatch(sendMentorMessage({
-        mentorId,
-        text: newMessage,
-      }));
+      dispatch(
+        sendMentorMessage({
+          mentorId,
+          text: newMessage,
+        })
+      );
       setNewMessage('');
     }
   };
@@ -300,15 +313,11 @@ const ChatScreen = ({ mentorId }) => {
       <FlatList
         data={messages}
         renderItem={({ item }) => <MessageBubble message={item} />}
-        keyExtractor={item => item.id}
+        keyExtractor={(item) => item.id}
       />
-      
+
       <View style={styles.inputContainer}>
-        <Input
-          placeholder="Message mentor..."
-          value={newMessage}
-          onChangeText={setNewMessage}
-        />
+        <Input placeholder="Message mentor..." value={newMessage} onChangeText={setNewMessage} />
         <Button label="Send" onPress={sendMessage} />
       </View>
     </View>
@@ -319,6 +328,7 @@ export default ChatScreen;
 ```
 
 #### Session Notes & Goals
+
 - [ ] Pre-session goal setting
 - [ ] Session recording/notes
 - [ ] Post-session feedback
@@ -326,6 +336,7 @@ export default ChatScreen;
 - [ ] Goal completion tracking
 
 #### Tasks
+
 - [ ] Mentor availability calendar
 - [ ] Booking backend + Firestore rules
 - [ ] Real-time messaging (Socket.io)
@@ -338,9 +349,11 @@ export default ChatScreen;
 ---
 
 ### Sprint 11: Community Challenges (Weeks 7–8)
+
 **Goal**: Social engagement through challenges + leaderboards
 
 #### Challenge Creation & Tracking
+
 ```javascript
 // app/screens/Community/ChallengesScreen.js
 const challenges = [
@@ -373,18 +386,11 @@ const ChallengesScreen = () => {
   return (
     <ScrollView>
       {/* Active challenges */}
-      <ChallengeCarousel
-        challenges={challenges}
-        onSelect={setSelectedChallenge}
-      />
+      <ChallengeCarousel challenges={challenges} onSelect={setSelectedChallenge} />
 
       {/* Leaderboard for selected challenge */}
       {selectedChallenge && (
-        <Leaderboard
-          challenge={selectedChallenge}
-          currentUserRank={5}
-          currentUserValue={48920}
-        />
+        <Leaderboard challenge={selectedChallenge} currentUserRank={5} currentUserValue={48920} />
       )}
 
       {/* Badge showcase */}
@@ -397,6 +403,7 @@ export default ChallengesScreen;
 ```
 
 #### Leaderboard & Rewards
+
 - [ ] Real-time leaderboard updates
 - [ ] Badge system (5K steps, 7-day streak, etc.)
 - [ ] Achievement unlocking
@@ -404,6 +411,7 @@ export default ChallengesScreen;
 - [ ] Challenge history
 
 #### Tasks
+
 - [ ] Challenge CRUD (admin)
 - [ ] Real-time leaderboard (Firestore)
 - [ ] Badge logic + unlock system
@@ -415,9 +423,11 @@ export default ChallengesScreen;
 ---
 
 ### Sprint 12: Premium Subscription (Weeks 9–10)
+
 **Goal**: Monetization foundation
 
 #### Payment Setup (Stripe)
+
 ```javascript
 // app/services/payments.js
 import Stripe from '@react-native-stripe-sdk/stripe';
@@ -451,6 +461,7 @@ export { createPaymentIntent, processPayment };
 ```
 
 #### Subscription Plans
+
 ```javascript
 const subscriptionPlans = [
   {
@@ -479,6 +490,7 @@ const subscriptionPlans = [
 ```
 
 #### In-App Store
+
 ```javascript
 // app/screens/Premium/PremiumScreen.js
 const PremiumScreen = () => {
@@ -488,7 +500,7 @@ const PremiumScreen = () => {
     try {
       const clientSecret = await createPaymentIntent(selectedPlan);
       const result = await processPayment(clientSecret, cardToken);
-      
+
       if (result.status === 'succeeded') {
         // Activate premium
         dispatch(setPremiumStatus(true));
@@ -501,18 +513,14 @@ const PremiumScreen = () => {
   return (
     <ScrollView>
       {/* Plan cards */}
-      <PlanSelector
-        plans={subscriptionPlans}
-        selected={selectedPlan}
-        onSelect={setSelectedPlan}
-      />
+      <PlanSelector plans={subscriptionPlans} selected={selectedPlan} onSelect={setSelectedPlan} />
 
       {/* Features list */}
-      <FeatureList features={subscriptionPlans.find(p => p.id === selectedPlan).features} />
+      <FeatureList features={subscriptionPlans.find((p) => p.id === selectedPlan).features} />
 
       {/* Subscribe button */}
       <Button
-        label={`Subscribe - ${subscriptionPlans.find(p => p.id === selectedPlan).price} TRY`}
+        label={`Subscribe - ${subscriptionPlans.find((p) => p.id === selectedPlan).price} TRY`}
         onPress={handleSubscribe}
       />
     </ScrollView>
@@ -521,6 +529,7 @@ const PremiumScreen = () => {
 ```
 
 #### Paywall Placement
+
 - [ ] Premium mentor features (gated)
 - [ ] Advanced health analytics
 - [ ] Challenge badges
@@ -528,6 +537,7 @@ const PremiumScreen = () => {
 - [ ] Ad-free experience
 
 #### Tasks
+
 - [ ] Stripe setup + testing
 - [ ] Subscription backend
 - [ ] Paywall UI implementation
@@ -543,6 +553,7 @@ const PremiumScreen = () => {
 ### Backend Expansion
 
 #### New Collections (Firestore)
+
 ```
 users/{uid}/
   - subscription (plan, status, renew_date)
@@ -576,6 +587,7 @@ payments/
 ```
 
 #### New Cloud Functions
+
 - `healthKit:syncData` — Periodic sync from wearables
 - `talks:recordAudio` — Audio file storage
 - `mentorship:scheduleSession` — Calendar + reminder
@@ -627,6 +639,7 @@ premiumSlice: {
 ## Phase 2 Success Metrics
 
 ### User Engagement
+
 - DAU growth: 1K → 5K (400% increase)
 - Average session: 8m → 15m
 - Talks per user/month: 3 → 8
@@ -635,12 +648,14 @@ premiumSlice: {
 - Challenge participation: 0% → 35%
 
 ### Monetization
+
 - Premium conversion rate: 2–5%
 - Average revenue per user (ARPU): $0 → $1–2
 - Subscription churn: <5% monthly
 - Payment processing success: >99%
 
 ### Technical
+
 - Health sync success rate: >95%
 - Audio stream quality: >4.2 stars
 - Chat latency (p95): <500ms
@@ -648,6 +663,7 @@ premiumSlice: {
 - Payment processing: <100ms
 
 ### Retention
+
 - D30 retention: 25% → 40%
 - D60 retention: New metric to track
 
@@ -658,29 +674,34 @@ premiumSlice: {
 ### Core Team (Phase 1) → Extended Team (Phase 2)
 
 #### +1 Backend Engineer
+
 - Manages API scaling
 - Implements Cloud Functions
 - Handles payment processing
 
 #### +1 DevOps/Infrastructure
+
 - Database optimization (PostgreSQL migration)
 - Monitoring & alerting
 - Deployment automation
 - Cost optimization
 
 #### +1 QA/Test Engineer
+
 - E2E testing expansion (50+ flows)
 - Performance testing
 - Device fragmentation testing
 - Regression testing
 
 #### +1 Community Manager
+
 - Moderates live talks
 - Manages challenges
 - Community engagement
 - User feedback collection
 
 #### +1 Growth/Marketing
+
 - Analytics dashboard
 - User acquisition strategy
 - Retention experiments
@@ -693,34 +714,40 @@ premiumSlice: {
 ## Phase 2 Timeline & Milestones
 
 ### Week 1–2: Wearable Integration
+
 - ✅ HealthKit + Google Fit live
 - ✅ Data normalization working
 - ✅ Background sync established
 
 ### Week 3–4: Live Talks Audio
+
 - ✅ Agora SDK integrated
 - ✅ Real-time chat functional
 - ✅ Host controls working
 
 ### Week 5–6: Mentorship
+
 - ✅ Mentor directory live
 - ✅ Booking system functional
 - ✅ Real-time messaging working
 - ✅ Session tracking operational
 
 ### Week 7–8: Community Challenges
+
 - ✅ Challenges launchable
 - ✅ Real-time leaderboards
 - ✅ Badge system unlocking
 - ✅ Challenge participation >30%
 
 ### Week 9–10: Premium & Payments
+
 - ✅ Stripe integration live
 - ✅ Subscription plans active
 - ✅ Paywall UI implemented
 - ✅ Payments processing
 
 ### Week 11–12: Polish & Scale
+
 - ✅ Performance optimization
 - ✅ Scale to 5K DAU
 - ✅ Monitoring setup
@@ -730,27 +757,27 @@ premiumSlice: {
 
 ## Phase 2 Budget
 
-| Category | Cost | Notes |
-|----------|------|-------|
-| **Engineering** | $25K | +2 engineers |
-| **Infrastructure** | $5K | Agora, Stripe, cloud |
-| **Tools & Services** | $3K | Monitoring, CI/CD |
-| **Testing & QA** | $4K | Device lab, tools |
-| **Community Mgmt** | $3K | Moderators |
-| **Total** | **$40–60K** | 3 months |
+| Category             | Cost        | Notes                |
+| -------------------- | ----------- | -------------------- |
+| **Engineering**      | $25K        | +2 engineers         |
+| **Infrastructure**   | $5K         | Agora, Stripe, cloud |
+| **Tools & Services** | $3K         | Monitoring, CI/CD    |
+| **Testing & QA**     | $4K         | Device lab, tools    |
+| **Community Mgmt**   | $3K         | Moderators           |
+| **Total**            | **$40–60K** | 3 months             |
 
 ---
 
 ## Phase 2 Risk Mitigation
 
-| Risk | Mitigation |
-|------|-----------|
-| **Agora latency issues** | Load testing, fallback to audio-only |
-| **Payment failures** | Stripe redundancy, retry logic |
-| **Wearable sync errors** | Graceful degradation, local caching |
-| **Mentor availability mismatch** | Calendar sync, timezone handling |
-| **Leaderboard scaling** | Pre-computed rankings, caching |
-| **Churn from premium** | 7-day free trial, feature parity free tier |
+| Risk                             | Mitigation                                 |
+| -------------------------------- | ------------------------------------------ |
+| **Agora latency issues**         | Load testing, fallback to audio-only       |
+| **Payment failures**             | Stripe redundancy, retry logic             |
+| **Wearable sync errors**         | Graceful degradation, local caching        |
+| **Mentor availability mismatch** | Calendar sync, timezone handling           |
+| **Leaderboard scaling**          | Pre-computed rankings, caching             |
+| **Churn from premium**           | 7-day free trial, feature parity free tier |
 
 ---
 
@@ -764,13 +791,14 @@ premiumSlice: {
 ✅ Health sync working for >60% of users  
 ✅ Mentor booking system producing bookings  
 ✅ 35%+ users participating in challenges  
-✅ Ready for Phase 3 (AI, advanced health)  
+✅ Ready for Phase 3 (AI, advanced health)
 
 ---
 
 ## Transition to Phase 3
 
 ### Success Criteria for Phase 3
+
 - ✅ 25K MAU achieved
 - ✅ Premium revenue stable ($5K+ MRR)
 - ✅ Community features strong (challenges, leaderboards)
@@ -778,6 +806,7 @@ premiumSlice: {
 - ✅ AI infrastructure planned
 
 ### Phase 3 Preview (Q1–Q2 2027)
+
 - AI-powered mentor matching
 - Personalized wellness plans
 - Advanced health insights + predictions
@@ -792,6 +821,7 @@ premiumSlice: {
 By end of Q4 2026, BreakFree Türkiye will be:
 
 **A thriving wellness community** where:
+
 - ✅ 5,000 daily active users
 - ✅ Real-time talks with 100+ listeners
 - ✅ 500+ mentors available
@@ -801,6 +831,7 @@ By end of Q4 2026, BreakFree Türkiye will be:
 - ✅ Ready for international expansion
 
 **With exceptional quality**:
+
 - ✅ 4.7-star App Store rating
 - ✅ <0.5% crash rate
 - ✅ 40%+ D30 retention

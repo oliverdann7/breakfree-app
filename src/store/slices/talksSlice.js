@@ -28,7 +28,7 @@ const MOCK_TALKS = [
   {
     talkId: 'talk3',
     title: 'Koşu ile Meditasyon',
-    description: 'Hareket ve zihin sağlığını birleştiren bu talk\'ta koşuyu meditasyona dönüştürün.',
+    description: "Hareket ve zihin sağlığını birleştiren bu talk'ta koşuyu meditasyona dönüştürün.",
     host: { uid: 'host3', name: 'Selin Arslan', avatar: null },
     category: 'Hareket',
     status: 'ended',
@@ -51,16 +51,13 @@ const MOCK_TALKS = [
   },
 ];
 
-export const fetchTalks = createAsyncThunk(
-  'talks/fetchAll',
-  async (_, { rejectWithValue }) => {
-    try {
-      return MOCK_TALKS;
-    } catch (error) {
-      return rejectWithValue(error.message);
-    }
+export const fetchTalks = createAsyncThunk('talks/fetchAll', async (_, { rejectWithValue }) => {
+  try {
+    return MOCK_TALKS;
+  } catch (error) {
+    return rejectWithValue(error.message);
   }
-);
+});
 
 export const fetchTalkById = createAsyncThunk(
   'talks/fetchById',

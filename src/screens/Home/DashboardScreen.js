@@ -1,12 +1,5 @@
 import React, { useEffect } from 'react';
-import {
-  View,
-  Text,
-  ScrollView,
-  TouchableOpacity,
-  StyleSheet,
-  SafeAreaView,
-} from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, SafeAreaView } from 'react-native';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { fetchMetrics } from '../../store/slices/metricsSlice';
 import WellnessRing from '../../components/features/WellnessRing';
@@ -23,7 +16,7 @@ function greeting() {
 
 const TODAY_PLAN = [
   { time: '07:00', title: 'Sabah Yürüyüşü', done: true },
-  { time: '12:00', title: 'Beslenme Talk\'ı — Prof. Mert', done: false },
+  { time: '12:00', title: "Beslenme Talk'ı — Prof. Mert", done: false },
   { time: '19:00', title: 'Akşam Meditasyonu', done: false },
 ];
 
@@ -91,8 +84,7 @@ export default function DashboardScreen() {
               <Text style={styles.wellnessSideTitle}>Bu Hafta</Text>
               <View style={styles.wellnessStat}>
                 <Text style={styles.wellnessStatValue} numberOfLines={1}>
-                  +5{' '}
-                  <Text style={[styles.wellnessStatSub, { color: colors.success }]}>↑</Text>
+                  +5 <Text style={[styles.wellnessStatSub, { color: colors.success }]}>↑</Text>
                 </Text>
                 <Text style={styles.wellnessStatLabel}>dünden fazla</Text>
               </View>
@@ -179,7 +171,12 @@ const styles = StyleSheet.create({
   wellnessCard: { marginHorizontal: 20, marginBottom: 8 },
   wellnessRow: { flexDirection: 'row', alignItems: 'center', gap: 20 },
   wellnessSide: { flex: 1, gap: 12 },
-  wellnessSideTitle: { fontSize: 12, color: colors.textTertiary, fontWeight: '600', letterSpacing: 0.5 },
+  wellnessSideTitle: {
+    fontSize: 12,
+    color: colors.textTertiary,
+    fontWeight: '600',
+    letterSpacing: 0.5,
+  },
   wellnessStat: { gap: 2 },
   wellnessStatValue: { fontSize: 22, fontWeight: '800', color: colors.textPrimary },
   wellnessStatSub: { fontSize: 16 },

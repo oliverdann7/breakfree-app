@@ -1,303 +1,663 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="tr">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BreakFree App — Preview 2026</title>
-  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-  <script src="https://unpkg.com/framer-motion@10/dist/framer-motion.js"></script>
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body { height: 100%; }
-    body { 
-      font-family: 'Manrope', system-ui, -apple-system, sans-serif;
-      background: #061829;
-      color: #fff;
-      overflow-x: hidden;
-    }
-    @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500&family=Manrope:wght@300;400;600;700&display=swap');
-    ::selection { background: #E6B530; color: #0A2540; }
-    .scrollbar-hide { scrollbar-width: none; }
-    .scrollbar-hide::-webkit-scrollbar { display: none; }
-  </style>
-</head>
-<body>
-  <div id="root"></div>
-  <script type="text/babel">
-    const { useState, useEffect, useRef } = React;
-    const { motion, AnimatePresence } = window;
-    
-    const C = {
-      navy: '#0A2540',
-      deep: '#061829',
-      royal: '#0B72B9',
-      cyan: '#14B8D4',
-      cream: '#F4E8C8',
-      gold: '#E6B530',
-      amber: '#C99419',
-    };
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BreakFree App — Preview 2026</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"
+    ></script>
+    <script src="https://unpkg.com/framer-motion@10/dist/framer-motion.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html,
+      body {
+        height: 100%;
+      }
+      body {
+        font-family:
+          'Manrope',
+          system-ui,
+          -apple-system,
+          sans-serif;
+        background: #061829;
+        color: #fff;
+        overflow-x: hidden;
+      }
+      @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500&family=Manrope:wght@300;400;600;700&display=swap');
+      ::selection {
+        background: #e6b530;
+        color: #0a2540;
+      }
+      .scrollbar-hide {
+        scrollbar-width: none;
+      }
+      .scrollbar-hide::-webkit-scrollbar {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect, useRef } = React;
+      const { motion, AnimatePresence } = window;
 
-    const Icon = ({ d, size = 14, stroke = 'currentColor', fill = 'none', sw = 1.6 }) => (
-      <svg width={size} height={size} viewBox="0 0 24 24" fill={fill} stroke={stroke} strokeWidth={sw} strokeLinecap="round" strokeLinejoin="round">
-        <path d={d} />
-      </svg>
-    );
+      const C = {
+        navy: '#0A2540',
+        deep: '#061829',
+        royal: '#0B72B9',
+        cyan: '#14B8D4',
+        cream: '#F4E8C8',
+        gold: '#E6B530',
+        amber: '#C99419',
+      };
 
-    const Ico = {
-      home: "M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z",
-      mic: "M12 1a3 3 0 013 3v8a3 3 0 01-6 0V4a3 3 0 013-3zm-7 9a7 7 0 0114 0M12 19v4M8 23h8",
-      activity: "M22 12h-4l-3 9L9 3l-3 9H2",
-      users: "M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75",
-      user: "M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2M12 11a4 4 0 100-8 4 4 0 000 8z",
-      heart: "M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z",
-      flame: "M8.5 14.5A2.5 2.5 0 0111 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 11-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 002.5 3z",
-      moon: "M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z",
-      zap: "M13 2L3 14h9l-1 8 10-12h-9l1-8z",
-      star: "M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z",
-      play: "M5 3l14 9-14 9V3z",
-      search: "M11 17a6 6 0 100-12 6 6 0 000 12zM21 21l-4.35-4.35",
-      plus: "M12 5v14M5 12h14",
-      check: "M9 11l3 3L22 4M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11",
-      arrow: "M5 12h14M12 5l7 7-7 7",
-      bell: "M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0",
-      target: "M12 22a10 10 0 100-20 10 10 0 000 20zM12 18a6 6 0 100-12 6 6 0 000 12zM12 14a2 2 0 100-4 2 2 0 000 4z",
-      chart: "M18 20V10M12 20V4M6 20v-6",
-      sparkles: "M12 3l1.5 4.5L18 9l-4.5 1.5L12 15l-1.5-4.5L6 9l4.5-1.5L12 3zM4 17l.8 2.4L7 20l-2.2.8L4 23l-.8-2.2L1 20l2.2-.8L4 17zM20 3l.8 2.4L23 6l-2.2.8L20 9l-.8-2.2L17 6l2.2-.8L20 3z",
-      calendar: "M3 4h18v18H3zM16 2v4M8 2v4M3 10h18",
-      brain: "M9.5 2A2.5 2.5 0 007 4.5v.5H5a2 2 0 00-2 2v12a2 2 0 002 2h14a2 2 0 002-2V7a2 2 0 00-2-2h-2v-.5A2.5 2.5 0 0014.5 2h-5z",
-      clock: "M12 22a10 10 0 100-20 10 10 0 000 20zM12 6v6l4 2",
-      video: "M23 7l-7 5 7 5V7zM1 5h15v14H1z",
-      message: "M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z",
-      award: "M12 15a7 7 0 100-14 7 7 0 000 14zM8.21 13.89L7 23l5-3 5 3-1.21-9.12",
-      trending: "M23 6l-9.5 9.5-5-5L1 18",
-      foot: "M3 12l9-9 9 9M4 10v10a1 1 0 001 1h5M20 10v10a1 1 0 01-1 1h-5M9 21v-6a1 1 0 011-1h4a1 1 0 011 1v6",
-    };
-
-    const Ring = ({ score = 76, r = 34, size = 84, color = C.gold }) => {
-      const circ = 2 * Math.PI * r;
-      const dash = circ * (score / 100);
-      return (
-        <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ transform: 'rotate(-90deg)' }}>
-          <circle cx={size/2} cy={size/2} r={r} fill="none" stroke="rgba(255,255,255,0.07)" strokeWidth={6}/>
-          <circle cx={size/2} cy={size/2} r={r} fill="none" stroke={color} strokeWidth={6} strokeLinecap="round"
-            strokeDasharray={circ} strokeDashoffset={circ - dash} style={{
-              transition: 'stroke-dashoffset 1.5s cubic-bezier(0.22, 1, 0.36, 1)',
-              transitionDelay: '0.4s'
-            }}
-          />
+      const Icon = ({ d, size = 14, stroke = 'currentColor', fill = 'none', sw = 1.6 }) => (
+        <svg
+          width={size}
+          height={size}
+          viewBox="0 0 24 24"
+          fill={fill}
+          stroke={stroke}
+          strokeWidth={sw}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d={d} />
         </svg>
       );
-    };
 
-    const TabBar = ({ active = 0 }) => {
-      const tabs = [
-        { ico: Ico.home, l: "Ana" },
-        { ico: Ico.mic, l: "Talks" },
-        { ico: Ico.activity, l: "Sağlık" },
-        { ico: Ico.users, l: "Topluluk" },
-        { ico: Ico.user, l: "Profil" },
-      ];
-      return (
-        <div style={{
-          position: "absolute", bottom: 0, left: 0, right: 0,
-          borderTop: "1px solid rgba(255,255,255,0.08)",
-          background: "rgba(6,24,41,0.95)", backdropFilter: "blur(20px)",
-          display: "flex", justifyContent: "space-around", padding: "6px 0 8px",
-        }}>
-          {tabs.map((t, i) => (
-            <div key={i} style={{
-              display: "flex", flexDirection: "column", alignItems: "center", gap: 2,
-              color: i === active ? C.gold : "rgba(255,255,255,0.35)", cursor: "pointer"
-            }}>
-              <Icon d={t.ico} size={14} sw={i === active ? 2.2 : 1.5}/>
-              <span style={{ fontSize: 7, fontWeight: i === active ? 700 : 500 }}>{t.l}</span>
-            </div>
-          ))}
-        </div>
-      );
-    };
+      const Ico = {
+        home: 'M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z',
+        mic: 'M12 1a3 3 0 013 3v8a3 3 0 01-6 0V4a3 3 0 013-3zm-7 9a7 7 0 0114 0M12 19v4M8 23h8',
+        activity: 'M22 12h-4l-3 9L9 3l-3 9H2',
+        users:
+          'M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75',
+        user: 'M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2M12 11a4 4 0 100-8 4 4 0 000 8z',
+        heart:
+          'M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z',
+        flame:
+          'M8.5 14.5A2.5 2.5 0 0111 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 11-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 002.5 3z',
+        moon: 'M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z',
+        zap: 'M13 2L3 14h9l-1 8 10-12h-9l1-8z',
+        star: 'M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z',
+        play: 'M5 3l14 9-14 9V3z',
+        search: 'M11 17a6 6 0 100-12 6 6 0 000 12zM21 21l-4.35-4.35',
+        plus: 'M12 5v14M5 12h14',
+        check: 'M9 11l3 3L22 4M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11',
+        arrow: 'M5 12h14M12 5l7 7-7 7',
+        bell: 'M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0',
+        target:
+          'M12 22a10 10 0 100-20 10 10 0 000 20zM12 18a6 6 0 100-12 6 6 0 000 12zM12 14a2 2 0 100-4 2 2 0 000 4z',
+        chart: 'M18 20V10M12 20V4M6 20v-6',
+        sparkles:
+          'M12 3l1.5 4.5L18 9l-4.5 1.5L12 15l-1.5-4.5L6 9l4.5-1.5L12 3zM4 17l.8 2.4L7 20l-2.2.8L4 23l-.8-2.2L1 20l2.2-.8L4 17zM20 3l.8 2.4L23 6l-2.2.8L20 9l-.8-2.2L17 6l2.2-.8L20 3z',
+        calendar: 'M3 4h18v18H3zM16 2v4M8 2v4M3 10h18',
+        brain:
+          'M9.5 2A2.5 2.5 0 007 4.5v.5H5a2 2 0 00-2 2v12a2 2 0 002 2h14a2 2 0 002-2V7a2 2 0 00-2-2h-2v-.5A2.5 2.5 0 0014.5 2h-5z',
+        clock: 'M12 22a10 10 0 100-20 10 10 0 000 20zM12 6v6l4 2',
+        video: 'M23 7l-7 5 7 5V7zM1 5h15v14H1z',
+        message: 'M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z',
+        award: 'M12 15a7 7 0 100-14 7 7 0 000 14zM8.21 13.89L7 23l5-3 5 3-1.21-9.12',
+        trending: 'M23 6l-9.5 9.5-5-5L1 18',
+        foot: 'M3 12l9-9 9 9M4 10v10a1 1 0 001 1h5M20 10v10a1 1 0 01-1 1h-5M9 21v-6a1 1 0 011-1h4a1 1 0 011 1v6',
+      };
 
-    const Phone = ({ children, label, sub, accent = false }) => (
-      <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-        <div style={{ marginBottom: 20, textAlign: "center" }}>
-          <span style={{
-            display: "inline-block",
-            background: accent ? C.gold : "transparent",
-            border: accent ? "none" : "1px solid rgba(255,255,255,0.12)",
-            color: accent ? C.navy : "rgba(255,255,255,0.5)",
-            borderRadius: 999, padding: "3px 12px", fontSize: 9,
-            textTransform: "uppercase", letterSpacing: "0.22em", fontWeight: 600,
-          }}>{label}</span>
-          <div style={{
-            marginTop: 10, fontSize: 16, color: "rgba(255,255,255,0.85)",
-            fontFamily: "'Fraunces',Georgia,serif", fontWeight: 300
-          }}>{sub}</div>
-        </div>
+      const Ring = ({ score = 76, r = 34, size = 84, color = C.gold }) => {
+        const circ = 2 * Math.PI * r;
+        const dash = circ * (score / 100);
+        return (
+          <svg
+            width={size}
+            height={size}
+            viewBox={`0 0 ${size} ${size}`}
+            style={{ transform: 'rotate(-90deg)' }}
+          >
+            <circle
+              cx={size / 2}
+              cy={size / 2}
+              r={r}
+              fill="none"
+              stroke="rgba(255,255,255,0.07)"
+              strokeWidth={6}
+            />
+            <circle
+              cx={size / 2}
+              cy={size / 2}
+              r={r}
+              fill="none"
+              stroke={color}
+              strokeWidth={6}
+              strokeLinecap="round"
+              strokeDasharray={circ}
+              strokeDashoffset={circ - dash}
+              style={{
+                transition: 'stroke-dashoffset 1.5s cubic-bezier(0.22, 1, 0.36, 1)',
+                transitionDelay: '0.4s',
+              }}
+            />
+          </svg>
+        );
+      };
 
-        <div style={{ position: "relative" }}>
-          <div style={{
-            position: "absolute", inset: -24, borderRadius: 56,
-            background: accent ? C.gold : C.cyan, opacity: 0.18, filter: "blur(40px)", pointerEvents: "none"
-          }} />
-          <div style={{
-            width: 260, height: 560, borderRadius: 44,
-            border: "2.5px solid rgba(255,255,255,0.1)",
-            background: "linear-gradient(160deg,#1c1c1c,#000)",
-            padding: 7, boxShadow: "0 40px 80px rgba(0,0,0,0.6)",
-            position: "relative",
-          }}>
-            <div style={{
-              width: "100%", height: "100%", borderRadius: 37,
-              background: C.navy, overflow: "hidden", position: "relative"
-            }}>
-              <div style={{
-                position: "absolute", top: 6, left: "50%", transform: "translateX(-50%)",
-                width: 80, height: 20, borderRadius: 999, background: "#000", zIndex: 30
-              }}/>
-              <div style={{
-                position: "absolute", top: 0, left: 0, right: 0, zIndex: 20,
-                display: "flex", justifyContent: "space-between", alignItems: "center",
-                padding: "6px 16px 0", fontSize: 9, fontWeight: 700, color: "#fff"
-              }}>
-                <span>9:41</span>
-                <span style={{ opacity: 0 }}>.</span>
-                <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-                  <div style={{ display: "flex", gap: 2, alignItems: "flex-end" }}>
-                    {[6,8,10,10].map((h,i)=><div key={i} style={{width:2,height:h,background:"#fff",borderRadius:1}}/>)}
-                  </div>
-                  <div style={{width:14,height:8,borderRadius:2,border:"1px solid #fff",padding:1,display:"flex",alignItems:"center"}}>
-                    <div style={{width:8,height:4,background:"#fff",borderRadius:1}}/>
-                  </div>
-                </div>
+      const TabBar = ({ active = 0 }) => {
+        const tabs = [
+          { ico: Ico.home, l: 'Ana' },
+          { ico: Ico.mic, l: 'Talks' },
+          { ico: Ico.activity, l: 'Sağlık' },
+          { ico: Ico.users, l: 'Topluluk' },
+          { ico: Ico.user, l: 'Profil' },
+        ];
+        return (
+          <div
+            style={{
+              position: 'absolute',
+              bottom: 0,
+              left: 0,
+              right: 0,
+              borderTop: '1px solid rgba(255,255,255,0.08)',
+              background: 'rgba(6,24,41,0.95)',
+              backdropFilter: 'blur(20px)',
+              display: 'flex',
+              justifyContent: 'space-around',
+              padding: '6px 0 8px',
+            }}
+          >
+            {tabs.map((t, i) => (
+              <div
+                key={i}
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: 2,
+                  color: i === active ? C.gold : 'rgba(255,255,255,0.35)',
+                  cursor: 'pointer',
+                }}
+              >
+                <Icon d={t.ico} size={14} sw={i === active ? 2.2 : 1.5} />
+                <span style={{ fontSize: 7, fontWeight: i === active ? 700 : 500 }}>{t.l}</span>
               </div>
-              <div style={{ height: "100%", width: "100%", paddingTop: 28, overflow: "hidden" }}>
-                {children}
-              </div>
-            </div>
+            ))}
           </div>
-        </div>
-      </div>
-    );
+        );
+      };
 
-    // SCREEN COMPONENTS (S1-S8) - Same as before
-    const S1 = () => (
-      <div style={{ height: "100%", position: "relative", background: `linear-gradient(135deg, ${C.navy}, ${C.royal}50, ${C.navy})` }}>
-        <div style={{ position: "relative", display: "flex", flexDirection: "column", alignItems: "center", height: "100%", padding: "16px 20px 16px" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <svg viewBox="0 0 178.9 263.7" style={{ width: 24, height: 24 * 263.7 / 178.9 }}>
-              <g>
-                <path d="M136.7,112.6c-23.8-35.8-85.4,9.4-61.6-82.3C65,50.5,58.4,72.5,56.1,95.8c3.5,13.7,10.8,27,19.3,37.7c1.4,1.8,2.9,3.6,4.6,5.4c8.5,9.3,18,16.3,26.6,20.1c2.4,1,4.7,1.8,6.8,2.2c-12.1-10.7-33.8-39.8-20.2-52.7C101.6,100.5,120,101.5,136.7,112.6L136.7,112.6z M62.8,166.6c6.1,20.7,15.7,40.1,28.3,57.5c-5.4-13.7-9.2-28.1-11.2-43c-4.2-3.2-8.5-6.6-12.7-10.3C65.7,169.4,64.2,168,62.8,166.6L62.8,166.6z" fill="#0072B0" fillRule="evenodd" clipRule="evenodd"/>
-                <path d="M89.2,53.6c6.6,0,12,5.4,12,12c0,6.7-5.4,12.1-12,12.1c-6.7,0-12.1-5.4-12.1-12.1C77.1,59,82.5,53.6,89.2,53.6L89.2,53.6z" fill="#0072B0" fillRule="evenodd" clipRule="evenodd"/>
-              </g>
-              <g>
-                <path d="M110.1,108.9c1.3,1.2,2.4,2.5,3.7,3.8c21,23.1,28.2,49.6,16.1,59.2C95.9,198.7,1.8,86.6,65.8,43.1c-33.7,26.7-14.9,74.5,9,100.8c17.8,19.7,40.1,29.3,49.8,21.7c9.7-7.7,3.2-29.8-14.7-49.4c-2.5-2.7-5.1-5.2-7.7-7.6c2.2-0.3,4.4-0.3,6.9,0.1C109.5,108.8,109.8,108.8,110.1,108.9L110.1,108.9z" fill="#C9961A" fillRule="evenodd" clipRule="evenodd"/>
-                <path d="M39.8,81.6c-1.3,0.8-2.6,1.7-3.7,2.8c-15.6,15-1.4,51.3,31.7,81c46.8,42.1,98,45.1,87.3,5.1c1,6.7-1.5,12.7-5.2,16.3c-12,11.9-45.6-0.6-75.1-27.7c-27.4-25.3-41.6-54.5-33.9-67.9C40.3,88,40,84.8,39.8,81.6L39.8,81.6z" fill="#C9961A" fillRule="evenodd" clipRule="evenodd"/>
-              </g>
-              <path d="M144.1,232.2c-22.7-9.1-92-5.5-113.7,6C63.5,216.7,109.1,214.3,144.1,232.2L144.1,232.2z" fill="#C9961A"/>
-            </svg>
-            <span style={{ fontFamily: "'Fraunces',Georgia,serif", fontSize: 16, color: "#fff", fontWeight: 400 }}>
-              BreakFree<span style={{color:C.gold}}>.</span>
+      const Phone = ({ children, label, sub, accent = false }) => (
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <div style={{ marginBottom: 20, textAlign: 'center' }}>
+            <span
+              style={{
+                display: 'inline-block',
+                background: accent ? C.gold : 'transparent',
+                border: accent ? 'none' : '1px solid rgba(255,255,255,0.12)',
+                color: accent ? C.navy : 'rgba(255,255,255,0.5)',
+                borderRadius: 999,
+                padding: '3px 12px',
+                fontSize: 9,
+                textTransform: 'uppercase',
+                letterSpacing: '0.22em',
+                fontWeight: 600,
+              }}
+            >
+              {label}
             </span>
-          </div>
-
-          <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <Ring score={76} r={29} size={70}/>
-          </div>
-
-          <div style={{ textAlign: "center", marginBottom: 16 }}>
-            <h2 style={{ fontFamily: "'Fraunces',Georgia,serif", fontSize: 26, fontWeight: 300, color: "#fff", lineHeight: 1.1, margin: 0 }}>
-              Özgürlüğüne<br/><em style={{color:C.gold}}>hoş geldin.</em>
-            </h2>
-            <p style={{ fontSize: 10, color: "rgba(255,255,255,0.55)", marginTop: 8, lineHeight: 1.6 }}>
-              Türkiye'nin wellness topluluğu cebinde.
-            </p>
-          </div>
-
-          <div style={{ width: "100%", display: "flex", flexDirection: "column", gap: 8 }}>
-            <button style={{ width: "100%", background: C.gold, color: C.navy, border: "none", borderRadius: 999, padding: "11px 0", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
-              Başla →
-            </button>
-            <button style={{ width: "100%", background: "transparent", color: "rgba(255,255,255,0.7)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: 999, padding: "11px 0", fontSize: 12, cursor: "pointer" }}>
-              Hesabım var
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-
-    const S2 = () => {
-      const metrics = [
-        { ico: Ico.moon, l: "Uyku", v: "7s 24dk", c: C.cyan },
-        { ico: Ico.heart, l: "Nabız", v: "64 bpm", c: C.gold },
-        { ico: Ico.foot, l: "Adım", v: "8.2k", c: C.cyan },
-        { ico: Ico.flame, l: "Kalori", v: "1,847", c: C.gold },
-      ];
-      return (
-        <div style={{ height: "100%", background: C.deep, position: "relative", overflow: "hidden" }}>
-          <div style={{ height: "100%", overflowY: "auto", padding: "8px 14px 60px", scrollbarWidth: "none" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 12 }}>
-              <div>
-                <div style={{ fontSize: 8, textTransform: "uppercase", letterSpacing: "0.2em", color: "rgba(255,255,255,0.35)" }}>Pazar, 15 Haziran</div>
-                <div style={{ fontFamily: "'Fraunces',Georgia,serif", fontSize: 18, fontWeight: 300, color: "#fff", marginTop: 2 }}>
-                  Günaydın, <em style={{color:C.gold}}>Elif</em>
-                </div>
-              </div>
-              <div style={{ width: 32, height: 32, borderRadius: "50%", border: "1px solid rgba(255,255,255,0.1)", display: "flex", alignItems: "center", justifyContent: "center", position: "relative" }}>
-                <Icon d={Ico.bell} size={13} stroke="rgba(255,255,255,0.6)"/>
-                <div style={{ position: "absolute", top: 0, right: 0, width: 7, height: 7, borderRadius: "50%", background: C.gold, border: `2px solid ${C.deep}` }}/>
-              </div>
-            </div>
-
-            <div style={{ borderRadius: 20, border: `1px solid rgba(230,181,48,0.2)`, background: "linear-gradient(135deg,rgba(230,181,48,0.08),transparent,rgba(20,184,212,0.05))", padding: 14, marginBottom: 10, display: "flex", alignItems: "center", gap: 12 }}>
-              <Ring score={76} r={29} size={70}/>
-              <div>
-                <div style={{ fontSize: 9, color: "rgba(255,255,255,0.4)" }}>Wellness skorun</div>
-                <div style={{ fontFamily: "'Fraunces',Georgia,serif", fontSize: 15, color: "#fff", marginTop: 2 }}>
-                  Bugün <em style={{color:C.gold}}>hazırsın.</em>
-                </div>
-              </div>
-            </div>
-
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6, marginBottom: 10 }}>
-              {metrics.map((m, i) => (
-                <div key={i} style={{ borderRadius: 14, border: "1px solid rgba(255,255,255,0.08)", background: "rgba(255,255,255,0.02)", padding: 10 }}>
-                  <Icon d={m.ico} size={12} stroke={m.c}/>
-                  <div style={{ fontFamily: "'Fraunces',Georgia,serif", fontSize: 17, color: "#fff", marginTop: 6 }}>{m.v}</div>
-                  <div style={{ fontSize: 8, color: "rgba(255,255,255,0.35)", marginTop: 4 }}>{m.l}</div>
-                </div>
-              ))}
+            <div
+              style={{
+                marginTop: 10,
+                fontSize: 16,
+                color: 'rgba(255,255,255,0.85)',
+                fontFamily: "'Fraunces',Georgia,serif",
+                fontWeight: 300,
+              }}
+            >
+              {sub}
             </div>
           </div>
-          <TabBar active={0}/>
+
+          <div style={{ position: 'relative' }}>
+            <div
+              style={{
+                position: 'absolute',
+                inset: -24,
+                borderRadius: 56,
+                background: accent ? C.gold : C.cyan,
+                opacity: 0.18,
+                filter: 'blur(40px)',
+                pointerEvents: 'none',
+              }}
+            />
+            <div
+              style={{
+                width: 260,
+                height: 560,
+                borderRadius: 44,
+                border: '2.5px solid rgba(255,255,255,0.1)',
+                background: 'linear-gradient(160deg,#1c1c1c,#000)',
+                padding: 7,
+                boxShadow: '0 40px 80px rgba(0,0,0,0.6)',
+                position: 'relative',
+              }}
+            >
+              <div
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  borderRadius: 37,
+                  background: C.navy,
+                  overflow: 'hidden',
+                  position: 'relative',
+                }}
+              >
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: 6,
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                    width: 80,
+                    height: 20,
+                    borderRadius: 999,
+                    background: '#000',
+                    zIndex: 30,
+                  }}
+                />
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    zIndex: 20,
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    padding: '6px 16px 0',
+                    fontSize: 9,
+                    fontWeight: 700,
+                    color: '#fff',
+                  }}
+                >
+                  <span>9:41</span>
+                  <span style={{ opacity: 0 }}>.</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                    <div style={{ display: 'flex', gap: 2, alignItems: 'flex-end' }}>
+                      {[6, 8, 10, 10].map((h, i) => (
+                        <div
+                          key={i}
+                          style={{ width: 2, height: h, background: '#fff', borderRadius: 1 }}
+                        />
+                      ))}
+                    </div>
+                    <div
+                      style={{
+                        width: 14,
+                        height: 8,
+                        borderRadius: 2,
+                        border: '1px solid #fff',
+                        padding: 1,
+                        display: 'flex',
+                        alignItems: 'center',
+                      }}
+                    >
+                      <div style={{ width: 8, height: 4, background: '#fff', borderRadius: 1 }} />
+                    </div>
+                  </div>
+                </div>
+                <div style={{ height: '100%', width: '100%', paddingTop: 28, overflow: 'hidden' }}>
+                  {children}
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       );
-    };
 
-    // S3-S8 would go here (same structure as before - simplified for space)
-    const S3 = () => <div style={{ height: "100%", background: C.navy, padding: "20px", color: "#fff" }}>Screen 3</div>;
-    const S4 = () => <div style={{ height: "100%", background: C.navy, padding: "20px", color: "#fff" }}>Screen 4</div>;
-    const S5 = () => <div style={{ height: "100%", background: C.navy, padding: "20px", color: "#fff" }}>Screen 5</div>;
-    const S6 = () => <div style={{ height: "100%", background: C.navy, padding: "20px", color: "#fff" }}>Screen 6</div>;
-    const S7 = () => <div style={{ height: "100%", background: C.navy, padding: "20px", color: "#fff" }}>Screen 7</div>;
-    const S8 = () => <div style={{ height: "100%", background: C.navy, padding: "20px", color: "#fff" }}>Screen 8</div>;
+      // SCREEN COMPONENTS (S1-S8) - Same as before
+      const S1 = () => (
+        <div
+          style={{
+            height: '100%',
+            position: 'relative',
+            background: `linear-gradient(135deg, ${C.navy}, ${C.royal}50, ${C.navy})`,
+          }}
+        >
+          <div
+            style={{
+              position: 'relative',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              height: '100%',
+              padding: '16px 20px 16px',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <svg viewBox="0 0 178.9 263.7" style={{ width: 24, height: (24 * 263.7) / 178.9 }}>
+                <g>
+                  <path
+                    d="M136.7,112.6c-23.8-35.8-85.4,9.4-61.6-82.3C65,50.5,58.4,72.5,56.1,95.8c3.5,13.7,10.8,27,19.3,37.7c1.4,1.8,2.9,3.6,4.6,5.4c8.5,9.3,18,16.3,26.6,20.1c2.4,1,4.7,1.8,6.8,2.2c-12.1-10.7-33.8-39.8-20.2-52.7C101.6,100.5,120,101.5,136.7,112.6L136.7,112.6z M62.8,166.6c6.1,20.7,15.7,40.1,28.3,57.5c-5.4-13.7-9.2-28.1-11.2-43c-4.2-3.2-8.5-6.6-12.7-10.3C65.7,169.4,64.2,168,62.8,166.6L62.8,166.6z"
+                    fill="#0072B0"
+                    fillRule="evenodd"
+                    clipRule="evenodd"
+                  />
+                  <path
+                    d="M89.2,53.6c6.6,0,12,5.4,12,12c0,6.7-5.4,12.1-12,12.1c-6.7,0-12.1-5.4-12.1-12.1C77.1,59,82.5,53.6,89.2,53.6L89.2,53.6z"
+                    fill="#0072B0"
+                    fillRule="evenodd"
+                    clipRule="evenodd"
+                  />
+                </g>
+                <g>
+                  <path
+                    d="M110.1,108.9c1.3,1.2,2.4,2.5,3.7,3.8c21,23.1,28.2,49.6,16.1,59.2C95.9,198.7,1.8,86.6,65.8,43.1c-33.7,26.7-14.9,74.5,9,100.8c17.8,19.7,40.1,29.3,49.8,21.7c9.7-7.7,3.2-29.8-14.7-49.4c-2.5-2.7-5.1-5.2-7.7-7.6c2.2-0.3,4.4-0.3,6.9,0.1C109.5,108.8,109.8,108.8,110.1,108.9L110.1,108.9z"
+                    fill="#C9961A"
+                    fillRule="evenodd"
+                    clipRule="evenodd"
+                  />
+                  <path
+                    d="M39.8,81.6c-1.3,0.8-2.6,1.7-3.7,2.8c-15.6,15-1.4,51.3,31.7,81c46.8,42.1,98,45.1,87.3,5.1c1,6.7-1.5,12.7-5.2,16.3c-12,11.9-45.6-0.6-75.1-27.7c-27.4-25.3-41.6-54.5-33.9-67.9C40.3,88,40,84.8,39.8,81.6L39.8,81.6z"
+                    fill="#C9961A"
+                    fillRule="evenodd"
+                    clipRule="evenodd"
+                  />
+                </g>
+                <path
+                  d="M144.1,232.2c-22.7-9.1-92-5.5-113.7,6C63.5,216.7,109.1,214.3,144.1,232.2L144.1,232.2z"
+                  fill="#C9961A"
+                />
+              </svg>
+              <span
+                style={{
+                  fontFamily: "'Fraunces',Georgia,serif",
+                  fontSize: 16,
+                  color: '#fff',
+                  fontWeight: 400,
+                }}
+              >
+                BreakFree<span style={{ color: C.gold }}>.</span>
+              </span>
+            </div>
 
-    const screens = [
-      { comp: S1, label: "01 · Karşılama", sub: "Onboarding" },
-      { comp: S2, label: "02 · Ana sayfa", sub: "Dashboard", accent: true },
-      { comp: S3, label: "03 · İçerik", sub: "Palestralar & Sesler" },
-      { comp: S4, label: "04 · Veriler", sub: "Sağlık Metrikleri", accent: true },
-      { comp: S5, label: "05 · Mentor", sub: "1-1 Mentörlük" },
-      { comp: S6, label: "06 · Sosyal", sub: "Topluluk & Etkinlik" },
-      { comp: S7, label: "07 · Antrenman", sub: "Workout Detail", accent: true },
-      { comp: S8, label: "08 · Ayarlar", sub: "Profil & Tercihler" },
-    ];
+            <div
+              style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+            >
+              <Ring score={76} r={29} size={70} />
+            </div>
 
-    function App() {
-      return (
-        <div style={{ minHeight: "100vh", background: C.deep, color: "#fff", fontFamily: "'Manrope',system-ui,sans-serif", overflowX: "hidden" }}>
-          <style>{`
+            <div style={{ textAlign: 'center', marginBottom: 16 }}>
+              <h2
+                style={{
+                  fontFamily: "'Fraunces',Georgia,serif",
+                  fontSize: 26,
+                  fontWeight: 300,
+                  color: '#fff',
+                  lineHeight: 1.1,
+                  margin: 0,
+                }}
+              >
+                Özgürlüğüne
+                <br />
+                <em style={{ color: C.gold }}>hoş geldin.</em>
+              </h2>
+              <p
+                style={{
+                  fontSize: 10,
+                  color: 'rgba(255,255,255,0.55)',
+                  marginTop: 8,
+                  lineHeight: 1.6,
+                }}
+              >
+                Türkiye'nin wellness topluluğu cebinde.
+              </p>
+            </div>
+
+            <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 8 }}>
+              <button
+                style={{
+                  width: '100%',
+                  background: C.gold,
+                  color: C.navy,
+                  border: 'none',
+                  borderRadius: 999,
+                  padding: '11px 0',
+                  fontSize: 12,
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                }}
+              >
+                Başla →
+              </button>
+              <button
+                style={{
+                  width: '100%',
+                  background: 'transparent',
+                  color: 'rgba(255,255,255,0.7)',
+                  border: '1px solid rgba(255,255,255,0.15)',
+                  borderRadius: 999,
+                  padding: '11px 0',
+                  fontSize: 12,
+                  cursor: 'pointer',
+                }}
+              >
+                Hesabım var
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+
+      const S2 = () => {
+        const metrics = [
+          { ico: Ico.moon, l: 'Uyku', v: '7s 24dk', c: C.cyan },
+          { ico: Ico.heart, l: 'Nabız', v: '64 bpm', c: C.gold },
+          { ico: Ico.foot, l: 'Adım', v: '8.2k', c: C.cyan },
+          { ico: Ico.flame, l: 'Kalori', v: '1,847', c: C.gold },
+        ];
+        return (
+          <div
+            style={{ height: '100%', background: C.deep, position: 'relative', overflow: 'hidden' }}
+          >
+            <div
+              style={{
+                height: '100%',
+                overflowY: 'auto',
+                padding: '8px 14px 60px',
+                scrollbarWidth: 'none',
+              }}
+            >
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'flex-start',
+                  marginBottom: 12,
+                }}
+              >
+                <div>
+                  <div
+                    style={{
+                      fontSize: 8,
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.2em',
+                      color: 'rgba(255,255,255,0.35)',
+                    }}
+                  >
+                    Pazar, 15 Haziran
+                  </div>
+                  <div
+                    style={{
+                      fontFamily: "'Fraunces',Georgia,serif",
+                      fontSize: 18,
+                      fontWeight: 300,
+                      color: '#fff',
+                      marginTop: 2,
+                    }}
+                  >
+                    Günaydın, <em style={{ color: C.gold }}>Elif</em>
+                  </div>
+                </div>
+                <div
+                  style={{
+                    width: 32,
+                    height: 32,
+                    borderRadius: '50%',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    position: 'relative',
+                  }}
+                >
+                  <Icon d={Ico.bell} size={13} stroke="rgba(255,255,255,0.6)" />
+                  <div
+                    style={{
+                      position: 'absolute',
+                      top: 0,
+                      right: 0,
+                      width: 7,
+                      height: 7,
+                      borderRadius: '50%',
+                      background: C.gold,
+                      border: `2px solid ${C.deep}`,
+                    }}
+                  />
+                </div>
+              </div>
+
+              <div
+                style={{
+                  borderRadius: 20,
+                  border: `1px solid rgba(230,181,48,0.2)`,
+                  background:
+                    'linear-gradient(135deg,rgba(230,181,48,0.08),transparent,rgba(20,184,212,0.05))',
+                  padding: 14,
+                  marginBottom: 10,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 12,
+                }}
+              >
+                <Ring score={76} r={29} size={70} />
+                <div>
+                  <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.4)' }}>Wellness skorun</div>
+                  <div
+                    style={{
+                      fontFamily: "'Fraunces',Georgia,serif",
+                      fontSize: 15,
+                      color: '#fff',
+                      marginTop: 2,
+                    }}
+                  >
+                    Bugün <em style={{ color: C.gold }}>hazırsın.</em>
+                  </div>
+                </div>
+              </div>
+
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: '1fr 1fr',
+                  gap: 6,
+                  marginBottom: 10,
+                }}
+              >
+                {metrics.map((m, i) => (
+                  <div
+                    key={i}
+                    style={{
+                      borderRadius: 14,
+                      border: '1px solid rgba(255,255,255,0.08)',
+                      background: 'rgba(255,255,255,0.02)',
+                      padding: 10,
+                    }}
+                  >
+                    <Icon d={m.ico} size={12} stroke={m.c} />
+                    <div
+                      style={{
+                        fontFamily: "'Fraunces',Georgia,serif",
+                        fontSize: 17,
+                        color: '#fff',
+                        marginTop: 6,
+                      }}
+                    >
+                      {m.v}
+                    </div>
+                    <div style={{ fontSize: 8, color: 'rgba(255,255,255,0.35)', marginTop: 4 }}>
+                      {m.l}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <TabBar active={0} />
+          </div>
+        );
+      };
+
+      // S3-S8 would go here (same structure as before - simplified for space)
+      const S3 = () => (
+        <div style={{ height: '100%', background: C.navy, padding: '20px', color: '#fff' }}>
+          Screen 3
+        </div>
+      );
+      const S4 = () => (
+        <div style={{ height: '100%', background: C.navy, padding: '20px', color: '#fff' }}>
+          Screen 4
+        </div>
+      );
+      const S5 = () => (
+        <div style={{ height: '100%', background: C.navy, padding: '20px', color: '#fff' }}>
+          Screen 5
+        </div>
+      );
+      const S6 = () => (
+        <div style={{ height: '100%', background: C.navy, padding: '20px', color: '#fff' }}>
+          Screen 6
+        </div>
+      );
+      const S7 = () => (
+        <div style={{ height: '100%', background: C.navy, padding: '20px', color: '#fff' }}>
+          Screen 7
+        </div>
+      );
+      const S8 = () => (
+        <div style={{ height: '100%', background: C.navy, padding: '20px', color: '#fff' }}>
+          Screen 8
+        </div>
+      );
+
+      const screens = [
+        { comp: S1, label: '01 · Karşılama', sub: 'Onboarding' },
+        { comp: S2, label: '02 · Ana sayfa', sub: 'Dashboard', accent: true },
+        { comp: S3, label: '03 · İçerik', sub: 'Palestralar & Sesler' },
+        { comp: S4, label: '04 · Veriler', sub: 'Sağlık Metrikleri', accent: true },
+        { comp: S5, label: '05 · Mentor', sub: '1-1 Mentörlük' },
+        { comp: S6, label: '06 · Sosyal', sub: 'Topluluk & Etkinlik' },
+        { comp: S7, label: '07 · Antrenman', sub: 'Workout Detail', accent: true },
+        { comp: S8, label: '08 · Ayarlar', sub: 'Profil & Tercihler' },
+      ];
+
+      function App() {
+        return (
+          <div
+            style={{
+              minHeight: '100vh',
+              background: C.deep,
+              color: '#fff',
+              fontFamily: "'Manrope',system-ui,sans-serif",
+              overflowX: 'hidden',
+            }}
+          >
+            <style>{`
             @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
             * { box-sizing: border-box; }
             ::selection { background: ${C.gold}; color: ${C.navy}; }
@@ -305,67 +665,154 @@
             .scrollbar-hide::-webkit-scrollbar { display: none; }
           `}</style>
 
-          <div style={{ position: "fixed", inset: 0, pointerEvents: "none", zIndex: 0 }}>
-            <div style={{ position: "absolute", inset: 0, background: `linear-gradient(160deg,${C.navy},${C.deep},#000)` }} />
-          </div>
+            <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 0 }}>
+              <div
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  background: `linear-gradient(160deg,${C.navy},${C.deep},#000)`,
+                }}
+              />
+            </div>
 
-          <div style={{ position: "relative", zIndex: 1 }}>
-            <header style={{ maxWidth: 1100, margin: "0 auto", padding: "64px 32px 48px" }}>
-              <div style={{ marginBottom: 32 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 32 }}>
-                  <svg viewBox="0 0 178.9 263.7" style={{ width: 32, height: 32 * 263.7 / 178.9 }}>
-                    <g>
-                      <path d="M136.7,112.6c-23.8-35.8-85.4,9.4-61.6-82.3C65,50.5,58.4,72.5,56.1,95.8c3.5,13.7,10.8,27,19.3,37.7c1.4,1.8,2.9,3.6,4.6,5.4c8.5,9.3,18,16.3,26.6,20.1c2.4,1,4.7,1.8,6.8,2.2c-12.1-10.7-33.8-39.8-20.2-52.7C101.6,100.5,120,101.5,136.7,112.6L136.7,112.6z M62.8,166.6c6.1,20.7,15.7,40.1,28.3,57.5c-5.4-13.7-9.2-28.1-11.2-43c-4.2-3.2-8.5-6.6-12.7-10.3C65.7,169.4,64.2,168,62.8,166.6L62.8,166.6z" fill="#0072B0" fillRule="evenodd" clipRule="evenodd"/>
-                      <path d="M89.2,53.6c6.6,0,12,5.4,12,12c0,6.7-5.4,12.1-12,12.1c-6.7,0-12.1-5.4-12.1-12.1C77.1,59,82.5,53.6,89.2,53.6L89.2,53.6z" fill="#0072B0" fillRule="evenodd" clipRule="evenodd"/>
-                    </g>
-                    <g>
-                      <path d="M110.1,108.9c1.3,1.2,2.4,2.5,3.7,3.8c21,23.1,28.2,49.6,16.1,59.2C95.9,198.7,1.8,86.6,65.8,43.1c-33.7,26.7-14.9,74.5,9,100.8c17.8,19.7,40.1,29.3,49.8,21.7c9.7-7.7,3.2-29.8-14.7-49.4c-2.5-2.7-5.1-5.2-7.7-7.6c2.2-0.3,4.4-0.3,6.9,0.1C109.5,108.8,109.8,108.8,110.1,108.9L110.1,108.9z" fill="#C9961A" fillRule="evenodd" clipRule="evenodd"/>
-                      <path d="M39.8,81.6c-1.3,0.8-2.6,1.7-3.7,2.8c-15.6,15-1.4,51.3,31.7,81c46.8,42.1,98,45.1,87.3,5.1c1,6.7-1.5,12.7-5.2,16.3c-12,11.9-45.6-0.6-75.1-27.7c-27.4-25.3-41.6-54.5-33.9-67.9C40.3,88,40,84.8,39.8,81.6L39.8,81.6z" fill="#C9961A" fillRule="evenodd" clipRule="evenodd"/>
-                    </g>
-                    <path d="M144.1,232.2c-22.7-9.1-92-5.5-113.7,6C63.5,216.7,109.1,214.3,144.1,232.2L144.1,232.2z" fill="#C9961A"/>
-                  </svg>
-                  <span style={{ fontFamily: "'Fraunces',Georgia,serif", fontSize: 20, fontWeight: 400, color: "#fff" }}>
-                    BreakFree<span style={{color:C.gold}}>.</span>
-                  </span>
-                  <span style={{ marginLeft: 8, border: `1px solid rgba(230,181,48,0.3)`, background: "rgba(230,181,48,0.08)", color: C.gold, borderRadius: 999, padding: "3px 12px", fontSize: 9, textTransform: "uppercase", letterSpacing: "0.2em", fontWeight: 600 }}>
-                    App Konsepti · 2026
-                  </span>
+            <div style={{ position: 'relative', zIndex: 1 }}>
+              <header style={{ maxWidth: 1100, margin: '0 auto', padding: '64px 32px 48px' }}>
+                <div style={{ marginBottom: 32 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 32 }}>
+                    <svg
+                      viewBox="0 0 178.9 263.7"
+                      style={{ width: 32, height: (32 * 263.7) / 178.9 }}
+                    >
+                      <g>
+                        <path
+                          d="M136.7,112.6c-23.8-35.8-85.4,9.4-61.6-82.3C65,50.5,58.4,72.5,56.1,95.8c3.5,13.7,10.8,27,19.3,37.7c1.4,1.8,2.9,3.6,4.6,5.4c8.5,9.3,18,16.3,26.6,20.1c2.4,1,4.7,1.8,6.8,2.2c-12.1-10.7-33.8-39.8-20.2-52.7C101.6,100.5,120,101.5,136.7,112.6L136.7,112.6z M62.8,166.6c6.1,20.7,15.7,40.1,28.3,57.5c-5.4-13.7-9.2-28.1-11.2-43c-4.2-3.2-8.5-6.6-12.7-10.3C65.7,169.4,64.2,168,62.8,166.6L62.8,166.6z"
+                          fill="#0072B0"
+                          fillRule="evenodd"
+                          clipRule="evenodd"
+                        />
+                        <path
+                          d="M89.2,53.6c6.6,0,12,5.4,12,12c0,6.7-5.4,12.1-12,12.1c-6.7,0-12.1-5.4-12.1-12.1C77.1,59,82.5,53.6,89.2,53.6L89.2,53.6z"
+                          fill="#0072B0"
+                          fillRule="evenodd"
+                          clipRule="evenodd"
+                        />
+                      </g>
+                      <g>
+                        <path
+                          d="M110.1,108.9c1.3,1.2,2.4,2.5,3.7,3.8c21,23.1,28.2,49.6,16.1,59.2C95.9,198.7,1.8,86.6,65.8,43.1c-33.7,26.7-14.9,74.5,9,100.8c17.8,19.7,40.1,29.3,49.8,21.7c9.7-7.7,3.2-29.8-14.7-49.4c-2.5-2.7-5.1-5.2-7.7-7.6c2.2-0.3,4.4-0.3,6.9,0.1C109.5,108.8,109.8,108.8,110.1,108.9L110.1,108.9z"
+                          fill="#C9961A"
+                          fillRule="evenodd"
+                          clipRule="evenodd"
+                        />
+                        <path
+                          d="M39.8,81.6c-1.3,0.8-2.6,1.7-3.7,2.8c-15.6,15-1.4,51.3,31.7,81c46.8,42.1,98,45.1,87.3,5.1c1,6.7-1.5,12.7-5.2,16.3c-12,11.9-45.6-0.6-75.1-27.7c-27.4-25.3-41.6-54.5-33.9-67.9C40.3,88,40,84.8,39.8,81.6L39.8,81.6z"
+                          fill="#C9961A"
+                          fillRule="evenodd"
+                          clipRule="evenodd"
+                        />
+                      </g>
+                      <path
+                        d="M144.1,232.2c-22.7-9.1-92-5.5-113.7,6C63.5,216.7,109.1,214.3,144.1,232.2L144.1,232.2z"
+                        fill="#C9961A"
+                      />
+                    </svg>
+                    <span
+                      style={{
+                        fontFamily: "'Fraunces',Georgia,serif",
+                        fontSize: 20,
+                        fontWeight: 400,
+                        color: '#fff',
+                      }}
+                    >
+                      BreakFree<span style={{ color: C.gold }}>.</span>
+                    </span>
+                    <span
+                      style={{
+                        marginLeft: 8,
+                        border: `1px solid rgba(230,181,48,0.3)`,
+                        background: 'rgba(230,181,48,0.08)',
+                        color: C.gold,
+                        borderRadius: 999,
+                        padding: '3px 12px',
+                        fontSize: 9,
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.2em',
+                        fontWeight: 600,
+                      }}
+                    >
+                      App Konsepti · 2026
+                    </span>
+                  </div>
+
+                  <h1
+                    style={{
+                      fontFamily: "'Fraunces',Georgia,serif",
+                      fontSize: 'clamp(2.4rem,7vw,5.5rem)',
+                      fontWeight: 300,
+                      lineHeight: 0.95,
+                      letterSpacing: '-0.02em',
+                      margin: '0 0 24px',
+                    }}
+                  >
+                    Topluluk
+                    <br />
+                    <em style={{ color: C.gold }}>cebinde.</em>
+                  </h1>
+                  <p
+                    style={{
+                      maxWidth: 520,
+                      fontSize: 'clamp(14px,2vw,18px)',
+                      fontWeight: 300,
+                      color: 'rgba(255,255,255,0.6)',
+                      lineHeight: 1.7,
+                      margin: 0,
+                    }}
+                  >
+                    Bütünsel sağlık metrikleri, canlı palestralar, kişisel mentörlük ve topluluk —
+                    tek uygulamada.
+                  </p>
                 </div>
+              </header>
 
-                <h1 style={{ fontFamily: "'Fraunces',Georgia,serif", fontSize: "clamp(2.4rem,7vw,5.5rem)", fontWeight: 300, lineHeight: 0.95, letterSpacing: "-0.02em", margin: "0 0 24px" }}>
-                  Topluluk<br/>
-                  <em style={{color:C.gold}}>cebinde.</em>
-                </h1>
-                <p style={{ maxWidth: 520, fontSize: "clamp(14px,2vw,18px)", fontWeight: 300, color: "rgba(255,255,255,0.6)", lineHeight: 1.7, margin: 0 }}>
-                  Bütünsel sağlık metrikleri, canlı palestralar, kişisel mentörlük ve topluluk — tek uygulamada.
-                </p>
-              </div>
-            </header>
+              <section style={{ maxWidth: 1160, margin: '0 auto', padding: '40px 24px 80px' }}>
+                <div
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fill,minmax(260px,1fr))',
+                    gap: '80px 32px',
+                    justifyItems: 'center',
+                  }}
+                >
+                  {screens.map((s, i) => (
+                    <Phone key={i} label={s.label} sub={s.sub} accent={s.accent}>
+                      <s.comp />
+                    </Phone>
+                  ))}
+                </div>
+              </section>
 
-            <section style={{ maxWidth: 1160, margin: "0 auto", padding: "40px 24px 80px" }}>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(260px,1fr))", gap: "80px 32px", justifyItems: "center" }}>
-                {screens.map((s, i) => (
-                  <Phone key={i} label={s.label} sub={s.sub} accent={s.accent}>
-                    <s.comp/>
-                  </Phone>
-                ))}
-              </div>
-            </section>
-
-            <footer style={{ borderTop: "1px solid rgba(255,255,255,0.07)", padding: "32px", textAlign: "center" }}>
-              <span style={{ fontFamily: "'Fraunces',Georgia,serif", fontSize: 18, color: "#fff" }}>
-                BreakFree<span style={{color:C.gold}}>.</span>
-              </span>
-              <div style={{ fontSize: 11, color: "rgba(255,255,255,0.3)", marginTop: 8 }}>
-                App Concept · Design preview · İstanbul, Türkiye · 2026
-              </div>
-            </footer>
+              <footer
+                style={{
+                  borderTop: '1px solid rgba(255,255,255,0.07)',
+                  padding: '32px',
+                  textAlign: 'center',
+                }}
+              >
+                <span
+                  style={{ fontFamily: "'Fraunces',Georgia,serif", fontSize: 18, color: '#fff' }}
+                >
+                  BreakFree<span style={{ color: C.gold }}>.</span>
+                </span>
+                <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)', marginTop: 8 }}>
+                  App Concept · Design preview · İstanbul, Türkiye · 2026
+                </div>
+              </footer>
+            </div>
           </div>
-        </div>
-      );
-    }
+        );
+      }
 
-    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
-  </script>
-</body>
+      ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+    </script>
+  </body>
 </html>

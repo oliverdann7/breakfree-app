@@ -18,16 +18,12 @@ const ProfileStack = createStackNavigator();
 function TabIcon({ label, focused }) {
   const icons = {
     'Ana Sayfa': '⬡',
-    'Palestralar': '🎙',
-    'Sağlık': '💚',
-    'Topluluk': '👥',
-    'Profil': '👤',
+    Palestralar: '🎙',
+    Sağlık: '💚',
+    Topluluk: '👥',
+    Profil: '👤',
   };
-  return (
-    <Text style={{ fontSize: 20, opacity: focused ? 1 : 0.45 }}>
-      {icons[label] || '●'}
-    </Text>
-  );
+  return <Text style={{ fontSize: 20, opacity: focused ? 1 : 0.45 }}>{icons[label] || '●'}</Text>;
 }
 
 function TalksStackNavigator() {

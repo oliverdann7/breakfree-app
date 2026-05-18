@@ -71,7 +71,9 @@ export default function TalksListScreen({ navigation }) {
           </View>
           <View style={styles.liveBannerInfo}>
             <Text style={styles.liveBannerLabel}>ŞU AN CANLI</Text>
-            <Text style={styles.liveBannerTitle} numberOfLines={1}>{liveTalk.title}</Text>
+            <Text style={styles.liveBannerTitle} numberOfLines={1}>
+              {liveTalk.title}
+            </Text>
             <Text style={styles.liveBannerHost}>{liveTalk.host.name}</Text>
           </View>
           <View style={styles.joinPill}>
@@ -119,7 +121,9 @@ export default function TalksListScreen({ navigation }) {
         ListEmptyComponent={
           loading ? (
             <View style={{ paddingHorizontal: 20, gap: 10 }}>
-              {[1, 2, 3].map((i) => <Skeleton.TalkCard key={i} />)}
+              {[1, 2, 3].map((i) => (
+                <Skeleton.TalkCard key={i} />
+              ))}
             </View>
           ) : (
             <Text style={styles.emptyText}>Sonuç bulunamadı.</Text>
@@ -172,7 +176,12 @@ const styles = StyleSheet.create({
   },
   liveBannerInfo: { flex: 1 },
   liveBannerLabel: { fontSize: 10, color: colors.error, fontWeight: '700', letterSpacing: 1 },
-  liveBannerTitle: { fontSize: 14, color: colors.textPrimary, fontWeight: '600', marginVertical: 1 },
+  liveBannerTitle: {
+    fontSize: 14,
+    color: colors.textPrimary,
+    fontWeight: '600',
+    marginVertical: 1,
+  },
   liveBannerHost: { fontSize: 12, color: colors.textTertiary },
   joinPill: {
     backgroundColor: colors.error,

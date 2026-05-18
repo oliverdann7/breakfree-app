@@ -35,10 +35,7 @@ export default function WellnessRing({
     strokeDashoffset: circumference * (1 - progress.value),
   }));
 
-  const ringColor =
-    score >= 75 ? colors.success :
-    score >= 45 ? colors.cyan :
-    colors.gold;
+  const ringColor = score >= 75 ? colors.success : score >= 45 ? colors.cyan : colors.gold;
 
   return (
     <View style={{ width: size, height: size, alignItems: 'center', justifyContent: 'center' }}>

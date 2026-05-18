@@ -12,28 +12,25 @@ const generateWeeklyData = () => {
   }));
 };
 
-export const fetchMetrics = createAsyncThunk(
-  'metrics/fetch',
-  async (_, { rejectWithValue }) => {
-    try {
-      const weeklyData = generateWeeklyData();
-      const today = weeklyData[weeklyData.length - 1];
-      return {
-        dailyMetrics: {
-          date: new Date().toISOString().split('T')[0],
-          sleep: { hours: today.sleep, quality: today.sleep >= 7 ? 'İyi' : 'Orta' },
-          heartRate: today.heartRate,
-          steps: today.steps,
-          calories: today.calories,
-        },
-        weeklyData,
-        wellnessScore: today.wellnessScore,
-      };
-    } catch (error) {
-      return rejectWithValue(error.message);
-    }
+export const fetchMetrics = createAsyncThunk('metrics/fetch', async (_, { rejectWithValue }) => {
+  try {
+    const weeklyData = generateWeeklyData();
+    const today = weeklyData[weeklyData.length - 1];
+    return {
+      dailyMetrics: {
+        date: new Date().toISOString().split('T')[0],
+        sleep: { hours: today.sleep, quality: today.sleep >= 7 ? 'İyi' : 'Orta' },
+        heartRate: today.heartRate,
+        steps: today.steps,
+        calories: today.calories,
+      },
+      weeklyData,
+      wellnessScore: today.wellnessScore,
+    };
+  } catch (error) {
+    return rejectWithValue(error.message);
   }
-);
+});
 
 const metricsSlice = createSlice({
   name: 'metrics',

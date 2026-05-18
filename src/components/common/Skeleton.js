@@ -23,14 +23,7 @@ export default function Skeleton({ width, height, borderRadius = 8, style }) {
   const animatedStyle = useAnimatedStyle(() => ({ opacity: opacity.value }));
 
   return (
-    <Animated.View
-      style={[
-        styles.base,
-        { width, height, borderRadius },
-        animatedStyle,
-        style,
-      ]}
-    />
+    <Animated.View style={[styles.base, { width, height, borderRadius }, animatedStyle, style]} />
   );
 }
 

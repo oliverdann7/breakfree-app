@@ -7,34 +7,34 @@ export const colors = {
   cyan: '#14B8D4',
   gold: '#E6B530',
   amber: '#C99419',
-  
+
   // Secondary
   cream: '#F4E8C8',
-  
+
   // Neutral
   white: '#FFFFFF',
   black: '#000000',
-  
+
   // Text
   textPrimary: '#FFFFFF',
   textSecondary: 'rgba(255, 255, 255, 0.6)',
   textTertiary: 'rgba(255, 255, 255, 0.35)',
-  
+
   // Backgrounds
   bgPrimary: '#061829',
   bgSecondary: '#0A2540',
   bgTertiary: 'rgba(255, 255, 255, 0.05)',
-  
+
   // Status
   success: '#10B981',
   warning: '#F59E0B',
   error: '#EF4444',
   info: '#3B82F6',
-  
+
   // Semantic
   border: 'rgba(255, 255, 255, 0.12)',
   overlay: 'rgba(0, 0, 0, 0.5)',
-  
+
   // Transparent variants
   goldLight: 'rgba(230, 181, 48, 0.1)',
   cyanLight: 'rgba(20, 184, 212, 0.1)',
@@ -47,7 +47,7 @@ export const typography = {
     display: 'Fraunces',
     body: 'Manrope',
   },
-  
+
   sizes: {
     xs: 10,
     sm: 12,
@@ -60,7 +60,7 @@ export const typography = {
     '5xl': 32,
     '6xl': 40,
   },
-  
+
   weights: {
     light: '300',
     regular: '400',
@@ -68,7 +68,7 @@ export const typography = {
     semibold: '600',
     bold: '700',
   },
-  
+
   lineHeights: {
     tight: 1.2,
     normal: 1.5,
@@ -138,7 +138,7 @@ export const theme = {
   spacing,
   shadows,
   borderRadius,
-  
+
   // Component-level defaults
   button: {
     height: 48,
@@ -146,13 +146,13 @@ export const theme = {
     paddingHorizontal: spacing[4],
     paddingVertical: spacing[3],
   },
-  
+
   card: {
     borderRadius: borderRadius.lg,
     padding: spacing[4],
     ...shadows.md,
   },
-  
+
   input: {
     height: 48,
     borderRadius: borderRadius.md,

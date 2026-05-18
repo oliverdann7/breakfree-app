@@ -3,6 +3,7 @@
 ## 🚀 Getting Started (Week 1)
 
 ### Prerequisites
+
 - Node.js 18+ (download from nodejs.org)
 - npm or pnpm
 - Expo CLI: `npm install -g expo-cli`
@@ -74,19 +75,20 @@ touch app/services/api.js
 4. Document in Storybook (optional for MVP)
 
 **Example: Button Component**
+
 ```javascript
 // app/components/Button.js
 import React from 'react';
 import { TouchableOpacity, Text, StyleSheet } from 'react-native';
 import { colors, spacing, typography } from '../utils';
 
-const Button = ({ 
-  label, 
-  onPress, 
+const Button = ({
+  label,
+  onPress,
   variant = 'primary',
   size = 'md',
   disabled = false,
-  ...props 
+  ...props
 }) => {
   const styles = StyleSheet.create({
     container: {
@@ -108,12 +110,7 @@ const Button = ({
   });
 
   return (
-    <TouchableOpacity 
-      style={styles.container}
-      onPress={onPress}
-      disabled={disabled}
-      {...props}
-    >
+    <TouchableOpacity style={styles.container} onPress={onPress} disabled={disabled} {...props}>
       <Text style={styles.text}>{label}</Text>
     </TouchableOpacity>
   );
@@ -140,8 +137,8 @@ const Stack = createNativeStackNavigator();
 
 const RootNavigator = () => {
   const dispatch = useDispatch();
-  const isAuthenticated = useSelector(state => state.auth.isAuthenticated);
-  const isLoading = useSelector(state => state.auth.isLoading);
+  const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
+  const isLoading = useSelector((state) => state.auth.isLoading);
 
   useEffect(() => {
     // Check if user already logged in
@@ -235,6 +232,7 @@ export default api;
 ### Step 8: Authentication Screens (Day 5–6)
 
 Create:
+
 1. LoginScreen.js
 2. SignupScreen.js
 3. OnboardingScreen.js (with goal selection)
@@ -262,7 +260,11 @@ const loginSchema = yup.object({
 
 const LoginScreen = ({ navigation }) => {
   const dispatch = useDispatch();
-  const { control, handleSubmit, formState: { errors } } = useForm({
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
     resolver: yupResolver(loginSchema),
   });
 
@@ -278,7 +280,7 @@ const LoginScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>BreakFree</Text>
-      
+
       <Controller
         control={control}
         name="email"
@@ -306,16 +308,9 @@ const LoginScreen = ({ navigation }) => {
         )}
       />
 
-      <Button 
-        label="Login" 
-        onPress={handleSubmit(onSubmit)}
-      />
-      
-      <Button 
-        label="Sign Up" 
-        variant="secondary"
-        onPress={() => navigation.navigate('Signup')}
-      />
+      <Button label="Login" onPress={handleSubmit(onSubmit)} />
+
+      <Button label="Sign Up" variant="secondary" onPress={() => navigation.navigate('Signup')} />
     </View>
   );
 };
@@ -342,6 +337,7 @@ export default LoginScreen;
 ### Step 9: Home Screen with Data (Day 7)
 
 Create `DashboardScreen.js`:
+
 - Fetch user from Redux
 - Display wellness ring (mock data initially)
 - Show metric cards
@@ -382,6 +378,7 @@ npm test
 ## 📋 Week-by-Week Implementation Checklist
 
 ### Week 1: Foundation
+
 - [ ] Expo project created + Git setup
 - [ ] Firebase configured + .env set
 - [ ] Folder structure created
@@ -390,6 +387,7 @@ npm test
 - [ ] Navigation structure defined
 
 ### Week 2: Auth
+
 - [ ] Login screen complete
 - [ ] Signup screen complete
 - [ ] Onboarding flow complete
@@ -397,6 +395,7 @@ npm test
 - [ ] Auth tests written (50% coverage)
 
 ### Week 3: Home
+
 - [ ] Dashboard screen layout
 - [ ] Wellness ring component
 - [ ] Metric cards
@@ -404,6 +403,7 @@ npm test
 - [ ] User profile Firestore sync
 
 ### Week 4: Talks
+
 - [ ] Talks list screen
 - [ ] Talk detail screen
 - [ ] Talk card components
@@ -411,6 +411,7 @@ npm test
 - [ ] Pagination logic
 
 ### Week 5: Health & Community
+
 - [ ] Health metrics screen
 - [ ] Chart integration
 - [ ] Community feed screen
@@ -418,6 +419,7 @@ npm test
 - [ ] Mock data setup
 
 ### Week 6: Settings & Polish
+
 - [ ] Profile screen
 - [ ] Settings screens
 - [ ] Language selector
@@ -425,6 +427,7 @@ npm test
 - [ ] Bug fixes
 
 ### Week 7: Testing & Optimization
+
 - [ ] E2E tests
 - [ ] Component tests
 - [ ] Performance audit
@@ -432,6 +435,7 @@ npm test
 - [ ] Error handling
 
 ### Week 8: Beta Launch
+
 - [ ] App Store metadata
 - [ ] Privacy policy
 - [ ] TestFlight build

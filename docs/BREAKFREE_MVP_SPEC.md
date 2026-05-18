@@ -3,29 +3,27 @@
 ## 1. Tech Stack Decision
 
 ### Frontend
+
 - **Framework**: React Native with Expo
   - Why: Rapid iteration, live updates (EAS), no native code initially
   - Alternative: Flutter (if Swift/Kotlin team preference)
-  
 - **State Management**: Redux Toolkit + Redux Persist
   - Global state: user, auth, talks, metrics
   - Local storage: offline cache
-  
 - **Navigation**: React Navigation (Stack + Tab + Drawer)
   - Tab-based primary (5 tabs)
   - Modal for detailed views
   - Stack for deep linking
-  
 - **UI Framework**: Custom components + React Native Paper (optional)
   - Design tokens in constants
   - Custom theme provider
-  
 - **Forms**: React Hook Form + Yup validation
 - **HTTP**: Axios + interceptors for auth/errors
 - **Charts**: Victory Native or React Native Chart Kit (mock data for MVP)
 - **Audio**: React Native Sound + RNWebRTC (for talks, later)
 
 ### Backend
+
 - **Runtime**: Node.js 18+
 - **Framework**: Express.js
 - **Database**: Firebase Firestore (MVP) → PostgreSQL (Phase 2)
@@ -35,6 +33,7 @@
 - **Hosting**: Firebase Hosting (frontend) or Vercel
 
 ### Development Tools
+
 - **Package Manager**: npm or pnpm
 - **Version Control**: Git + GitHub
 - **CI/CD**: GitHub Actions → EAS Build → TestFlight/Play Store
@@ -161,6 +160,7 @@ breakfree-app/
 ### Collections
 
 #### `users/{uid}`
+
 ```json
 {
   "uid": "user123",
@@ -180,6 +180,7 @@ breakfree-app/
 ```
 
 #### `talks/{talkId}`
+
 ```json
 {
   "talkId": "talk123",
@@ -202,6 +203,7 @@ breakfree-app/
 ```
 
 #### `talks/{talkId}/listeners/{uid}`
+
 ```json
 {
   "uid": "user123",
@@ -211,6 +213,7 @@ breakfree-app/
 ```
 
 #### `talks/{talkId}/messages/{messageId}`
+
 ```json
 {
   "messageId": "msg123",
@@ -222,6 +225,7 @@ breakfree-app/
 ```
 
 #### `community/{postId}`
+
 ```json
 {
   "postId": "post123",
@@ -243,6 +247,7 @@ breakfree-app/
 ```
 
 #### `events/{eventId}`
+
 ```json
 {
   "eventId": "event123",
@@ -258,6 +263,7 @@ breakfree-app/
 ```
 
 #### `mentors/{mentorId}`
+
 ```json
 {
   "mentorId": "mentor1",
@@ -282,6 +288,7 @@ breakfree-app/
 ## 4. API Endpoints (Backend)
 
 ### Authentication
+
 ```
 POST /auth/signup
 POST /auth/login
@@ -290,6 +297,7 @@ POST /auth/refresh
 ```
 
 ### Users
+
 ```
 GET /users/:uid
 PATCH /users/:uid
@@ -297,6 +305,7 @@ GET /users/:uid/metrics
 ```
 
 ### Talks
+
 ```
 GET /talks (list + filters)
 GET /talks/:talkId
@@ -308,6 +317,7 @@ GET /talks/:talkId/messages
 ```
 
 ### Community
+
 ```
 GET /community/posts
 POST /community/posts
@@ -317,6 +327,7 @@ POST /community/posts/:postId/comments
 ```
 
 ### Events
+
 ```
 GET /events
 GET /events/:eventId
@@ -324,6 +335,7 @@ POST /events/:eventId/rsvp
 ```
 
 ### Mentors
+
 ```
 GET /mentors
 GET /mentors/:mentorId
@@ -335,6 +347,7 @@ POST /mentors/:mentorId/book
 ## 5. Authentication Flow
 
 ### Sign Up
+
 1. User enters email, password, name
 2. Validate locally (React Hook Form + Yup)
 3. POST /auth/signup → Firebase createUserWithEmailAndPassword
@@ -344,6 +357,7 @@ POST /mentors/:mentorId/book
 7. Navigate to Home
 
 ### Login
+
 1. Enter email + password
 2. POST /auth/login → Firebase signInWithEmailAndPassword
 3. Fetch user profile from Firestore
@@ -351,6 +365,7 @@ POST /mentors/:mentorId/book
 5. Navigate to Home (or prompt onboarding if new)
 
 ### Protected Routes
+
 - All API calls include `Authorization: Bearer {token}` header
 - Interceptor refreshes token if expired
 - Redirect to Login on 401
@@ -360,6 +375,7 @@ POST /mentors/:mentorId/book
 ## 6. State Management (Redux)
 
 ### authSlice
+
 ```javascript
 {
   isLoading: false,
@@ -371,6 +387,7 @@ POST /mentors/:mentorId/book
 ```
 
 ### userSlice
+
 ```javascript
 {
   uid: "user123",
@@ -381,6 +398,7 @@ POST /mentors/:mentorId/book
 ```
 
 ### talksSlice
+
 ```javascript
 {
   allTalks: [],
@@ -393,6 +411,7 @@ POST /mentors/:mentorId/book
 ```
 
 ### metricsSlice
+
 ```javascript
 {
   dailyMetrics: {
@@ -412,6 +431,7 @@ POST /mentors/:mentorId/book
 ## 7. MVP Screens Checklist
 
 ### Auth Stack
+
 - [ ] Splash Screen (logo + loading)
 - [ ] Login Screen
   - [ ] Email input + validation
@@ -419,22 +439,18 @@ POST /mentors/:mentorId/book
   - [ ] "Forgot password" link
   - [ ] Apple/Google sign-in buttons
   - [ ] "Sign up" link
-  
 - [ ] Signup Screen
   - [ ] Email input
   - [ ] Password + confirm password
   - [ ] Terms acceptance checkbox
   - [ ] Sign up button
   - [ ] "Back to login" link
-  
 - [ ] Onboarding Screen 1 (Welcome)
   - [ ] Logo + tagline
   - [ ] "Next" button
-  
 - [ ] Onboarding Screen 2 (Goals)
   - [ ] Multi-select goals (Sağlık, Hareket, Zihin, etc.)
   - [ ] "Next" button
-  
 - [ ] Onboarding Screen 3 (Profile)
   - [ ] Avatar picker
   - [ ] Name input
@@ -442,39 +458,35 @@ POST /mentors/:mentorId/book
   - [ ] "Complete" button
 
 ### App Stack
+
 - [ ] Home/Dashboard Screen
   - [ ] Header (greeting + notification bell)
   - [ ] Wellness ring + score
   - [ ] 4 metric cards
   - [ ] Today's plan section
   - [ ] Bottom tab bar
-  
 - [ ] Talks/Palestralar Screen
   - [ ] Search bar + filters
   - [ ] Live/Featured banner
   - [ ] Talks list (infinite scroll)
   - [ ] Each talk card (image, title, host, listeners)
-  
 - [ ] Talk Detail Screen
   - [ ] Talk hero (image, title, host)
   - [ ] Join button (disabled during MVP)
   - [ ] Description
   - [ ] Host info
   - [ ] Share/bookmark buttons
-  
 - [ ] Health Metrics Screen
   - [ ] Period selector (Day/Week/Month)
   - [ ] Wellness score card
   - [ ] Line chart
   - [ ] 4 metric bars
   - [ ] AI insight card
-  
 - [ ] Community Screen
   - [ ] Featured event banner
   - [ ] Community posts list
   - [ ] Each post card (avatar, name, text, stats, likes)
   - [ ] Weekly challenge progress bar
-  
 - [ ] Profile Screen
   - [ ] Avatar + name + stats
   - [ ] Edit profile link
@@ -487,6 +499,7 @@ POST /mentors/:mentorId/book
 ## 8. Sprint Plan (Week by Week)
 
 ### Sprint 1: Foundation (Week 1–2)
+
 - [ ] Project setup (Expo, Redux, navigation)
 - [ ] Design system (colors, typography, components)
 - [ ] Firebase setup + authentication rules
@@ -495,6 +508,7 @@ POST /mentors/:mentorId/book
 - **Deliverable**: Auth flow end-to-end working
 
 ### Sprint 2: Home & Core Components (Week 3–4)
+
 - [ ] Dashboard screen layout
 - [ ] Wellness ring component (hardcoded data)
 - [ ] Metric cards
@@ -504,6 +518,7 @@ POST /mentors/:mentorId/book
 - **Deliverable**: Home screen + profile fetching works
 
 ### Sprint 3: Talks Feature (Week 5–6)
+
 - [ ] Talks list screen
 - [ ] Talk card components
 - [ ] Talk detail screen
@@ -513,6 +528,7 @@ POST /mentors/:mentorId/book
 - **Deliverable**: Browse talks fully functional
 
 ### Sprint 4: Health & Community (Week 7–8)
+
 - [ ] Health metrics screen
 - [ ] Mock health data (Redux)
 - [ ] Weekly view toggle
@@ -523,6 +539,7 @@ POST /mentors/:mentorId/book
 - **Deliverable**: All screens navigable with mock data
 
 ### Sprint 5: Profile & Settings (Week 9)
+
 - [ ] Profile screen
 - [ ] Edit profile modal
 - [ ] Settings (language, units, theme)
@@ -531,6 +548,7 @@ POST /mentors/:mentorId/book
 - **Deliverable**: Full settings management
 
 ### Sprint 6: Polish & Testing (Week 10–11)
+
 - [ ] E2E testing (critical flows)
 - [ ] Component tests
 - [ ] Bug fixes
@@ -541,6 +559,7 @@ POST /mentors/:mentorId/book
 - **Deliverable**: TestFlight/Play Store ready
 
 ### Sprint 7: Beta Launch Prep (Week 12)
+
 - [ ] App Store metadata (screenshots, description)
 - [ ] Privacy policy + terms
 - [ ] Marketing assets
@@ -554,6 +573,7 @@ POST /mentors/:mentorId/book
 ## 9. Key Components to Build
 
 ### WellnessRing.js
+
 ```javascript
 // SVG-based animated ring chart
 // Props: score (0–100), size, color
@@ -561,6 +581,7 @@ POST /mentors/:mentorId/book
 ```
 
 ### TalkCard.js
+
 ```javascript
 // Displays: image, title, category, host avatar, listener count
 // Props: talk object
@@ -568,30 +589,35 @@ POST /mentors/:mentorId/book
 ```
 
 ### MetricCard.js
+
 ```javascript
 // Icon + label + value + unit
 // Props: icon, label, value, unit, color
 ```
 
 ### MetricBar.js
+
 ```javascript
 // Horizontal bar with percentage
 // Props: label, value, color
 ```
 
 ### LineChart.js
+
 ```javascript
 // Weekly line chart (Victory Native or RN Chart Kit)
 // Props: data array, yAxis label, color
 ```
 
 ### TalksList.js
+
 ```javascript
 // FlatList of TalkCard with pagination
 // Props: talks array, onPress, filters
 ```
 
 ### CommunityPost.js
+
 ```javascript
 // User info, content, stats (if any), like/comment buttons
 // Props: post object, onLike, onComment
@@ -602,16 +628,19 @@ POST /mentors/:mentorId/book
 ## 10. Testing Strategy
 
 ### Unit Tests (Jest)
+
 - Redux slices (actions, reducers)
 - Utility functions (validators, helpers)
 - **Target**: 40% coverage
 
 ### Component Tests (React Native Testing Library)
+
 - Common components (Button, Card, Input)
 - Feature components (WellnessRing, TalkCard)
 - **Target**: Snapshot tests
 
 ### E2E Tests (Detox or Appium)
+
 1. Sign up + onboarding
 2. Navigate to each tab
 3. Browse talks
@@ -620,6 +649,7 @@ POST /mentors/:mentorId/book
 6. Log back in
 
 ### Manual Testing
+
 - Device testing: iPhone 14, iPhone 15, Samsung S23
 - Network conditions: 3G, offline
 - Orientation changes
@@ -630,23 +660,27 @@ POST /mentors/:mentorId/book
 ## 11. Deployment Pipeline
 
 ### Development
+
 - Main branch protected (PR reviews)
 - Feature branches (feature/auth, feature/talks, etc.)
 - Automated tests on PR
 - Manual QA on staging build
 
 ### Staging
+
 - EAS Build → Staging build → TestFlight/Play Store Internal Testing
 - Daily automated builds from `develop` branch
 - Beta testers (internal team + early access users)
 
 ### Production
+
 - Tag releases (v1.0.0, v1.0.1, etc.)
 - EAS Build → Submission to stores
 - Staged rollout: 10% → 50% → 100%
 - Monitoring & crash reporting
 
 ### Rollback Plan
+
 - Keep previous version in stores for 2 weeks
 - Hot patch procedure (fast-track review)
 - In-app messaging to downgrade if critical issue
@@ -656,6 +690,7 @@ POST /mentors/:mentorId/book
 ## 12. Firebase Security Rules (MVP)
 
 ### Firestore Rules
+
 ```
 match /users/{uid} {
   allow read, write: if request.auth.uid == uid;
@@ -686,6 +721,7 @@ match /events/{eventId} {
 ```
 
 ### Storage Rules
+
 ```
 match /avatars/{uid}/{file=**} {
   allow read: if request.auth != null;
@@ -698,6 +734,7 @@ match /avatars/{uid}/{file=**} {
 ## 13. Error Handling & Logging
 
 ### Global Error Boundary
+
 ```javascript
 // Catches React errors
 // Displays user-friendly message
@@ -706,6 +743,7 @@ match /avatars/{uid}/{file=**} {
 ```
 
 ### API Error Handling
+
 ```javascript
 // Interceptor catches all HTTP errors
 // Log to Firebase Analytics
@@ -714,6 +752,7 @@ match /avatars/{uid}/{file=**} {
 ```
 
 ### Logging Strategy
+
 - Firebase Analytics: User events (login, talk_joined, post_viewed)
 - Crashlytics: Unhandled errors + breadcrumbs
 - Console logs: Development only (stripped in production)
@@ -722,15 +761,15 @@ match /avatars/{uid}/{file=**} {
 
 ## 14. Performance Targets
 
-| Metric | Target |
-|--------|--------|
-| App startup | < 2 seconds |
-| Screen transition | < 300ms |
-| Bundle size | < 150MB |
-| First contentful paint | < 1.5s |
-| List scroll FPS | 60 FPS |
-| API latency (p95) | < 500ms |
-| Memory usage | < 150MB |
+| Metric                 | Target      |
+| ---------------------- | ----------- |
+| App startup            | < 2 seconds |
+| Screen transition      | < 300ms     |
+| Bundle size            | < 150MB     |
+| First contentful paint | < 1.5s      |
+| List scroll FPS        | 60 FPS      |
+| API latency (p95)      | < 500ms     |
+| Memory usage           | < 150MB     |
 
 ---
 

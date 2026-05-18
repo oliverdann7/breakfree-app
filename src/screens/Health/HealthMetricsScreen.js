@@ -67,27 +67,33 @@ export default function HealthMetricsScreen() {
 
   const periods = ['Gün', 'Hafta', 'Ay'];
 
-  const chartData = weeklyData.length > 0 ? {
-    labels: weeklyData.map((d) => d.day),
-    datasets: [
-      {
-        data: weeklyData.map((d) => d.steps),
-        color: (opacity = 1) => `rgba(20, 184, 212, ${opacity})`,
-        strokeWidth: 2,
-      },
-    ],
-  } : null;
+  const chartData =
+    weeklyData.length > 0
+      ? {
+          labels: weeklyData.map((d) => d.day),
+          datasets: [
+            {
+              data: weeklyData.map((d) => d.steps),
+              color: (opacity = 1) => `rgba(20, 184, 212, ${opacity})`,
+              strokeWidth: 2,
+            },
+          ],
+        }
+      : null;
 
-  const sleepChartData = weeklyData.length > 0 ? {
-    labels: weeklyData.map((d) => d.day),
-    datasets: [
-      {
-        data: weeklyData.map((d) => d.sleep),
-        color: (opacity = 1) => `rgba(11, 114, 185, ${opacity})`,
-        strokeWidth: 2,
-      },
-    ],
-  } : null;
+  const sleepChartData =
+    weeklyData.length > 0
+      ? {
+          labels: weeklyData.map((d) => d.day),
+          datasets: [
+            {
+              data: weeklyData.map((d) => d.sleep),
+              color: (opacity = 1) => `rgba(11, 114, 185, ${opacity})`,
+              strokeWidth: 2,
+            },
+          ],
+        }
+      : null;
 
   const chartWidth = SCREEN_WIDTH - 40;
 
@@ -118,7 +124,11 @@ export default function HealthMetricsScreen() {
             <View style={styles.scoreInfo}>
               <Text style={styles.scoreTitle}>Bugünkü Skor</Text>
               <Text style={styles.scoreTrend}>
-                {wellnessScore >= 75 ? '🌟 Harika!' : wellnessScore >= 45 ? '💪 İyi' : '🎯 Gelişiyor'}
+                {wellnessScore >= 75
+                  ? '🌟 Harika!'
+                  : wellnessScore >= 45
+                    ? '💪 İyi'
+                    : '🎯 Gelişiyor'}
               </Text>
               <View style={styles.scoreStats}>
                 <View>
@@ -221,9 +231,9 @@ export default function HealthMetricsScreen() {
             <Text style={styles.insightTitle}>AI Tavsiyesi</Text>
           </View>
           <Text style={styles.insightText}>
-            Bu hafta uyku süreniz ortalamanın üzerinde. Egzersiz rutininizi daha da
-            artırırsanız wellness skorunuz 90'a ulaşabilir. Kalp atış hızınız dinlenme
-            değerleri mükemmel görünüyor.
+            Bu hafta uyku süreniz ortalamanın üzerinde. Egzersiz rutininizi daha da artırırsanız
+            wellness skorunuz 90&apos;a ulaşabilir. Kalp atış hızınız dinlenme değerleri mükemmel
+            görünüyor.
           </Text>
         </Card>
 

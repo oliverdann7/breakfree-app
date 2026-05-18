@@ -1,10 +1,28 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, useScroll, useTransform, AnimatePresence, useInView } from 'framer-motion';
 import {
-  Mountain, Dumbbell, Heart, Users, Compass, Sparkles,
-  MessageCircle, Calendar, Instagram, Mail, MapPin,
-  ArrowRight, ArrowUpRight, Play, Menu, X, ChevronRight,
-  Youtube, Phone, Globe, Clock, Star
+  Mountain,
+  Dumbbell,
+  Heart,
+  Users,
+  Compass,
+  Sparkles,
+  MessageCircle,
+  Calendar,
+  Instagram,
+  Mail,
+  MapPin,
+  ArrowRight,
+  ArrowUpRight,
+  Play,
+  Menu,
+  X,
+  ChevronRight,
+  Youtube,
+  Phone,
+  Globe,
+  Clock,
+  Star,
 } from 'lucide-react';
 
 // ─────────────────────────────────────────────────────────────────
@@ -59,7 +77,12 @@ const Counter = ({ to, suffix = '' }) => {
     };
     requestAnimationFrame(tick);
   }, [inView, to]);
-  return <span ref={ref}>{n.toLocaleString('tr-TR')}{suffix}</span>;
+  return (
+    <span ref={ref}>
+      {n.toLocaleString('tr-TR')}
+      {suffix}
+    </span>
+  );
 };
 
 // Magnetic button
@@ -132,9 +155,7 @@ export default function BreakFreeLanding() {
         animate={{ y: 0 }}
         transition={{ duration: 0.6, delay: 0.2 }}
         className={`fixed top-0 z-50 w-full transition-all duration-500 ${
-          scrolled
-            ? 'border-b border-white/10 bg-[#0A2540]/80 backdrop-blur-xl'
-            : 'bg-transparent'
+          scrolled ? 'border-b border-white/10 bg-[#0A2540]/80 backdrop-blur-xl' : 'bg-transparent'
         }`}
       >
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5 lg:px-12">
@@ -205,8 +226,12 @@ export default function BreakFreeLanding() {
             className="fixed inset-0 z-[60] bg-[#061829]/95 backdrop-blur-2xl lg:hidden"
           >
             <div className="flex items-center justify-between px-6 py-5">
-              <span className="font-display text-xl">BreakFree<span className="text-[#E6B530]">.</span></span>
-              <button onClick={() => setMenuOpen(false)}><X className="h-6 w-6" /></button>
+              <span className="font-display text-xl">
+                BreakFree<span className="text-[#E6B530]">.</span>
+              </span>
+              <button onClick={() => setMenuOpen(false)}>
+                <X className="h-6 w-6" />
+              </button>
             </div>
             <div className="flex flex-col gap-2 px-6 py-12">
               {[
@@ -245,10 +270,7 @@ export default function BreakFreeLanding() {
       {/* ───────────── HERO ───────────── */}
       <section id="home" className="relative min-h-screen overflow-hidden">
         {/* Animated gradient bg */}
-        <motion.div
-          style={{ y: heroY }}
-          className="absolute inset-0"
-        >
+        <motion.div style={{ y: heroY }} className="absolute inset-0">
           <div className="absolute inset-0 bg-gradient-to-b from-[#061829] via-[#0A2540] to-[#0B72B9]/30" />
           {/* Aurora blobs */}
           <motion.div
@@ -329,8 +351,8 @@ export default function BreakFreeLanding() {
               transition={{ duration: 1, delay: 0.7 }}
               className="mt-10 max-w-xl text-lg font-light leading-relaxed text-white/70 md:text-xl"
             >
-              Türkiye'de daha sağlıklı bir beden, güçlü bir zihin ve anlamlı bir
-              topluluk inşa ediyoruz. Hareket, dostluk, amaç.
+              Türkiye'de daha sağlıklı bir beden, güçlü bir zihin ve anlamlı bir topluluk inşa
+              ediyoruz. Hareket, dostluk, amaç.
             </motion.p>
 
             {/* CTAs */}
@@ -379,9 +401,7 @@ export default function BreakFreeLanding() {
                 <div className="font-display text-3xl font-light text-white md:text-4xl">
                   <Counter to={s.n} suffix={s.s} />
                 </div>
-                <div className="mt-1 text-xs uppercase tracking-wider text-white/50">
-                  {s.label}
-                </div>
+                <div className="mt-1 text-xs uppercase tracking-wider text-white/50">{s.label}</div>
                 <div className="absolute -right-8 -bottom-8 h-20 w-20 rounded-full bg-[#E6B530]/20 blur-2xl opacity-0 transition-opacity group-hover:opacity-100" />
               </motion.div>
             ))}
@@ -409,7 +429,10 @@ export default function BreakFreeLanding() {
           className="flex whitespace-nowrap"
         >
           {Array.from({ length: 8 }).map((_, i) => (
-            <div key={i} className="flex items-center gap-12 px-6 font-display text-4xl font-light text-white/40 md:text-6xl">
+            <div
+              key={i}
+              className="flex items-center gap-12 px-6 font-display text-4xl font-light text-white/40 md:text-6xl"
+            >
               <span>Hareket</span>
               <span className="text-[#E6B530]">✦</span>
               <span className="italic">Sağlık</span>
@@ -445,9 +468,8 @@ export default function BreakFreeLanding() {
                 </Reveal>
                 <Reveal delay={0.2}>
                   <p className="mt-8 max-w-md text-lg font-light leading-relaxed text-white/60">
-                    BreakFree, hareket, dostluk ve bilinçli yaşam etrafında inşa edilen
-                    bütünsel bir wellness topluluğudur. Beden, zihin ve sosyal yaşamı
-                    birlikte güçlendiriyoruz.
+                    BreakFree, hareket, dostluk ve bilinçli yaşam etrafında inşa edilen bütünsel bir
+                    wellness topluluğudur. Beden, zihin ve sosyal yaşamı birlikte güçlendiriyoruz.
                   </p>
                 </Reveal>
                 <Reveal delay={0.3}>
@@ -504,9 +526,7 @@ export default function BreakFreeLanding() {
                           <h3 className="font-display text-2xl font-medium md:text-3xl">
                             {p.title}
                           </h3>
-                          <p className="mt-3 text-white/60 leading-relaxed">
-                            {p.desc}
-                          </p>
+                          <p className="mt-3 text-white/60 leading-relaxed">{p.desc}</p>
                         </div>
                         <ArrowUpRight className="h-5 w-5 text-white/30 transition-all group-hover:text-[#E6B530] group-hover:rotate-12" />
                       </div>
@@ -567,13 +587,17 @@ export default function BreakFreeLanding() {
                   } p-6 transition-colors hover:border-[#E6B530]/50`}
                 >
                   {/* Decorative blob */}
-                  <div className={`absolute -right-12 -top-12 h-40 w-40 rounded-full ${a.accent ? 'bg-[#E6B530]' : 'bg-[#14B8D4]'} opacity-10 blur-3xl transition-opacity duration-500 group-hover:opacity-30`} />
+                  <div
+                    className={`absolute -right-12 -top-12 h-40 w-40 rounded-full ${a.accent ? 'bg-[#E6B530]' : 'bg-[#14B8D4]'} opacity-10 blur-3xl transition-opacity duration-500 group-hover:opacity-30`}
+                  />
 
                   <div className="flex h-full flex-col justify-between">
                     <div className="flex items-start justify-between">
-                      <div className={`flex h-12 w-12 items-center justify-center rounded-xl ${
-                        a.accent ? 'bg-[#E6B530] text-[#0A2540]' : 'bg-white/10 text-white'
-                      }`}>
+                      <div
+                        className={`flex h-12 w-12 items-center justify-center rounded-xl ${
+                          a.accent ? 'bg-[#E6B530] text-[#0A2540]' : 'bg-white/10 text-white'
+                        }`}
+                      >
                         <a.icon className="h-5 w-5" strokeWidth={1.5} />
                       </div>
                       <span className="text-[10px] uppercase tracking-widest text-white/40">
@@ -581,9 +605,7 @@ export default function BreakFreeLanding() {
                       </span>
                     </div>
                     <div>
-                      <h3 className="font-display text-2xl font-medium leading-tight">
-                        {a.title}
-                      </h3>
+                      <h3 className="font-display text-2xl font-medium leading-tight">{a.title}</h3>
                       <div className="mt-4 flex items-center gap-2 text-xs text-white/40 transition-all group-hover:gap-3 group-hover:text-[#E6B530]">
                         <span>Detay</span>
                         <ArrowRight className="h-3 w-3" />
@@ -618,7 +640,10 @@ export default function BreakFreeLanding() {
               </Reveal>
             </div>
             <Reveal delay={0.2}>
-              <a href="#" className="group flex items-center gap-3 rounded-full border border-white/10 px-5 py-3 text-sm transition-colors hover:border-[#E6B530] hover:text-[#E6B530]">
+              <a
+                href="#"
+                className="group flex items-center gap-3 rounded-full border border-white/10 px-5 py-3 text-sm transition-colors hover:border-[#E6B530] hover:text-[#E6B530]"
+              >
                 Tüm takvimi gör
                 <ArrowUpRight className="h-4 w-4 transition-transform group-hover:rotate-12" />
               </a>
@@ -634,7 +659,8 @@ export default function BreakFreeLanding() {
                   Öne çıkan
                 </span>
                 <h3 className="mt-6 font-display text-4xl font-light leading-tight md:text-5xl lg:text-6xl">
-                  Belgrad Ormanı <br/><span className="italic text-[#E6B530]">Şafak Yürüyüşü</span>
+                  Belgrad Ormanı <br />
+                  <span className="italic text-[#E6B530]">Şafak Yürüyüşü</span>
                 </h3>
                 <div className="mt-6 flex flex-wrap gap-6 text-sm text-white/70">
                   <div className="flex items-center gap-2">
@@ -665,11 +691,16 @@ export default function BreakFreeLanding() {
                     { v: 22, l: 'Dk' },
                     { v: 47, l: 'Sn' },
                   ].map((c, i) => (
-                    <div key={i} className="rounded-2xl border border-white/10 bg-[#061829]/60 p-4 backdrop-blur-md">
+                    <div
+                      key={i}
+                      className="rounded-2xl border border-white/10 bg-[#061829]/60 p-4 backdrop-blur-md"
+                    >
                       <div className="font-display text-3xl font-light text-[#E6B530] md:text-4xl">
                         {String(c.v).padStart(2, '0')}
                       </div>
-                      <div className="mt-1 text-[10px] uppercase tracking-widest text-white/40">{c.l}</div>
+                      <div className="mt-1 text-[10px] uppercase tracking-widest text-white/40">
+                        {c.l}
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -680,9 +711,27 @@ export default function BreakFreeLanding() {
           {/* Event list */}
           <div className="grid gap-4 md:grid-cols-3">
             {[
-              { date: '22 HAZ', day: 'Çar', title: 'Wellness atölyesi: Nefes & odak', loc: 'Kadıköy', spots: '8 yer kaldı' },
-              { date: '28 HAZ', day: 'Cmt', title: 'Sahil koşusu — Moda', loc: 'Moda Sahili', spots: '24 yer kaldı' },
-              { date: '05 TEM', day: 'Cmt', title: 'Genç buluşması & barbekü', loc: 'Belgrad Ormanı', spots: 'Açık' },
+              {
+                date: '22 HAZ',
+                day: 'Çar',
+                title: 'Wellness atölyesi: Nefes & odak',
+                loc: 'Kadıköy',
+                spots: '8 yer kaldı',
+              },
+              {
+                date: '28 HAZ',
+                day: 'Cmt',
+                title: 'Sahil koşusu — Moda',
+                loc: 'Moda Sahili',
+                spots: '24 yer kaldı',
+              },
+              {
+                date: '05 TEM',
+                day: 'Cmt',
+                title: 'Genç buluşması & barbekü',
+                loc: 'Belgrad Ormanı',
+                spots: 'Açık',
+              },
             ].map((e, i) => (
               <Reveal key={i} delay={i * 0.08}>
                 <motion.a
@@ -692,7 +741,9 @@ export default function BreakFreeLanding() {
                 >
                   <div className="flex items-start justify-between">
                     <div>
-                      <div className="font-display text-3xl font-medium text-[#E6B530]">{e.date}</div>
+                      <div className="font-display text-3xl font-medium text-[#E6B530]">
+                        {e.date}
+                      </div>
                       <div className="text-xs uppercase tracking-wider text-white/40">{e.day}</div>
                     </div>
                     <ArrowUpRight className="h-5 w-5 text-white/30 transition-all group-hover:text-[#E6B530] group-hover:rotate-12" />
@@ -730,7 +781,10 @@ export default function BreakFreeLanding() {
                 </h2>
               </Reveal>
               <Reveal delay={0.2}>
-                <a href="#" className="group flex items-center gap-2 text-sm text-white/60 hover:text-[#E6B530]">
+                <a
+                  href="#"
+                  className="group flex items-center gap-2 text-sm text-white/60 hover:text-[#E6B530]"
+                >
                   <Instagram className="h-4 w-4" />
                   @breakfreeturkiye
                   <ArrowUpRight className="h-4 w-4 transition-transform group-hover:rotate-12" />
@@ -747,7 +801,12 @@ export default function BreakFreeLanding() {
               { gradient: 'from-[#14B8D4] to-[#0A2540]', emoji: '🏃', label: 'Koşu' },
               { tall: true, gradient: 'from-[#C99419] to-[#0A2540]', emoji: '🌅', label: 'Şafak' },
               { gradient: 'from-[#0A2540] to-[#0B72B9]', emoji: '💪', label: 'Fitness' },
-              { tall: true, gradient: 'from-[#E6B530] to-[#14B8D4]', emoji: '🤝', label: 'Topluluk' },
+              {
+                tall: true,
+                gradient: 'from-[#E6B530] to-[#14B8D4]',
+                emoji: '🤝',
+                label: 'Topluluk',
+              },
               { gradient: 'from-[#0B72B9] to-[#E6B530]', emoji: '🌿', label: 'Doğa' },
               { gradient: 'from-[#14B8D4] to-[#C99419]', emoji: '✨', label: 'Atölye' },
             ].map((g, i) => (
@@ -766,7 +825,9 @@ export default function BreakFreeLanding() {
                   </div>
                   {/* Label on hover */}
                   <div className="absolute inset-0 flex flex-col items-start justify-end bg-gradient-to-t from-black/60 via-transparent to-transparent p-4 opacity-0 transition-opacity group-hover:opacity-100">
-                    <span className="text-xs uppercase tracking-widest text-white/70">{g.label}</span>
+                    <span className="text-xs uppercase tracking-widest text-white/70">
+                      {g.label}
+                    </span>
                     <div className="mt-1 flex items-center gap-1 text-sm font-medium">
                       Detay <ArrowUpRight className="h-3 w-3" />
                     </div>
@@ -798,19 +859,22 @@ export default function BreakFreeLanding() {
           <div className="grid gap-6 md:grid-cols-3">
             {[
               {
-                quote: 'İstanbul\'a yeni taşınmıştım ve kendimi yalnız hissediyordum. BreakFree benim ailem oldu.',
+                quote:
+                  "İstanbul'a yeni taşınmıştım ve kendimi yalnız hissediyordum. BreakFree benim ailem oldu.",
                 name: 'Elif K.',
                 role: 'Üye · 1 yıl',
                 accent: false,
               },
               {
-                quote: 'Sadece spor değil — hayata bakışım değişti. Daha sağlıklı, daha mutlu, daha bağlıyım.',
+                quote:
+                  'Sadece spor değil — hayata bakışım değişti. Daha sağlıklı, daha mutlu, daha bağlıyım.',
                 name: 'Mehmet A.',
                 role: 'Üye · 8 ay',
                 accent: true,
               },
               {
-                quote: 'Her hafta yeni bir macera. Doğa yürüyüşleri hayatımın en güzel anları oldu.',
+                quote:
+                  'Her hafta yeni bir macera. Doğa yürüyüşleri hayatımın en güzel anları oldu.',
                 name: 'Zeynep T.',
                 role: 'Üye · 2 yıl',
                 accent: false,
@@ -825,19 +889,37 @@ export default function BreakFreeLanding() {
                       : 'border border-white/10 bg-white/[0.03] backdrop-blur-md'
                   }`}
                 >
-                  <div className={`text-6xl font-display leading-none ${t.accent ? 'text-[#0A2540]/30' : 'text-[#E6B530]/40'}`}>"</div>
-                  <p className={`mt-2 font-display text-xl font-light leading-snug md:text-2xl ${t.accent ? 'text-[#0A2540]' : 'text-white'}`}>
+                  <div
+                    className={`text-6xl font-display leading-none ${t.accent ? 'text-[#0A2540]/30' : 'text-[#E6B530]/40'}`}
+                  >
+                    "
+                  </div>
+                  <p
+                    className={`mt-2 font-display text-xl font-light leading-snug md:text-2xl ${t.accent ? 'text-[#0A2540]' : 'text-white'}`}
+                  >
                     {t.quote}
                   </p>
-                  <div className={`mt-8 flex items-center gap-4 border-t pt-6 ${t.accent ? 'border-[#0A2540]/20' : 'border-white/10'}`}>
-                    <div className={`flex h-10 w-10 items-center justify-center rounded-full font-semibold ${
-                      t.accent ? 'bg-[#0A2540] text-[#E6B530]' : 'bg-[#E6B530] text-[#0A2540]'
-                    }`}>
+                  <div
+                    className={`mt-8 flex items-center gap-4 border-t pt-6 ${t.accent ? 'border-[#0A2540]/20' : 'border-white/10'}`}
+                  >
+                    <div
+                      className={`flex h-10 w-10 items-center justify-center rounded-full font-semibold ${
+                        t.accent ? 'bg-[#0A2540] text-[#E6B530]' : 'bg-[#E6B530] text-[#0A2540]'
+                      }`}
+                    >
                       {t.name[0]}
                     </div>
                     <div>
-                      <div className={`text-sm font-semibold ${t.accent ? 'text-[#0A2540]' : 'text-white'}`}>{t.name}</div>
-                      <div className={`text-xs ${t.accent ? 'text-[#0A2540]/70' : 'text-white/50'}`}>{t.role}</div>
+                      <div
+                        className={`text-sm font-semibold ${t.accent ? 'text-[#0A2540]' : 'text-white'}`}
+                      >
+                        {t.name}
+                      </div>
+                      <div
+                        className={`text-xs ${t.accent ? 'text-[#0A2540]/70' : 'text-white/50'}`}
+                      >
+                        {t.role}
+                      </div>
                     </div>
                   </div>
                 </motion.div>
@@ -873,7 +955,7 @@ export default function BreakFreeLanding() {
           </Reveal>
           <Reveal delay={0.1}>
             <h2 className="font-display text-[clamp(3rem,8vw,7rem)] font-light leading-[0.95] tracking-tight">
-              Yolculuğun <br/>
+              Yolculuğun <br />
               <span className="italic text-[#E6B530]">burada başlar.</span>
             </h2>
           </Reveal>
@@ -917,8 +999,8 @@ export default function BreakFreeLanding() {
                 </span>
               </div>
               <p className="mt-6 max-w-sm text-sm leading-relaxed text-white/50">
-                Türkiye'de bütünsel sağlık, hareket ve gerçek topluluk inşa ediyoruz.
-                Daha güçlü beden, berrak zihin, anlamlı bağlantı.
+                Türkiye'de bütünsel sağlık, hareket ve gerçek topluluk inşa ediyoruz. Daha güçlü
+                beden, berrak zihin, anlamlı bağlantı.
               </p>
               <div className="mt-8 flex items-center gap-2 text-sm text-white/60">
                 <MapPin className="h-4 w-4 text-[#E6B530]" />
@@ -929,9 +1011,11 @@ export default function BreakFreeLanding() {
             <div className="lg:col-span-3">
               <div className="text-xs uppercase tracking-[0.2em] text-[#E6B530]">Keşfet</div>
               <ul className="mt-4 space-y-3 text-sm">
-                {['Hakkımızda', 'Aktiviteler', 'Etkinlikler', 'Galeri', 'Topluluk'].map(x => (
+                {['Hakkımızda', 'Aktiviteler', 'Etkinlikler', 'Galeri', 'Topluluk'].map((x) => (
                   <li key={x}>
-                    <a href="#" className="text-white/60 transition-colors hover:text-[#E6B530]">{x}</a>
+                    <a href="#" className="text-white/60 transition-colors hover:text-[#E6B530]">
+                      {x}
+                    </a>
                   </li>
                 ))}
               </ul>
@@ -939,7 +1023,10 @@ export default function BreakFreeLanding() {
 
             <div className="lg:col-span-4">
               <div className="text-xs uppercase tracking-[0.2em] text-[#E6B530]">İletişim</div>
-              <a href="mailto:hi@breakfreetr.com" className="mt-4 block text-2xl font-display font-light hover:text-[#E6B530] transition-colors">
+              <a
+                href="mailto:hi@breakfreetr.com"
+                className="mt-4 block text-2xl font-display font-light hover:text-[#E6B530] transition-colors"
+              >
                 hi@breakfreetr.com
               </a>
               <div className="mt-6 flex gap-3">
@@ -965,9 +1052,15 @@ export default function BreakFreeLanding() {
           <div className="mt-16 flex flex-col items-center justify-between gap-4 border-t border-white/5 pt-8 text-xs text-white/40 md:flex-row">
             <div>© 2026 BreakFree Türkiye. Tüm hakları saklıdır.</div>
             <div className="flex gap-6">
-              <a href="#" className="hover:text-white/70 transition-colors">Gizlilik</a>
-              <a href="#" className="hover:text-white/70 transition-colors">Kullanım koşulları</a>
-              <a href="#" className="hover:text-white/70 transition-colors">KVKK</a>
+              <a href="#" className="hover:text-white/70 transition-colors">
+                Gizlilik
+              </a>
+              <a href="#" className="hover:text-white/70 transition-colors">
+                Kullanım koşulları
+              </a>
+              <a href="#" className="hover:text-white/70 transition-colors">
+                KVKK
+              </a>
             </div>
           </div>
         </div>

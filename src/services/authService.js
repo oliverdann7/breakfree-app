@@ -7,8 +7,15 @@ import {
 import { doc, setDoc, getDoc } from 'firebase/firestore';
 import { auth, db } from './firebase';
 
+const checkFirebaseAvailable = () => {
+  if (!auth || !db) {
+    throw new Error('Firebase not configured. Please add environment variables.');
+  }
+};
+
 export const signup = async (email, password, displayName) => {
   try {
+    checkFirebaseAvailable();
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
 
@@ -33,6 +40,7 @@ export const signup = async (email, password, displayName) => {
 
 export const login = async (email, password) => {
   try {
+    checkFirebaseAvailable();
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
 
@@ -41,7 +49,12 @@ export const login = async (email, password) => {
 
     const token = await user.getIdToken();
     return {
-      user: { uid: user.uid, email: user.email, displayName: userData?.displayName || 'User', ...userData },
+      user: {
+        uid: user.uid,
+        email: user.email,
+        displayName: userData?.displayName || 'User',
+        ...userData,
+      },
       token,
     };
   } catch (error) {
@@ -51,6 +64,7 @@ export const login = async (email, password) => {
 
 export const logout = async () => {
   try {
+    checkFirebaseAvailable();
     await signOut(auth);
   } catch (error) {
     throw new Error(error.message);
@@ -59,6 +73,7 @@ export const logout = async () => {
 
 export const refreshToken = async () => {
   try {
+    checkFirebaseAvailable();
     const user = auth.currentUser;
     if (user) return await user.getIdToken(true);
     throw new Error('No authenticated user');
@@ -69,6 +84,12 @@ export const refreshToken = async () => {
 
 export const getCurrentUser = () => {
   return new Promise((resolve, reject) => {
+    try {
+      checkFirebaseAvailable();
+    } catch (error) {
+      reject(error);
+      return;
+    }
     const unsubscribe = onAuthStateChanged(
       auth,
       async (user) => {

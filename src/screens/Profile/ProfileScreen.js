@@ -52,7 +52,12 @@ export default function ProfileScreen({ navigation }) {
   };
 
   const displayName = displayData.displayName || 'Kullanıcı';
-  const initials = displayName.split(' ').map((w) => w[0]).join('').toUpperCase().slice(0, 2);
+  const initials = displayName
+    .split(' ')
+    .map((w) => w[0])
+    .join('')
+    .toUpperCase()
+    .slice(0, 2);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -64,9 +69,7 @@ export default function ProfileScreen({ navigation }) {
           </View>
           <Text style={styles.userName}>{displayName}</Text>
           <Text style={styles.userEmail}>{displayData.email || user?.email}</Text>
-          {displayData.bio ? (
-            <Text style={styles.userBio}>{displayData.bio}</Text>
-          ) : null}
+          {displayData.bio ? <Text style={styles.userBio}>{displayData.bio}</Text> : null}
 
           {/* Stats */}
           <View style={styles.statsRow}>
@@ -94,7 +97,10 @@ export default function ProfileScreen({ navigation }) {
         <Card style={styles.goalsCard}>
           <Text style={styles.sectionTitle}>Hedeflerim</Text>
           <View style={styles.goalsRow}>
-            {(displayData.goals?.length ? displayData.goals : ['sleep', 'fitness', 'mindfulness']).map((g) => (
+            {(displayData.goals?.length
+              ? displayData.goals
+              : ['sleep', 'fitness', 'mindfulness']
+            ).map((g) => (
               <View key={g} style={styles.goalChip}>
                 <Text style={styles.goalChipText}>{g}</Text>
               </View>
@@ -116,14 +122,20 @@ export default function ProfileScreen({ navigation }) {
             icon="🔔"
             label="Bildirimler"
             value={preferences.notifications ? 'Açık' : 'Kapalı'}
-            onPress={() => dispatch(updatePreferences({ notifications: !preferences.notifications }))}
+            onPress={() =>
+              dispatch(updatePreferences({ notifications: !preferences.notifications }))
+            }
           />
           <View style={styles.divider} />
           <SettingRow
             icon="📏"
             label="Birimler"
             value={preferences.units === 'metric' ? 'Metrik' : 'Imperial'}
-            onPress={() => dispatch(updatePreferences({ units: preferences.units === 'metric' ? 'imperial' : 'metric' }))}
+            onPress={() =>
+              dispatch(
+                updatePreferences({ units: preferences.units === 'metric' ? 'imperial' : 'metric' })
+              )
+            }
           />
         </Card>
 
@@ -133,14 +145,13 @@ export default function ProfileScreen({ navigation }) {
           <View style={styles.divider} />
           <SettingRow icon="📱" label="Cihazları Yönet" onPress={() => Alert.alert('Yakında')} />
           <View style={styles.divider} />
-          <SettingRow icon="📄" label="Gizlilik Politikası" onPress={() => Alert.alert('Yakında')} />
-          <View style={styles.divider} />
           <SettingRow
-            icon="🚪"
-            label="Çıkış Yap"
-            onPress={handleLogout}
-            isDestructive
+            icon="📄"
+            label="Gizlilik Politikası"
+            onPress={() => Alert.alert('Yakında')}
           />
+          <View style={styles.divider} />
+          <SettingRow icon="🚪" label="Çıkış Yap" onPress={handleLogout} isDestructive />
         </Card>
 
         <Text style={styles.version}>BreakFree v1.0.0</Text>
@@ -172,7 +183,14 @@ const styles = StyleSheet.create({
   avatarInitials: { fontSize: 32, fontWeight: '800', color: colors.navy },
   userName: { fontSize: 22, fontWeight: '700', color: colors.textPrimary },
   userEmail: { fontSize: 13, color: colors.textTertiary, marginTop: 2 },
-  userBio: { fontSize: 13, color: colors.textSecondary, marginTop: 6, marginBottom: 20, textAlign: 'center', paddingHorizontal: 16 },
+  userBio: {
+    fontSize: 13,
+    color: colors.textSecondary,
+    marginTop: 6,
+    marginBottom: 20,
+    textAlign: 'center',
+    paddingHorizontal: 16,
+  },
   statsRow: {
     flexDirection: 'row',
     gap: 32,

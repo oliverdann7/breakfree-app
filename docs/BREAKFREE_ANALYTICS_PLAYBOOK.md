@@ -74,7 +74,7 @@ ENGAGEMENT & SESSION DATA
 
 Avg Session Length:     11.2 min (Target: >10min)
 Sessions/User/Day:      1.4 (Target: >1)
-Session Frequency:      
+Session Frequency:
   - 1+ per day:        52% of active users
   - 3+ per day:        18% of active users
   - 5+ per day:         3% of active users
@@ -406,7 +406,7 @@ Payment Methods:
   - Debit card: 18%
   - Apple Pay / Google Pay: 10%
 
-Avg Transaction Value:  
+Avg Transaction Value:
   - Monthly plan: $29.99
   - Annual plan: $249.99
   - Avg (weighted): $47.80
@@ -545,7 +545,7 @@ Breakdown:
   - Passives (7-8): 454 (34%)
   - Detractors (0-6): 206 (15%)
 
-NPS Formula: (51% - 15%) × 100 = 36... 
+NPS Formula: (51% - 15%) × 100 = 36...
 
 Wait, that's 36, not 42. Let me recalculate:
 - 52% promoters, 33% passives, 15% detractors
@@ -582,18 +582,21 @@ Action Items from NPS:
 ## 4. Reporting Schedule
 
 ### Daily Dashboard
+
 - DAU / MAU
 - Active sessions (real-time)
 - Crashes
 - API latency
 
 ### Weekly Report (Monday 9am)
+
 - Signups + retention cohort
 - Feature usage
 - Top bugs/crashes
 - Growth metrics vs targets
 
 ### Monthly Report (1st of month)
+
 - Acquisition recap (CAC, channels)
 - Engagement metrics (DAU, sessions)
 - Monetization (MRR, churn)
@@ -603,6 +606,7 @@ Action Items from NPS:
 - Financial forecast
 
 ### Quarterly Business Review (End of quarter)
+
 - Full P&L
 - Cohort analysis
 - Strategic initiatives review
@@ -614,24 +618,28 @@ Action Items from NPS:
 ## 5. Key Monitoring Alerts
 
 ### Critical (Page Immediately)
+
 - Crash rate >2%
 - API error rate >5%
 - Payment processing failure >10%
 - DAU drop >20% YoD
 
 ### High Priority (Within 1 hour)
+
 - Crash rate >1%
 - API latency p95 >2s
 - DB query slow (>10s)
 - MRR declining >5% MoM
 
 ### Medium Priority (End of day)
+
 - App startup time >3s
 - ANR (app not responding) >100/day
 - Memory leak detected
 - Low retention cohort (<30% D7)
 
 ### Low Priority (Weekly review)
+
 - Session length declining
 - Notification opt-out increasing
 - New feature adoption <10%
@@ -641,21 +649,25 @@ Action Items from NPS:
 ## 6. Analysis Deep Dives (When Needed)
 
 ### Retention Analysis
+
 1. Segment by: New user goal, age, OS, country
 2. Identify: Which segments retain best?
 3. Action: Double down on high-retention features/types
 
 ### Monetization Analysis
+
 1. Segment by: Sign-up source, feature usage
 2. Identify: What predicts conversion?
 3. Action: Target high-conversion users with paywall
 
 ### Feature Impact Analysis
+
 1. Compare: Before/after feature launch
 2. Measure: Engagement, retention, churn impact
 3. Action: Deprecate low-impact features, expand hits
 
 ### User Segmentation
+
 - **Core Users**: D30+ retention, 3+ sessions/day, premium or mentor
 - **Engaged Free**: D30+ retention, 1-2 sessions/day, no spending
 - **Casual**: 7-14 day retention, <1 session/day
