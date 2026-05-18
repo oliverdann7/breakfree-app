@@ -11,6 +11,7 @@ import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { updateProfile } from '../../store/slices/userSlice';
 import Button from '../../components/common/Button';
 import Input from '../../components/common/Input';
+import BreakFreeLogo from '../../components/branding/BreakFreeLogo';
 import { colors } from '../../constants/designTokens';
 
 const { width } = Dimensions.get('window');
@@ -125,6 +126,9 @@ export default function OnboardingScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
+      <View style={styles.header}>
+        <BreakFreeLogo variant="symbol" size="small" />
+      </View>
       <View style={styles.progressBar}>
         {[0, 1, 2].map((i) => (
           <View
@@ -162,10 +166,14 @@ export default function OnboardingScreen({ navigation }) {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.bgPrimary },
+  header: {
+    paddingTop: 40,
+    paddingBottom: 16,
+    alignItems: 'center',
+  },
   progressBar: {
     flexDirection: 'row',
     justifyContent: 'center',
-    paddingTop: 60,
     paddingBottom: 12,
     gap: 8,
   },
