@@ -1,6 +1,20 @@
 {
-  "buildCommand": "mkdir -p dist && cp breakfree-landing-web.html dist/",
+  "buildCommand": "npm install --legacy-peer-deps --no-audit --no-fund --prefer-offline && npx expo export --platform web --output-dir dist && mv dist/index.html dist/app.html && cp breakfree-landing-web.html dist/index.html",
   "outputDirectory": "dist",
-  "installCommand": "echo 'Static file — no dependencies needed'",
-  "framework": null
+  "installCommand": "echo 'install runs inside buildCommand'",
+  "framework": null,
+  "cleanUrls": true,
+  "rewrites": [
+    { "source": "/app", "destination": "/app.html" },
+    { "source": "/app/(.*)", "destination": "/app.html" }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" }
+      ]
+    }
+  ]
 }
