@@ -21,9 +21,14 @@ export default function LandingScreen({ navigation }) {
             <BreakFreeLogo variant="full" size="large" />
           </View>
 
-          <Text style={styles.heroTitle}>Sağlıklı Yaşamın Yolculuğuna Başla</Text>
+          <Text style={styles.heroTitle}>
+            Break Free
+            <Text style={styles.heroHighlight}>.</Text>
+            {'\n'}
+            <Text style={{ color: colors.cyan }}>Live Better.</Text>
+          </Text>
           <Text style={styles.heroSubtitle}>
-            BreakFree ile kişisel gelişimini hızlandır, toplulukla bağlan ve hedeflerine ulaş
+            Türkiye&apos;nin en dinamik wellness topluluğuyla birleşin
           </Text>
 
           <View style={styles.ctaButtons}>
@@ -152,6 +157,75 @@ export default function LandingScreen({ navigation }) {
           </View>
         </View>
 
+        {/* Activities Section */}
+        <View style={styles.sectionPadded}>
+          <Text style={styles.sectionTitle}>Aktiviteler</Text>
+          <View style={styles.activitiesGrid}>
+            {['🧘 Yoga', '🏃 Koşu', '🧠 Meditasyon', '💪 Güç', '🤸 Esneklik', '✨ Wellness'].map((activity) => (
+              <View key={activity} style={styles.activityCard}>
+                <Text style={styles.activityText}>{activity}</Text>
+              </View>
+            ))}
+          </View>
+        </View>
+
+        {/* Events Section */}
+        <View style={styles.sectionPaddedAlt}>
+          <Text style={styles.sectionTitle}>Etkinlikler & Yarışmalar</Text>
+          <View style={styles.eventsList}>
+            <View style={styles.eventCard}>
+              <Text style={styles.eventTitle}>30 Günlük Challenge</Text>
+              <Text style={styles.eventDate}>Başlıyor</Text>
+            </View>
+            <View style={styles.eventCard}>
+              <Text style={styles.eventTitle}>Topluluk Koşusu</Text>
+              <Text style={styles.eventDate}>Her Pazar</Text>
+            </View>
+            <View style={styles.eventCard}>
+              <Text style={styles.eventTitle}>Wellness Atölyesi</Text>
+              <Text style={styles.eventDate}>Aylık</Text>
+            </View>
+          </View>
+        </View>
+
+        {/* Social Contact Section */}
+        <View style={styles.contactSection}>
+          <Text style={styles.footerTitle}>Bize Ulaşın</Text>
+          <Text style={styles.footerDesc}>
+            Sorularınız var mı? Sosyal medyada bize takip edin
+          </Text>
+
+          <View style={styles.socialButtons}>
+            <TouchableOpacity
+              style={styles.socialButton}
+              onPress={() => {
+                const url = 'https://instagram.com/breakfreeturkiye';
+                try {
+                  require('react-native').Linking.openURL(url);
+                } catch (e) {
+                  console.error('Error opening Instagram:', e);
+                }
+              }}
+            >
+              <Text style={styles.socialButtonText}>📱 Instagram</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.socialButton}
+              onPress={() => {
+                const url = 'https://wa.me/905418617772';
+                try {
+                  require('react-native').Linking.openURL(url);
+                } catch (e) {
+                  console.error('Error opening WhatsApp:', e);
+                }
+              }}
+            >
+              <Text style={styles.socialButtonText}>💬 WhatsApp</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+
         {/* CTA Footer */}
         <View style={styles.footerSection}>
           <Text style={styles.footerTitle}>Bugün Başlayın</Text>
@@ -210,6 +284,9 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 32,
     lineHeight: 22,
+  },
+  heroHighlight: {
+    color: '#00FF88',
   },
   ctaButtons: {
     width: '100%',
@@ -354,5 +431,85 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: colors.cyan,
     fontWeight: '600',
+  },
+
+  // Activities Section
+  sectionPadded: {
+    paddingHorizontal: 24,
+    paddingVertical: 48,
+  },
+  sectionPaddedAlt: {
+    paddingHorizontal: 24,
+    paddingVertical: 48,
+    backgroundColor: 'rgba(20, 184, 212, 0.05)',
+  },
+  activitiesGrid: {
+    display: 'flex',
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+    justifyContent: 'space-between',
+  },
+  activityCard: {
+    width: '48%',
+    backgroundColor: 'rgba(20, 184, 212, 0.1)',
+    padding: 16,
+    borderRadius: 12,
+    borderLeftWidth: 3,
+    borderLeftColor: '#00FF88',
+  },
+  activityText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: colors.textPrimary,
+  },
+
+  // Events Section
+  eventsList: {
+    gap: 12,
+  },
+  eventCard: {
+    backgroundColor: 'rgba(20, 184, 212, 0.08)',
+    padding: 16,
+    borderRadius: 12,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  eventTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: colors.textPrimary,
+  },
+  eventDate: {
+    fontSize: 12,
+    color: colors.textSecondary,
+  },
+
+  // Contact Section
+  contactSection: {
+    paddingHorizontal: 24,
+    paddingVertical: 48,
+    backgroundColor: 'rgba(0, 255, 136, 0.05)',
+    alignItems: 'center',
+  },
+  socialButtons: {
+    width: '100%',
+    gap: 12,
+    marginTop: 24,
+  },
+  socialButton: {
+    backgroundColor: 'rgba(0, 255, 136, 0.15)',
+    borderWidth: 1,
+    borderColor: 'rgba(0, 255, 136, 0.3)',
+    paddingVertical: 14,
+    paddingHorizontal: 20,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  socialButtonText: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: colors.textPrimary,
   },
 });
