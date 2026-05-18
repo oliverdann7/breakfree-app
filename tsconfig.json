@@ -8,5 +8,5 @@
       "@/*": ["src/*"]
     }
   },
-  "exclude": ["node_modules", "dist", "_expo", ".expo"]
+  "exclude": ["node_modules", "_expo", ".expo", "dist", "web-build", "coverage"]
 }
