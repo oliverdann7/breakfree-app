@@ -6,13 +6,10 @@ import {
   TouchableOpacity,
   StyleSheet,
   SafeAreaView,
-  Dimensions,
 } from 'react-native';
 import BreakFreeLogo from '../../components/branding/BreakFreeLogo';
 import Button from '../../components/common/Button';
 import { colors } from '../../constants/designTokens';
-
-const { width } = Dimensions.get('window');
 
 export default function LandingScreen({ navigation }) {
   return (
@@ -135,21 +132,21 @@ export default function LandingScreen({ navigation }) {
 
           <View style={styles.testimonialCard}>
             <Text style={styles.testimonialText}>
-              "BreakFree benim yaşamı değiştirdi. Artık sabahları kalkarken hedefli hissediyorum."
+              {`'BreakFree benim yaşamı değiştirdi. Artık sabahları kalkarken hedefli hissediyorum.'`}
             </Text>
             <Text style={styles.testimonialAuthor}>— Ayşe K., İstanbul</Text>
           </View>
 
           <View style={styles.testimonialCard}>
             <Text style={styles.testimonialText}>
-              "Topluluk desteği bana güç veriyor. Hiç yalnız hissetmiyorum artık."
+              {`'Topluluk desteği bana güç veriyor. Hiç yalnız hissetmiyorum artık.'`}
             </Text>
             <Text style={styles.testimonialAuthor}>— Mehmet T., Ankara</Text>
           </View>
 
           <View style={styles.testimonialCard}>
             <Text style={styles.testimonialText}>
-              "İlerleme takibi sayesinde gerçekten ne kadar ilerlediğimi görebiliyorum."
+              {`'İlerleme takibi sayesinde gerçekten ne kadar ilerlediğimi görebiliyorum.'`}
             </Text>
             <Text style={styles.testimonialAuthor}>— Fatih D., İzmir</Text>
           </View>
