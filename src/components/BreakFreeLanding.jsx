@@ -1,347 +1,148 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 
-const COLORS = {
-  navy: '#0A2540',
-  royal: '#0072B0',
-  cyan: '#14B8D4',
-  gold: '#C9961A',
-  cream: '#F4E8C8',
-};
-
-const styles = {
-  container: {
-    minHeight: '100vh',
-    overflowX: 'hidden',
-    backgroundColor: COLORS.navy,
-    color: 'white',
-    fontFamily: '"Manrope", system-ui, sans-serif',
-    fontSmooth: 'antialiased',
-    WebkitFontSmoothing: 'antialiased',
-  },
-  styleSheet: `
-    @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600;9..144,700&family=Manrope:wght@300;400;500;600;700;800&display=swap');
-    * { -webkit-font-smoothing: antialiased; }
-    .font-display { font-family: 'Fraunces', Georgia, serif; }
-  `,
-  nav: {
-    position: 'fixed',
-    top: 0,
-    left: 0,
-    right: 0,
-    zIndex: 50,
-    width: '100%',
-    transition: 'all 0.5s',
-    display: 'flex',
-    flexDirection: 'column',
-  },
-  navInner: {
-    maxWidth: '80rem',
-    margin: '0 auto',
-    width: '100%',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: '1.25rem 1.5rem',
-    '@media (min-width: 1024px)': {
-      padding: '1.25rem 3rem',
-    },
-  },
-  logoLink: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '0.5rem',
-    textDecoration: 'none',
-    color: 'white',
-  },
-  logoSvg: {
-    width: '32px',
-    height: '32px',
-  },
-  brandText: {
-    fontFamily: '"Fraunces", Georgia, serif',
-    fontSize: '1.25rem',
-    fontWeight: 500,
-  },
-  brandDot: {
-    color: COLORS.gold,
-  },
-  heroSection: {
-    marginTop: '8rem',
-    minHeight: 'calc(100vh - 128px)',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: '1.5rem',
-    textAlign: 'center',
-  },
-  heroContent: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '2rem',
-  },
-  heroTitle: {
-    fontFamily: '"Fraunces", Georgia, serif',
-    fontSize: 'clamp(2.25rem, 8vw, 8rem)',
-    fontWeight: 300,
-    lineHeight: 1.2,
-    margin: 0,
-  },
-  heroTitleGold: {
-    fontStyle: 'italic',
-    color: COLORS.gold,
-  },
-  heroSubtitle: {
-    maxWidth: '42rem',
-    margin: '0 auto',
-    fontSize: '1.25rem',
-    color: 'rgba(255, 255, 255, 0.6)',
-  },
-  ctaButton: {
-    display: 'inline-block',
-    margin: '0 auto',
-    borderRadius: '9999px',
-    backgroundColor: COLORS.gold,
-    color: COLORS.navy,
-    padding: '1rem 2rem',
-    fontWeight: 600,
-    border: 'none',
-    cursor: 'pointer',
-    fontSize: '1rem',
-    transition: 'all 0.3s',
-  },
-  ctaButtonHover: {
-    backgroundColor: COLORS.cream,
-  },
-  featuresSection: {
-    padding: '1.5rem',
-    paddingTop: '5rem',
-    paddingBottom: '5rem',
-  },
-  featuresInner: {
-    maxWidth: '80rem',
-    margin: '0 auto',
-  },
-  sectionTitle: {
-    marginBottom: '3rem',
-    textAlign: 'center',
-    fontFamily: '"Fraunces", Georgia, serif',
-    fontSize: '3rem',
-    fontWeight: 300,
-  },
-  sectionTitleGold: {
-    color: COLORS.gold,
-  },
-  featureGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-    gap: '2rem',
-  },
-  featureCard: {
-    borderRadius: '1rem',
-    border: '1px solid rgba(255, 255, 255, 0.1)',
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
-    backdropFilter: 'blur(4px)',
-    padding: '2rem',
-  },
-  featureTitle: {
-    marginBottom: '0.5rem',
-    fontFamily: '"Fraunces", Georgia, serif',
-    fontSize: '1.5rem',
-    fontWeight: 500,
-    color: COLORS.gold,
-  },
-  featureDesc: {
-    color: 'rgba(255, 255, 255, 0.6)',
-    margin: 0,
-  },
-  ctaSection: {
-    display: 'flex',
-    minHeight: '24rem',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: '1.5rem',
-    textAlign: 'center',
-  },
-  ctaContent: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '1.5rem',
-  },
-  ctaTitle: {
-    fontFamily: '"Fraunces", Georgia, serif',
-    fontSize: '3rem',
-    fontWeight: 300,
-    margin: 0,
-  },
-  ctaSubtitle: {
-    color: 'rgba(255, 255, 255, 0.6)',
-    margin: 0,
-    fontSize: '1rem',
-  },
-  footer: {
-    borderTop: '1px solid rgba(255, 255, 255, 0.1)',
-    padding: '1.5rem',
-    paddingTop: '3rem',
-    paddingBottom: '3rem',
-  },
-  footerInner: {
-    maxWidth: '80rem',
-    margin: '0 auto',
-    textAlign: 'center',
-    fontSize: '0.875rem',
-    color: 'rgba(255, 255, 255, 0.25)',
-  },
-};
+const BreakFreeLogo = ({ size = 36, className = '' }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 178.9 263.7" width={size} height={size} className={className} aria-label="BreakFree">
+    <path fill="#0072B0" d="M136.7,112.6c-23.8-35.8-85.4,9.4-61.6-82.3C65,50.5,58.4,72.5,56.1,95.8c3.5,13.7,10.8,27,19.3,37.7c1.4,1.8,2.9,3.6,4.6,5.4c8.5,9.3,18,16.3,26.6,20.1c2.4,1,4.7,1.8,6.8,2.2c-12.1-10.7-33.8-39.8-20.2-52.7C101.6,100.5,120,101.5,136.7,112.6z"/>
+    <path fill="#C9961A" d="M110.1,108.9c1.3,1.2,2.4,2.5,3.7,3.8c21,23.1,28.2,49.6,16.1,59.2C95.9,198.7,1.8,86.6,65.8,43.1c-33.7,26.7-14.9,74.5,9,100.8c17.8,19.7,40.1,29.3,49.8,21.7c9.7-7.7,3.2-29.8-14.7-49.4c-2.5-2.7-5.1-5.2-7.7-7.6c2.2-0.3,4.4-0.3,6.9,0.1C109.5,108.8,109.8,108.8,110.1,108.9z"/>
+  </svg>
+);
 
 export default function BreakFreeLanding({ onStart }) {
   const [scrolled, setScrolled] = useState(false);
+  const [yearly, setYearly] = useState(true);
+  const [openFaq, setOpenFaq] = useState(null);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 40);
+    const onScroll = () => setScrolled(window.scrollY > 30);
     window.addEventListener('scroll', onScroll);
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  const navStyle = {
-    ...styles.nav,
-    ...(scrolled
-      ? {
-          borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
-          backgroundColor: 'rgba(10, 37, 64, 0.8)',
-          backdropFilter: 'blur(16px)',
-        }
-      : { backgroundColor: 'transparent' }),
-  };
-
   return (
-    <div style={styles.container}>
-      <style>{styles.styleSheet}</style>
+    <div className="min-h-screen bg-[#061829] text-white" style={{ fontFamily: "'Manrope', sans-serif" }}>
+      <style>{`
+        .fraunces { font-family: 'Fraunces', serif; }
+        .glass { background: linear-gradient(135deg, rgba(10, 37, 64, 0.55), rgba(10, 37, 64, 0.35)); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 20px; }
+      `}</style>
 
       {/* Navigation */}
-      <motion.nav
-        initial={{ y: -80 }}
-        animate={{ y: 0 }}
-        transition={{ duration: 0.6, delay: 0.2 }}
-        style={navStyle}
-      >
-        <div style={styles.navInner}>
-          <a href="#" style={styles.logoLink}>
-            <svg style={styles.logoSvg} viewBox="0 0 178.9 263.7" xmlns="http://www.w3.org/2000/svg">
-              <path d="M89.45 0C55.35 0 28.26 27.09 28.26 61.19c0 33.58 24.89 61.19 56.24 61.19 17.64 0 33.58-8.15 43.95-21.01v90.22c0 18.77-15.19 34.1-34.1 34.1-18.77 0-34.1-15.19-34.1-34.1h-28.26c0 34.61 28.26 62.87 62.36 62.87 34.1 0 62.36-28.26 62.36-62.87V61.19C150.64 27.09 123.55 0 89.45 0zm0 28.26c18.25 0 33.58 15.19 33.58 33.93 0 18.77-15.33 33.93-33.58 33.93-18.25 0-33.58-15.16-33.58-33.93 0-18.74 15.33-33.93 33.58-33.93z" fill={COLORS.royal}/>
-              <path d="M89.45 131.62c17.64 0 33.58 8.15 43.95 21.01v28.26c-10.6 13.52-26.53 21.67-43.95 21.67-34.1 0-62.36-27.52-62.36-61.19v-28.26c13.18 20.49 35.88 33.58 62.36 33.51z" fill={COLORS.gold}/>
-            </svg>
-            <span style={styles.brandText}>
-              BreakFree
-              <span style={styles.brandDot}>.</span>
-            </span>
-          </a>
-          <div />
+      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? 'bg-[#061829]/90 border-b border-[#C9961A]/20 backdrop-blur-lg' : 'bg-transparent'}`}>
+        <div className="max-w-[1240px] mx-auto px-6 py-4 flex justify-between items-center">
+          <div className="flex items-center gap-2">
+            <BreakFreeLogo size={36} />
+            <span className="fraunces text-xl font-medium">Break<span className="italic text-[#C9961A]">Free</span></span>
+          </div>
+          <div className="flex gap-8 items-center text-sm font-medium text-white/80">
+            <a href="#features" className="hover:text-[#C9961A]">Özellikler</a>
+            <a href="#pricing" className="hover:text-[#C9961A]">Fiyatlandırma</a>
+            <button onClick={onStart} className="bg-gradient-to-r from-[#C9961A] to-[#E6B530] text-[#061829] px-6 py-2 rounded-full font-bold">
+              Hemen Başla
+            </button>
+          </div>
         </div>
-      </motion.nav>
+      </nav>
 
-      {/* Hero Section */}
-      <motion.section
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.8 }}
-        style={styles.heroSection}
-      >
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.2 }}
-          style={styles.heroContent}
-        >
-          <h1 style={styles.heroTitle}>
-            Sağlık ve Fitness için <span style={styles.heroTitleGold}>Özgürlük</span>
-          </h1>
+      {/* Hero */}
+      <section className="min-h-screen flex items-center pt-24 px-6">
+        <div className="max-w-[1240px] mx-auto grid md:grid-cols-2 gap-12 items-center">
+          <div className="space-y-6">
+            <div className="inline-flex items-center gap-2 bg-[#C9961A]/10 border border-[#C9961A]/30 rounded-full px-4 py-2 text-xs font-semibold text-[#E6B530]">
+              Türkiye'nin #1 Wellness Platformu
+            </div>
+            <h1 className="fraunces text-6xl md:text-8xl font-medium leading-tight">
+              Sağlığının <br /><span className="italic text-[#C9961A]">Sahibi Ol.</span>
+            </h1>
+            <p className="text-xl text-white/70 max-w-lg">
+              Uyku, stres, beslenme ve mental sağlık için yapay zeka koçu, canlı mentor ve gerçek topluluk desteği.
+            </p>
+            <button onClick={onStart} className="bg-gradient-to-r from-[#C9961A] to-[#E6B530] text-[#061829] px-10 py-4 rounded-full font-bold text-lg">
+              Hemen Başla →
+            </button>
+          </div>
+        </div>
+      </section>
 
-          <p style={styles.heroSubtitle}>
-            BreakFree, Türkiye&rsquo;nin en dynamik wellness topluluğudur. Bin binlerce insanla birlikte hedeflerine ulaşın.
-          </p>
-
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={onStart}
-            style={styles.ctaButton}
-            onHoverStart={(e) => {
-              e.currentTarget.style.backgroundColor = COLORS.cream;
-            }}
-            onHoverEnd={(e) => {
-              e.currentTarget.style.backgroundColor = COLORS.gold;
-            }}
-          >
-            Başla
-          </motion.button>
-        </motion.div>
-      </motion.section>
-
-      {/* Features Section */}
-      <section style={styles.featuresSection}>
-        <div style={styles.featuresInner}>
-          <h2 style={styles.sectionTitle}>
-            Neden <span style={styles.sectionTitleGold}>BreakFree?</span>
-          </h2>
-
-          <div style={styles.featureGrid}>
+      {/* Features */}
+      <section id="features" className="py-20 px-6">
+        <div className="max-w-[1240px] mx-auto">
+          <h2 className="fraunces text-5xl text-center mb-16">Her şey tek bir yerde.</h2>
+          <div className="grid md:grid-cols-3 gap-8">
             {[
-              { title: 'Topluluk', description: 'Binlerce aktif üye ile birlikte büyü' },
-              { title: 'Aktiviteler', description: 'Yoga, koşu, meditasyon ve daha fazlası' },
-              { title: 'Rehberlik', description: 'Profesyonel eğitmenler sana rehberlik edecek' },
-            ].map((item, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: i * 0.1 }}
-                style={styles.featureCard}
-              >
-                <h3 style={styles.featureTitle}>{item.title}</h3>
-                <p style={styles.featureDesc}>{item.description}</p>
-              </motion.div>
+              { icon: '🎧', title: 'Canlı Konuşmalar', desc: 'Sağlık uzmanları ve doktorlarla canlı oturumlar.' },
+              { icon: '🧑‍⚕️', title: '1-on-1 Mentörlük', desc: 'Sertifikalı koçlardan özel rehberlik.' },
+              { icon: '🤖', title: 'AI Wellness Koçu', desc: '24/7 kişiselleştirilmiş tavsiyeler.' },
+            ].map((f, i) => (
+              <div key={i} className="glass p-8 hover:border-[#C9961A]/40 transition-all">
+                <div className="text-4xl mb-4">{f.icon}</div>
+                <h3 className="fraunces text-2xl mb-2">{f.title}</h3>
+                <p className="text-white/70">{f.desc}</p>
+              </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section style={styles.ctaSection}>
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          transition={{ duration: 0.8 }}
-          style={styles.ctaContent}
-        >
-          <h2 style={styles.ctaTitle}>
-            Bugün <span style={styles.sectionTitleGold}>başla</span>
-          </h2>
-          <p style={styles.ctaSubtitle}>Sağlık yolculuğuna başlamak için hiç geç değil</p>
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={onStart}
-            style={styles.ctaButton}
-            onHoverStart={(e) => {
-              e.currentTarget.style.backgroundColor = COLORS.cream;
-            }}
-            onHoverEnd={(e) => {
-              e.currentTarget.style.backgroundColor = COLORS.gold;
-            }}
-          >
-            Katıl
-          </motion.button>
-        </motion.div>
+      {/* Pricing */}
+      <section id="pricing" className="py-20 px-6">
+        <div className="max-w-[1080px] mx-auto">
+          <h2 className="fraunces text-5xl text-center mb-12">Sağlığına yatırım yap.</h2>
+          <div className="flex justify-center gap-4 mb-12">
+            <button className={`px-6 py-2 rounded-full ${!yearly ? 'bg-[#C9961A]' : 'bg-[#061829]'}`} onClick={() => setYearly(false)}>Aylık</button>
+            <button className={`px-6 py-2 rounded-full ${yearly ? 'bg-[#C9961A]' : 'bg-[#061829]'}`} onClick={() => setYearly(true)}>Yıllık</button>
+          </div>
+          <div className="grid md:grid-cols-2 gap-8">
+            <div className="glass p-8">
+              <h3 className="text-2xl mb-4">Pro</h3>
+              <div className="text-4xl font-bold mb-6">{yearly ? '₺1.990' : '₺249'}</div>
+              <ul className="space-y-2 mb-8">
+                <li>✓ AI Wellness Koçu</li>
+                <li>✓ Sınırsız Canlı Talks</li>
+                <li>✓ Detaylı Analitikler</li>
+              </ul>
+              <button onClick={onStart} className="w-full bg-[#C9961A] py-3 rounded-lg font-bold">Başla</button>
+            </div>
+            <div className="glass p-8">
+              <h3 className="text-2xl mb-4">Kurumsal</h3>
+              <div className="text-4xl font-bold mb-6">Özel</div>
+              <p className="text-white/70 mb-8">Takımlar ve şirketler için özel çözümler.</p>
+              <button className="w-full border border-[#C9961A] py-3 rounded-lg font-bold">İletişime Geç</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <section className="py-20 px-6">
+        <div className="max-w-[820px] mx-auto">
+          <h2 className="fraunces text-5xl text-center mb-12">Sıkça Sorulan Sorular</h2>
+          <div className="space-y-4">
+            {[
+              { q: 'Ücretsiz plan var mı?', a: 'Evet, temel özellikler ücretsizdir.' },
+              { q: 'Verilerim güvende mi?', a: 'Evet, uçtan uca şifrelidir.' },
+            ].map((f, i) => (
+              <div key={i} className="glass p-6 cursor-pointer" onClick={() => setOpenFaq(openFaq === i ? null : i)}>
+                <div className="font-bold">{f.q}</div>
+                {openFaq === i && <p className="mt-4 text-white/70">{f.a}</p>}
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="py-20 px-6 text-center">
+        <div className="glass p-16 max-w-4xl mx-auto">
+          <h2 className="fraunces text-5xl mb-6">Wellness yolculuğuna başla.</h2>
+          <button onClick={onStart} className="bg-gradient-to-r from-[#C9961A] to-[#E6B530] text-[#061829] px-10 py-4 rounded-full font-bold text-lg">
+            Hemen Başla →
+          </button>
+        </div>
       </section>
 
       {/* Footer */}
-      <footer style={styles.footer}>
-        <div style={styles.footerInner}>
-          <p>© 2026 BreakFree Türkiye. Tüm hakları saklıdır.</p>
-        </div>
+      <footer className="border-t border-[#C9961A]/10 px-6 py-12 text-center text-sm text-white/50">
+        © 2026 BreakFree Türkiye. Tüm hakları saklıdır.
       </footer>
     </div>
   );
