@@ -1374,7 +1374,7 @@
                 <a href="#pricing">Fiyatlandırma</a>
                 <a href="#testimonials">Yorumlar</a>
                 <a href="#faq">SSS</a>
-                <a href="#contact" className="btn-primary" style={{ padding: '10px 22px' }}>Hemen Başla</a>
+                <a href="/app" className="btn-primary" style={{ padding: '10px 22px' }}>Hemen Başla</a>
               </div>
 
               <button
@@ -1392,7 +1392,7 @@
               <a href="#pricing" onClick={close}>Fiyatlandırma</a>
               <a href="#testimonials" onClick={close}>Yorumlar</a>
               <a href="#faq" onClick={close}>SSS</a>
-              <a href="#contact" className="btn-primary" onClick={close}>Hemen Başla</a>
+              <a href="/app" className="btn-primary" onClick={close}>Hemen Başla</a>
             </div>
           </div>
         </nav>
@@ -1426,8 +1426,8 @@
               </p>
 
               <div className="hero-cta-row">
-                <a href="#contact" className="btn-primary">
-                  iOS Uygulamasını İndir
+                <a href="/app" className="btn-primary">
+                  Ücretsiz Başla
                   <span style={{ fontSize: '16px' }}>→</span>
                 </a>
                 <a href="#features" className="btn-ghost">İçeriği Keşfet</a>
@@ -1794,9 +1794,13 @@
                   <div className="pricing-period">
                     {p.monthly === 'Özel' ? 'iletişime geçin' : (yearly ? '/ yıl' : '/ ay')}
                   </div>
-                  <button className={p.featured ? 'btn-primary' : 'btn-ghost'} style={{ width: '100%', justifyContent: 'center' }}>
+                  <a
+                    href={p.name === 'Kurumsal' ? '#contact' : '/app'}
+                    className={p.featured ? 'btn-primary' : 'btn-ghost'}
+                    style={{ width: '100%', justifyContent: 'center' }}
+                  >
                     {p.name === 'Kurumsal' ? 'Görüşme Ayarla' : 'Hemen Başla'}
-                  </button>
+                  </a>
                   <ul className="pricing-features" style={{ marginTop: '28px' }}>
                     {p.features.map((f, j) => (
                       <li key={j}>
