@@ -5,14 +5,11 @@ import {
   TouchableOpacity,
   StyleSheet,
   SafeAreaView,
-  Dimensions,
 } from 'react-native';
 import { colors } from '../../constants/designTokens';
 
-const { height, width } = Dimensions.get('window');
-
 export default function OnboardingScreen({ navigation }) {
-  const [currentPage, setCurrentPage] = useState(0);
+  const [currentPage] = useState(0);
 
   const pages = [
     {

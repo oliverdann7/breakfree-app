@@ -11,8 +11,6 @@ import {
 import Card from '../../components/common/Card';
 import { colors } from '../../constants/designTokens';
 
-const { width } = Dimensions.get('window');
-
 export default function HealthMetricsScreen() {
   return (
     <SafeAreaView style={styles.container}>

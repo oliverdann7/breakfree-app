@@ -140,7 +140,7 @@ export default function CommunityScreen() {
           { initial: 'A', name: 'Aslı', color: colors.gold },
           { initial: 'M', name: 'Mert', color: colors.cyan },
         ].map((person, i) => (
-          <View key={i} style={[styles.avatarCircle, { backgroundColor: person.color }]}>
+          <View key={i} style={[styles.avatarCircleStory, { backgroundColor: person.color }]}>
             <Text style={styles.avatarInitial}>{person.initial}</Text>
             <Text style={styles.avatarName}>{person.name}</Text>
           </View>
@@ -245,7 +245,7 @@ const styles = StyleSheet.create({
     color: 'rgba(255,255,255,0.5)',
     fontWeight: '500',
   },
-  avatarCircle: {
+  avatarCircleStory: {
     alignItems: 'center',
     gap: 4,
   },

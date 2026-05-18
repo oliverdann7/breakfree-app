@@ -6,7 +6,6 @@ import {
   TouchableOpacity,
   StyleSheet,
   SafeAreaView,
-  LinearGradient,
 } from 'react-native';
 import Card from '../../components/common/Card';
 import { colors } from '../../constants/designTokens';

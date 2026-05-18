@@ -1,11 +1,13 @@
 import React, { useEffect } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet, SafeAreaView } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, SafeAreaView, Dimensions } from 'react-native';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { fetchMetrics } from '../../store/slices/metricsSlice';
 import WellnessRing from '../../components/features/WellnessRing';
 import MetricCard from '../../components/features/MetricCard';
 import Card from '../../components/common/Card';
 import { colors } from '../../constants/designTokens';
+
+const { width } = Dimensions.get('window');
 
 function greeting() {
   const h = new Date().getHours();
@@ -15,9 +17,9 @@ function greeting() {
 }
 
 const TODAY_PLAN = [
-  { time: '07:00', title: 'Sabah Yürüyüşü', done: true },
-  { time: '12:00', title: "Beslenme Talk'ı — Prof. Mert", done: false },
-  { time: '19:00', title: 'Akşam Meditasyonu', done: false },
+  { time: '07:00', title: 'Sabah meditasyonu', duration: '10dk', done: true, icon: '🧘', accent: false },
+  { time: '17:30', title: 'Fitness · Üst beden', duration: '45dk', done: false, icon: '💪', accent: false },
+  { time: '20:00', title: 'Wellness palestrası', duration: '30dk', done: false, icon: '🎙', accent: true },
 ];
 
 export default function DashboardScreen() {
@@ -29,116 +31,126 @@ export default function DashboardScreen() {
     dispatch(fetchMetrics());
   }, []);
 
-  const metrics = dailyMetrics
-    ? [
-        {
-          emoji: '😴',
-          label: 'Uyku',
-          value: `${dailyMetrics.sleep.hours}`,
-          unit: 'saat',
-          color: colors.royal,
-        },
-        {
-          emoji: '❤️',
-          label: 'Kalp Atışı',
-          value: `${dailyMetrics.heartRate}`,
-          unit: 'bpm',
-          color: colors.error,
-        },
-        {
-          emoji: '👟',
-          label: 'Adımlar',
-          value: `${(dailyMetrics.steps / 1000).toFixed(1)}K`,
-          unit: 'adım',
-          color: colors.success,
-        },
-        {
-          emoji: '🔥',
-          label: 'Kalori',
-          value: `${dailyMetrics.calories}`,
-          unit: 'kcal',
-          color: colors.gold,
-        },
-      ]
-    : [];
+  const metrics = [
+    {
+      emoji: '😴',
+      label: 'Uyku',
+      value: '7s 24dk',
+      sub: 'İyi',
+      color: colors.cyan,
+    },
+    {
+      emoji: '❤️',
+      label: 'Nabız',
+      value: '64',
+      sub: 'Dinlenme',
+      color: colors.gold,
+    },
+    {
+      emoji: '👟',
+      label: 'Adım',
+      value: '8.2k',
+      sub: 'Hedef %82',
+      color: colors.cyan,
+    },
+    {
+      emoji: '🔥',
+      label: 'Kalori',
+      value: '1,847',
+      sub: 'Aktif',
+      color: colors.gold,
+    },
+  ];
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
         {/* Header */}
         <View style={styles.header}>
           <View>
-            <Text style={styles.greeting}>{greeting()},</Text>
-            <Text style={styles.name}>{user?.displayName || 'Kullanıcı'} 👋</Text>
+            <Text style={styles.date}>Pazar, 15 Haziran</Text>
+            <Text style={styles.greeting}>
+              {greeting()}, <Text style={styles.name}>{user?.displayName || 'Elif'}</Text>
+            </Text>
           </View>
           <TouchableOpacity style={styles.notifBtn}>
             <Text style={styles.notifIcon}>🔔</Text>
+            <View style={styles.notifDot} />
           </TouchableOpacity>
         </View>
 
         {/* Wellness Ring Card */}
-        <Card style={styles.wellnessCard} variant="elevated">
+        <Card style={styles.wellnessCard}>
           <View style={styles.wellnessRow}>
-            <WellnessRing score={wellnessScore || 0} size={150} />
+            <View style={styles.ringContainer}>
+              <WellnessRing score={wellnessScore || 76} size={70} />
+            </View>
             <View style={styles.wellnessSide}>
-              <Text style={styles.wellnessSideTitle}>Bu Hafta</Text>
-              <View style={styles.wellnessStat}>
-                <Text style={styles.wellnessStatValue} numberOfLines={1}>
-                  +5 <Text style={[styles.wellnessStatSub, { color: colors.success }]}>↑</Text>
-                </Text>
-                <Text style={styles.wellnessStatLabel}>dünden fazla</Text>
-              </View>
-              <View style={styles.wellnessDivider} />
-              <View style={styles.wellnessStat}>
-                <Text style={styles.wellnessStatValue}>{wellnessScore || 0}</Text>
-                <Text style={styles.wellnessStatLabel}>haftalık ort.</Text>
-              </View>
+              <Text style={styles.wellnessSideLabel}>Wellness skorun</Text>
+              <Text style={styles.wellnessSideTitle}>
+                Bugün <Text style={styles.wellnessSideAccent}>hazırsın.</Text>
+              </Text>
             </View>
           </View>
         </Card>
 
-        {/* Metric Cards */}
-        <Text style={styles.sectionTitle}>Günlük Metrikler</Text>
+        {/* Metrics Grid */}
         <View style={styles.metricsGrid}>
           {metrics.map((m) => (
-            <MetricCard key={m.label} {...m} style={styles.metricCardSize} />
+            <Card key={m.label} style={styles.metricCard}>
+              <Text style={{ fontSize: 14, color: m.color }}>●</Text>
+              <Text style={styles.metricValue}>{m.value}</Text>
+              <Text style={styles.metricLabel}>{m.label}</Text>
+              <Text style={styles.metricSub}>{m.sub}</Text>
+            </Card>
           ))}
         </View>
 
         {/* Today's Plan */}
-        <Text style={styles.sectionTitle}>Bugünkü Plan</Text>
-        <Card style={styles.planCard}>
-          {TODAY_PLAN.map((item, i) => (
-            <View
-              key={item.time}
-              style={[styles.planItem, i < TODAY_PLAN.length - 1 && styles.planItemBorder]}
-            >
-              <Text style={styles.planTime}>{item.time}</Text>
-              <View style={[styles.planDot, item.done && styles.planDotDone]} />
-              <Text style={[styles.planTitle, item.done && styles.planTitleDone]}>
-                {item.title}
-              </Text>
-              {item.done && <Text style={styles.planCheck}>✓</Text>}
-            </View>
-          ))}
-        </Card>
-
-        {/* Quick Actions */}
-        <Text style={styles.sectionTitle}>Hızlı Erişim</Text>
-        <View style={styles.quickRow}>
-          {[
-            { emoji: '🎙', label: 'Palestralar', color: colors.royal },
-            { emoji: '📊', label: 'Sağlık', color: colors.success },
-            { emoji: '👥', label: 'Topluluk', color: colors.gold },
-            { emoji: '🧘', label: 'Meditasyon', color: colors.cyan },
-          ].map((action) => (
-            <TouchableOpacity key={action.label} style={styles.quickBtn} activeOpacity={0.7}>
-              <View style={[styles.quickIcon, { backgroundColor: action.color + '20' }]}>
-                <Text style={styles.quickEmoji}>{action.emoji}</Text>
+        <View style={styles.planSection}>
+          <View style={styles.planHeader}>
+            <Text style={styles.sectionTitle}>Bugünkü plan</Text>
+            <Text style={styles.planArrow}>→</Text>
+          </View>
+          <View style={styles.planList}>
+            {TODAY_PLAN.map((item, i) => (
+              <View key={item.time}>
+                <View
+                  style={[
+                    styles.planItem,
+                    item.accent && styles.planItemAccent,
+                  ]}
+                >
+                  <View style={[styles.planIconBox, item.accent && styles.planIconBoxAccent]}>
+                    {item.done ? (
+                      <Text style={styles.planCheck}>✓</Text>
+                    ) : (
+                      <Text style={styles.planEmoji}>{item.icon}</Text>
+                    )}
+                  </View>
+                  <View style={styles.planContent}>
+                    <Text
+                      style={[
+                        styles.planTitle,
+                        item.done && styles.planTitleDone,
+                      ]}
+                    >
+                      {item.title}
+                    </Text>
+                    <Text style={styles.planTime}>
+                      {item.time} · {item.duration}
+                    </Text>
+                  </View>
+                  {item.accent && (
+                    <View style={styles.planLiveTag}>
+                      <Text style={styles.planLiveText}>Canlı</Text>
+                    </View>
+                  )}
+                </View>
+                {i < TODAY_PLAN.length - 1 && <View style={styles.planDivider} />}
               </View>
-              <Text style={styles.quickLabel}>{action.label}</Text>
-            </TouchableOpacity>
-          ))}
+            ))}
+          </View>
         </View>
 
         <View style={{ height: 24 }} />
@@ -148,18 +160,39 @@ export default function DashboardScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.bgPrimary },
+  container: {
+    flex: 1,
+    backgroundColor: colors.bgPrimary,
+  },
+  scrollContent: {
+    paddingBottom: 20,
+  },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     paddingHorizontal: 20,
     paddingTop: 16,
     paddingBottom: 20,
   },
-  greeting: { fontSize: 14, color: colors.textSecondary },
-  name: { fontSize: 22, fontWeight: '700', color: colors.textPrimary },
+  date: {
+    fontSize: 10,
+    color: 'rgba(255,255,255,0.4)',
+    fontWeight: '600',
+    letterSpacing: 0.2,
+    marginBottom: 4,
+  },
+  greeting: {
+    fontSize: 20,
+    color: colors.textPrimary,
+    fontWeight: '300',
+  },
+  name: {
+    fontWeight: '600',
+    color: colors.gold,
+  },
   notifBtn: {
+    position: 'relative',
     width: 40,
     height: 40,
     borderRadius: 20,
@@ -167,69 +200,167 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  notifIcon: { fontSize: 18 },
-  wellnessCard: { marginHorizontal: 20, marginBottom: 8 },
-  wellnessRow: { flexDirection: 'row', alignItems: 'center', gap: 20 },
-  wellnessSide: { flex: 1, gap: 12 },
-  wellnessSideTitle: {
-    fontSize: 12,
-    color: colors.textTertiary,
-    fontWeight: '600',
-    letterSpacing: 0.5,
-  },
-  wellnessStat: { gap: 2 },
-  wellnessStatValue: { fontSize: 22, fontWeight: '800', color: colors.textPrimary },
-  wellnessStatSub: { fontSize: 16 },
-  wellnessStatLabel: { fontSize: 11, color: colors.textTertiary },
-  wellnessDivider: { height: 1, backgroundColor: colors.border },
-  sectionTitle: {
+  notifIcon: {
     fontSize: 16,
-    fontWeight: '700',
-    color: colors.textPrimary,
+  },
+  notifDot: {
+    position: 'absolute',
+    top: 6,
+    right: 6,
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: colors.gold,
+  },
+  wellnessCard: {
     marginHorizontal: 20,
-    marginTop: 20,
-    marginBottom: 12,
+    marginBottom: 16,
+    paddingVertical: 16,
+    paddingHorizontal: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(230,181,48,0.2)',
+    backgroundColor: 'rgba(230,181,48,0.08)',
+  },
+  wellnessRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 16,
+  },
+  ringContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  wellnessSide: {
+    flex: 1,
+    gap: 4,
+  },
+  wellnessSideLabel: {
+    fontSize: 10,
+    color: 'rgba(255,255,255,0.4)',
+    fontWeight: '500',
+  },
+  wellnessSideTitle: {
+    fontSize: 16,
+    color: colors.textPrimary,
+    fontWeight: '300',
+  },
+  wellnessSideAccent: {
+    color: colors.gold,
+    fontWeight: '600',
   },
   metricsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     paddingHorizontal: 20,
-    gap: 10,
+    gap: 8,
+    marginBottom: 20,
   },
-  metricCardSize: { width: '47%' },
-  planCard: { marginHorizontal: 20, padding: 0, overflow: 'hidden' },
+  metricCard: {
+    width: (width - 56) / 2,
+    paddingVertical: 16,
+    paddingHorizontal: 12,
+    gap: 8,
+  },
+  metricValue: {
+    fontSize: 18,
+    fontWeight: '300',
+    color: colors.textPrimary,
+    marginTop: 4,
+  },
+  metricLabel: {
+    fontSize: 9,
+    color: 'rgba(255,255,255,0.35)',
+    fontWeight: '600',
+  },
+  metricSub: {
+    fontSize: 8,
+    color: 'rgba(255,255,255,0.5)',
+  },
+  planSection: {
+    paddingHorizontal: 20,
+  },
+  planHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  sectionTitle: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: colors.textPrimary,
+  },
+  planArrow: {
+    fontSize: 12,
+    color: 'rgba(255,255,255,0.4)',
+  },
+  planList: {
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.08)',
+    overflow: 'hidden',
+  },
   planItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 16,
     paddingVertical: 12,
+    paddingHorizontal: 12,
     gap: 12,
+    backgroundColor: 'rgba(255,255,255,0.03)',
   },
-  planItemBorder: { borderBottomWidth: 1, borderBottomColor: colors.border },
-  planTime: { fontSize: 12, color: colors.textTertiary, width: 44 },
-  planDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: colors.cyan,
+  planItemAccent: {
+    borderColor: 'rgba(230,181,48,0.3)',
+    backgroundColor: 'rgba(230,181,48,0.05)',
   },
-  planDotDone: { backgroundColor: colors.success },
-  planTitle: { flex: 1, fontSize: 14, color: colors.textPrimary },
-  planTitleDone: { color: colors.textTertiary, textDecorationLine: 'line-through' },
-  planCheck: { color: colors.success, fontWeight: '700', fontSize: 15 },
-  quickRow: {
-    flexDirection: 'row',
-    paddingHorizontal: 20,
-    justifyContent: 'space-between',
-  },
-  quickBtn: { alignItems: 'center', gap: 6 },
-  quickIcon: {
-    width: 56,
-    height: 56,
-    borderRadius: 16,
+  planIconBox: {
+    width: 36,
+    height: 36,
+    borderRadius: 8,
+    backgroundColor: 'rgba(255,255,255,0.1)',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  quickEmoji: { fontSize: 26 },
-  quickLabel: { fontSize: 11, color: colors.textSecondary },
+  planIconBoxAccent: {
+    backgroundColor: colors.gold,
+  },
+  planEmoji: {
+    fontSize: 18,
+  },
+  planCheck: {
+    fontSize: 16,
+    color: colors.cyan,
+    fontWeight: '700',
+  },
+  planContent: {
+    flex: 1,
+    gap: 2,
+  },
+  planTitle: {
+    fontSize: 12,
+    color: colors.textPrimary,
+    fontWeight: '500',
+  },
+  planTitleDone: {
+    color: 'rgba(255,255,255,0.4)',
+    textDecorationLine: 'line-through',
+  },
+  planTime: {
+    fontSize: 9,
+    color: 'rgba(255,255,255,0.4)',
+  },
+  planLiveTag: {
+    backgroundColor: colors.gold,
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+    borderRadius: 999,
+  },
+  planLiveText: {
+    fontSize: 7,
+    fontWeight: '700',
+    color: '#0A2540',
+  },
+  planDivider: {
+    height: 1,
+    backgroundColor: 'rgba(255,255,255,0.08)',
+  },
 });
