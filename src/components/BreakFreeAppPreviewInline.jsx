@@ -4,11 +4,11 @@ import { motion, AnimatePresence, useInView } from 'framer-motion';
 const C = {
   navy: '#0A2540',
   deep: '#061829',
-  royal: '#0B72B9',
+  royal: '#0072B0',
   cyan: '#14B8D4',
   cream: '#F4E8C8',
-  gold: '#E6B530',
-  amber: '#C99419',
+  gold: '#C9961A',
+  amber: '#C9961A',
 };
 
 /* ── tiny icon set (pure SVG, no dependency) ── */
