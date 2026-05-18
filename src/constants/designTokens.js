@@ -3,10 +3,10 @@ export const colors = {
   // Primary Brand Colors
   navy: '#0A2540',
   navyDeep: '#061829',
-  royal: '#0B72B9',
+  royal: '#0072B0',
   cyan: '#14B8D4',
-  gold: '#E6B530',
-  amber: '#C99419',
+  gold: '#C9961A',
+  amber: '#C9961A',
 
   // Secondary
   cream: '#F4E8C8',

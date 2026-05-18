@@ -53,11 +53,11 @@ import {
 const C = {
   navy: '#0A2540',
   navyDeep: '#061829',
-  royal: '#0B72B9',
+  royal: '#0072B0',
   cyan: '#14B8D4',
   cream: '#F4E8C8',
-  gold: '#E6B530',
-  amber: '#C99419',
+  gold: '#C9961A',
+  amber: '#C9961A',
 };
 
 // Phone frame
@@ -76,7 +76,7 @@ const PhoneFrame = ({ children, label, sublabel, delay = 0, accent = false }) =>
       <div className="mb-6 text-center">
         <div
           className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-[10px] uppercase tracking-[0.25em] ${
-            accent ? 'bg-[#E6B530] text-[#0A2540]' : 'border border-white/15 text-white/50'
+            accent ? 'bg-[#C9961A] text-[#0A2540]' : 'border border-white/15 text-white/50'
           }`}
         >
           {label}
@@ -93,7 +93,7 @@ const PhoneFrame = ({ children, label, sublabel, delay = 0, accent = false }) =>
         {/* Glow */}
         <div
           className={`absolute -inset-8 rounded-[60px] blur-3xl opacity-30 ${
-            accent ? 'bg-[#E6B530]' : 'bg-[#14B8D4]'
+            accent ? 'bg-[#C9961A]' : 'bg-[#14B8D4]'
           }`}
         />
 
@@ -142,11 +142,11 @@ const PhoneFrame = ({ children, label, sublabel, delay = 0, accent = false }) =>
 const ScreenOnboarding = () => (
   <div className="relative h-full w-full overflow-hidden">
     {/* Animated gradient bg */}
-    <div className="absolute inset-0 bg-gradient-to-br from-[#0A2540] via-[#0B72B9]/40 to-[#0A2540]" />
+    <div className="absolute inset-0 bg-gradient-to-br from-[#0A2540] via-[#0072B0]/40 to-[#0A2540]" />
     <motion.div
       animate={{ x: [0, 30, 0], y: [0, -20, 0] }}
       transition={{ duration: 8, repeat: Infinity }}
-      className="absolute top-20 -left-10 h-40 w-40 rounded-full bg-[#E6B530] opacity-30 blur-3xl"
+      className="absolute top-20 -left-10 h-40 w-40 rounded-full bg-[#C9961A] opacity-30 blur-3xl"
     />
     <motion.div
       animate={{ x: [0, -20, 0], y: [0, 30, 0] }}
@@ -158,13 +158,13 @@ const ScreenOnboarding = () => (
       {/* Logo */}
       <div className="flex items-center justify-center gap-2">
         <div className="relative h-7 w-7">
-          <div className="absolute inset-0 rounded-full bg-gradient-to-br from-[#E6B530] to-[#C99419]" />
+          <div className="absolute inset-0 rounded-full bg-gradient-to-br from-[#C9961A] to-[#C9961A]" />
           <div className="absolute inset-[2px] rounded-full bg-[#0A2540] flex items-center justify-center">
-            <div className="h-1.5 w-1.5 rounded-full bg-[#E6B530]" />
+            <div className="h-1.5 w-1.5 rounded-full bg-[#C9961A]" />
           </div>
         </div>
         <span className="font-display text-lg font-medium text-white">
-          BreakFree<span className="text-[#E6B530]">.</span>
+          BreakFree<span className="text-[#C9961A]">.</span>
         </span>
       </div>
 
@@ -175,7 +175,7 @@ const ScreenOnboarding = () => (
           <motion.div
             animate={{ rotate: 360 }}
             transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
-            className="absolute -inset-8 rounded-full border border-[#E6B530]/20"
+            className="absolute -inset-8 rounded-full border border-[#C9961A]/20"
           />
           <motion.div
             animate={{ rotate: -360 }}
@@ -189,7 +189,7 @@ const ScreenOnboarding = () => (
             transition={{ duration: 3, repeat: Infinity }}
             className="absolute -left-12 -top-4 rounded-full bg-white/10 px-3 py-1.5 text-[10px] text-white backdrop-blur-md border border-white/10"
           >
-            <Heart className="inline h-3 w-3 mr-1 text-[#E6B530]" />
+            <Heart className="inline h-3 w-3 mr-1 text-[#C9961A]" />
             Sağlık
           </motion.div>
           <motion.div
@@ -205,12 +205,12 @@ const ScreenOnboarding = () => (
             transition={{ duration: 4, repeat: Infinity, delay: 1 }}
             className="absolute -left-6 bottom-0 rounded-full bg-white/10 px-3 py-1.5 text-[10px] text-white backdrop-blur-md border border-white/10"
           >
-            <Brain className="inline h-3 w-3 mr-1 text-[#E6B530]" />
+            <Brain className="inline h-3 w-3 mr-1 text-[#C9961A]" />
             Zihin
           </motion.div>
 
           {/* Center */}
-          <div className="relative flex h-28 w-28 items-center justify-center rounded-full bg-gradient-to-br from-[#E6B530] to-[#C99419] shadow-lg shadow-[#E6B530]/40">
+          <div className="relative flex h-28 w-28 items-center justify-center rounded-full bg-gradient-to-br from-[#C9961A] to-[#C9961A] shadow-lg shadow-[#C9961A]/40">
             <Sparkles className="h-12 w-12 text-[#0A2540]" strokeWidth={1.5} />
           </div>
         </div>
@@ -220,7 +220,7 @@ const ScreenOnboarding = () => (
       <div className="text-center">
         <h2 className="font-display text-3xl font-light leading-tight text-white">
           Özgürlüğüne <br />
-          <span className="italic text-[#E6B530]">hoş geldin.</span>
+          <span className="italic text-[#C9961A]">hoş geldin.</span>
         </h2>
         <p className="mt-3 text-xs text-white/60 leading-relaxed px-4">
           Türkiye'nin en bağlı wellness topluluğu cebinde.
@@ -229,7 +229,7 @@ const ScreenOnboarding = () => (
 
       {/* CTA */}
       <div className="mt-6 space-y-2">
-        <button className="w-full rounded-full bg-[#E6B530] py-3.5 text-sm font-semibold text-[#0A2540]">
+        <button className="w-full rounded-full bg-[#C9961A] py-3.5 text-sm font-semibold text-[#0A2540]">
           Başla
         </button>
         <button className="w-full rounded-full border border-white/15 py-3.5 text-sm text-white">
@@ -239,7 +239,7 @@ const ScreenOnboarding = () => (
 
       {/* Dots */}
       <div className="mt-5 flex justify-center gap-1.5">
-        <div className="h-1 w-6 rounded-full bg-[#E6B530]" />
+        <div className="h-1 w-6 rounded-full bg-[#C9961A]" />
         <div className="h-1 w-1 rounded-full bg-white/20" />
         <div className="h-1 w-1 rounded-full bg-white/20" />
       </div>
@@ -259,20 +259,20 @@ const ScreenDashboard = () => (
               Pazar, 15 Haziran
             </div>
             <div className="mt-1 font-display text-xl font-light text-white">
-              Günaydın, <span className="italic text-[#E6B530]">Elif</span>
+              Günaydın, <span className="italic text-[#C9961A]">Elif</span>
             </div>
           </div>
           <div className="relative">
             <div className="flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/5">
               <Bell className="h-4 w-4 text-white/70" />
             </div>
-            <div className="absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full bg-[#E6B530]" />
+            <div className="absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full bg-[#C9961A]" />
           </div>
         </div>
       </div>
 
       {/* Ring score */}
-      <div className="mx-5 mt-5 overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-[#E6B530]/10 via-transparent to-[#14B8D4]/10 p-4">
+      <div className="mx-5 mt-5 overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-[#C9961A]/10 via-transparent to-[#14B8D4]/10 p-4">
         <div className="flex items-center gap-4">
           <div className="relative h-20 w-20">
             <svg className="absolute inset-0 -rotate-90" viewBox="0 0 80 80">
@@ -304,7 +304,7 @@ const ScreenDashboard = () => (
           <div className="flex-1">
             <div className="text-xs text-white/50">Wellness skorun</div>
             <div className="mt-0.5 font-display text-lg leading-tight text-white">
-              Bugün <span className="text-[#E6B530]">hazırsın.</span>
+              Bugün <span className="text-[#C9961A]">hazırsın.</span>
             </div>
             <div className="mt-1 flex items-center gap-1 text-[10px] text-[#14B8D4]">
               <TrendingUp className="h-3 w-3" />
@@ -318,9 +318,9 @@ const ScreenDashboard = () => (
       <div className="mx-5 mt-3 grid grid-cols-2 gap-2">
         {[
           { icon: Moon, label: 'Uyku', val: '7s 24dk', color: C.cyan, sub: 'İyi' },
-          { icon: Heart, label: 'Nabız', val: '64', color: '#E6B530', sub: 'Dinlenme' },
+          { icon: Heart, label: 'Nabız', val: '64', color: '#C9961A', sub: 'Dinlenme' },
           { icon: Footprints, label: 'Adım', val: '8.2k', color: '#14B8D4', sub: 'Hedef %82' },
-          { icon: Flame, label: 'Kalori', val: '1,847', color: '#E6B530', sub: 'Aktif' },
+          { icon: Flame, label: 'Kalori', val: '1,847', color: '#C9961A', sub: 'Aktif' },
         ].map((m, i) => (
           <div key={i} className="rounded-2xl border border-white/10 bg-white/[0.03] p-3">
             <div className="flex items-center justify-between">
@@ -361,7 +361,7 @@ const ScreenDashboard = () => (
             <div
               key={i}
               className={`flex items-center gap-3 rounded-xl border p-2.5 ${
-                t.accent ? 'border-[#E6B530]/30 bg-[#E6B530]/5' : 'border-white/10 bg-white/[0.03]'
+                t.accent ? 'border-[#C9961A]/30 bg-[#C9961A]/5' : 'border-white/10 bg-white/[0.03]'
               }`}
             >
               <div
@@ -369,7 +369,7 @@ const ScreenDashboard = () => (
                   t.done
                     ? 'bg-[#14B8D4]/20 text-[#14B8D4]'
                     : t.accent
-                      ? 'bg-[#E6B530] text-[#0A2540]'
+                      ? 'bg-[#C9961A] text-[#0A2540]'
                       : 'bg-white/10 text-white'
                 }`}
               >
@@ -386,7 +386,7 @@ const ScreenDashboard = () => (
                 </div>
               </div>
               {t.accent && (
-                <div className="rounded-full bg-[#E6B530] px-2 py-0.5 text-[8px] font-semibold uppercase text-[#0A2540]">
+                <div className="rounded-full bg-[#C9961A] px-2 py-0.5 text-[8px] font-semibold uppercase text-[#0A2540]">
                   Canlı
                 </div>
               )}
@@ -408,7 +408,7 @@ const ScreenDashboard = () => (
         ].map((t, i) => (
           <div
             key={i}
-            className={`flex flex-col items-center gap-0.5 px-1 py-1.5 ${t.active ? 'text-[#E6B530]' : 'text-white/40'}`}
+            className={`flex flex-col items-center gap-0.5 px-1 py-1.5 ${t.active ? 'text-[#C9961A]' : 'text-white/40'}`}
           >
             <t.i className="h-4 w-4" strokeWidth={t.active ? 2.2 : 1.5} />
             <span className="text-[8px] font-medium">{t.l}</span>
@@ -427,7 +427,7 @@ const ScreenTalks = () => (
       <div className="px-5 pt-4">
         <div className="flex items-center justify-between">
           <div className="font-display text-xl font-light text-white">
-            Palestralar <span className="italic text-[#E6B530]">&</span> sesler
+            Palestralar <span className="italic text-[#C9961A]">&</span> sesler
           </div>
           <Search className="h-4 w-4 text-white/40" />
         </div>
@@ -435,9 +435,9 @@ const ScreenTalks = () => (
       </div>
 
       {/* Live now */}
-      <div className="mx-5 mt-4 overflow-hidden rounded-2xl border border-[#E6B530]/30 bg-gradient-to-br from-[#E6B530]/15 via-[#E6B530]/5 to-transparent p-4">
+      <div className="mx-5 mt-4 overflow-hidden rounded-2xl border border-[#C9961A]/30 bg-gradient-to-br from-[#C9961A]/15 via-[#C9961A]/5 to-transparent p-4">
         <div className="flex items-center gap-2">
-          <span className="flex items-center gap-1 rounded-full bg-[#E6B530] px-2 py-0.5 text-[9px] font-bold uppercase text-[#0A2540]">
+          <span className="flex items-center gap-1 rounded-full bg-[#C9961A] px-2 py-0.5 text-[9px] font-bold uppercase text-[#0A2540]">
             <span className="h-1 w-1 rounded-full bg-[#0A2540] animate-pulse" />
             Canlı
           </span>
@@ -446,16 +446,16 @@ const ScreenTalks = () => (
         <h3 className="mt-3 font-display text-lg font-light leading-tight text-white">
           Yorgunluğun ardındaki
           <br />
-          <span className="italic text-[#E6B530]">gerçek hikaye</span>
+          <span className="italic text-[#C9961A]">gerçek hikaye</span>
         </h3>
         <div className="mt-2 flex items-center gap-2 text-[10px] text-white/60">
           <div className="flex -space-x-1.5">
-            <div className="h-5 w-5 rounded-full border-2 border-[#0A2540] bg-gradient-to-br from-[#14B8D4] to-[#0B72B9]" />
-            <div className="h-5 w-5 rounded-full border-2 border-[#0A2540] bg-gradient-to-br from-[#E6B530] to-[#C99419]" />
+            <div className="h-5 w-5 rounded-full border-2 border-[#0A2540] bg-gradient-to-br from-[#14B8D4] to-[#0072B0]" />
+            <div className="h-5 w-5 rounded-full border-2 border-[#0A2540] bg-gradient-to-br from-[#C9961A] to-[#C9961A]" />
           </div>
           <span>Dr. Ayşe Demir · Coach Burak</span>
         </div>
-        <button className="mt-3 flex w-full items-center justify-center gap-1.5 rounded-full bg-[#E6B530] py-2 text-[11px] font-semibold text-[#0A2540]">
+        <button className="mt-3 flex w-full items-center justify-center gap-1.5 rounded-full bg-[#C9961A] py-2 text-[11px] font-semibold text-[#0A2540]">
           <Headphones className="h-3 w-3" />
           Şimdi dinle
         </button>
@@ -477,9 +477,9 @@ const ScreenTalks = () => (
 
       {/* Featured talk */}
       <div className="mx-5 mt-4">
-        <div className="text-[10px] uppercase tracking-widest text-[#E6B530]">Öne çıkan</div>
+        <div className="text-[10px] uppercase tracking-widest text-[#C9961A]">Öne çıkan</div>
         <div className="mt-2 overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03]">
-          <div className="relative aspect-video bg-gradient-to-br from-[#0B72B9] via-[#14B8D4] to-[#E6B530]">
+          <div className="relative aspect-video bg-gradient-to-br from-[#0072B0] via-[#14B8D4] to-[#C9961A]">
             <div className="absolute inset-0 bg-black/30" />
             <div className="absolute left-3 top-3 rounded-full bg-black/40 px-2 py-0.5 text-[9px] text-white backdrop-blur-md">
               42 dk
@@ -498,7 +498,7 @@ const ScreenTalks = () => (
               Sezgisel beslenme: kuralları unutmak
             </div>
             <div className="mt-1.5 flex items-center gap-1.5 text-[9px] text-white/50">
-              <div className="h-4 w-4 rounded-full bg-gradient-to-br from-[#E6B530] to-[#C99419]" />
+              <div className="h-4 w-4 rounded-full bg-gradient-to-br from-[#C9961A] to-[#C9961A]" />
               <span>Beslenme uzmanı Selin Kaya</span>
             </div>
           </div>
@@ -518,21 +518,21 @@ const ScreenTalks = () => (
               title: 'Anksiyeteyi anlamak',
               dur: '28dk',
               host: 'Dr. Ayşe',
-              g: 'from-[#14B8D4] to-[#0B72B9]',
+              g: 'from-[#14B8D4] to-[#0072B0]',
             },
             {
               cat: 'Hareket',
               title: 'Koşunun bilimi',
               dur: '35dk',
               host: 'Mehmet Ç.',
-              g: 'from-[#E6B530] to-[#C99419]',
+              g: 'from-[#C9961A] to-[#C9961A]',
             },
             {
               cat: 'Uyku',
               title: 'Derin uykuya yolculuk',
               dur: '22dk',
               host: 'Dr. Levent',
-              g: 'from-[#0B72B9] to-[#0A2540]',
+              g: 'from-[#0072B0] to-[#0A2540]',
             },
           ].map((t, i) => (
             <div
@@ -545,7 +545,7 @@ const ScreenTalks = () => (
                 <Play className="h-4 w-4 fill-white text-white ml-0.5" />
               </div>
               <div className="flex-1 min-w-0">
-                <div className="text-[8px] uppercase tracking-wider text-[#E6B530]">{t.cat}</div>
+                <div className="text-[8px] uppercase tracking-wider text-[#C9961A]">{t.cat}</div>
                 <div className="mt-0.5 text-[11px] font-medium leading-tight text-white truncate">
                   {t.title}
                 </div>
@@ -572,7 +572,7 @@ const ScreenTalks = () => (
         ].map((t, i) => (
           <div
             key={i}
-            className={`flex flex-col items-center gap-0.5 px-1 py-1.5 ${t.active ? 'text-[#E6B530]' : 'text-white/40'}`}
+            className={`flex flex-col items-center gap-0.5 px-1 py-1.5 ${t.active ? 'text-[#C9961A]' : 'text-white/40'}`}
           >
             <t.i className="h-4 w-4" strokeWidth={t.active ? 2.2 : 1.5} />
             <span className="text-[8px] font-medium">{t.l}</span>
@@ -589,12 +589,12 @@ const ScreenMentor = () => (
     <div className="h-full overflow-y-auto pb-20 scrollbar-hide">
       {/* Header with mentor */}
       <div className="relative h-44 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-[#0B72B9] via-[#14B8D4] to-[#E6B530]" />
+        <div className="absolute inset-0 bg-gradient-to-br from-[#0072B0] via-[#14B8D4] to-[#C9961A]" />
         <div className="absolute inset-0 bg-gradient-to-t from-[#061829] via-transparent to-transparent" />
 
         <div className="relative flex h-full flex-col justify-end p-5">
           <div className="flex items-end gap-3">
-            <div className="relative h-16 w-16 rounded-2xl bg-gradient-to-br from-[#E6B530] to-[#C99419] flex items-center justify-center font-display text-2xl text-[#0A2540] border-2 border-[#061829] shadow-lg">
+            <div className="relative h-16 w-16 rounded-2xl bg-gradient-to-br from-[#C9961A] to-[#C9961A] flex items-center justify-center font-display text-2xl text-[#0A2540] border-2 border-[#061829] shadow-lg">
               A
               <div className="absolute -bottom-1 -right-1 h-4 w-4 rounded-full border-2 border-[#061829] bg-[#14B8D4]" />
             </div>
@@ -618,22 +618,22 @@ const ScreenMentor = () => (
             key={i}
             className="flex flex-col items-center gap-1 rounded-xl border border-white/10 bg-[#061829] p-2.5"
           >
-            <a.i className="h-4 w-4 text-[#E6B530]" />
+            <a.i className="h-4 w-4 text-[#C9961A]" />
             <span className="text-[9px] text-white/70">{a.l}</span>
           </div>
         ))}
       </div>
 
       {/* This week's focus */}
-      <div className="mx-5 mt-4 rounded-2xl border border-[#E6B530]/20 bg-gradient-to-br from-[#E6B530]/10 to-transparent p-4">
+      <div className="mx-5 mt-4 rounded-2xl border border-[#C9961A]/20 bg-gradient-to-br from-[#C9961A]/10 to-transparent p-4">
         <div className="flex items-center gap-2">
-          <Target className="h-3.5 w-3.5 text-[#E6B530]" />
-          <span className="text-[10px] uppercase tracking-widest text-[#E6B530]">
+          <Target className="h-3.5 w-3.5 text-[#C9961A]" />
+          <span className="text-[10px] uppercase tracking-widest text-[#C9961A]">
             Bu hafta odak
           </span>
         </div>
         <h3 className="mt-2 font-display text-base font-medium leading-snug text-white">
-          Akşam rutini ve <span className="italic text-[#E6B530]">uyku kalitesi</span>
+          Akşam rutini ve <span className="italic text-[#C9961A]">uyku kalitesi</span>
         </h3>
 
         <div className="mt-3 space-y-2">
@@ -645,7 +645,7 @@ const ScreenMentor = () => (
           ].map((g, i) => (
             <div key={i} className="flex items-center gap-2">
               {g.done ? (
-                <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-[#E6B530]" />
+                <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-[#C9961A]" />
               ) : (
                 <Circle className="h-3.5 w-3.5 shrink-0 text-white/30" />
               )}
@@ -660,7 +660,7 @@ const ScreenMentor = () => (
 
         <div className="mt-3 flex items-center gap-2">
           <div className="h-1 flex-1 rounded-full bg-white/10 overflow-hidden">
-            <div className="h-full w-1/2 rounded-full bg-[#E6B530]" />
+            <div className="h-full w-1/2 rounded-full bg-[#C9961A]" />
           </div>
           <span className="text-[10px] text-white/60">2/4</span>
         </div>
@@ -673,7 +673,7 @@ const ScreenMentor = () => (
           <span className="text-[9px] text-white/40">2sa önce</span>
         </div>
         <div className="mt-2 flex gap-2">
-          <div className="h-7 w-7 shrink-0 rounded-full bg-gradient-to-br from-[#E6B530] to-[#C99419] flex items-center justify-center text-[10px] font-semibold text-[#0A2540]">
+          <div className="h-7 w-7 shrink-0 rounded-full bg-gradient-to-br from-[#C9961A] to-[#C9961A] flex items-center justify-center text-[10px] font-semibold text-[#0A2540]">
             A
           </div>
           <div className="rounded-2xl rounded-tl-sm bg-white/5 p-2.5">
@@ -710,7 +710,7 @@ const ScreenMentor = () => (
         ].map((t, i) => (
           <div
             key={i}
-            className={`flex flex-col items-center gap-0.5 px-1 py-1.5 ${t.active ? 'text-[#E6B530]' : 'text-white/40'}`}
+            className={`flex flex-col items-center gap-0.5 px-1 py-1.5 ${t.active ? 'text-[#C9961A]' : 'text-white/40'}`}
           >
             <t.i className="h-4 w-4" strokeWidth={t.active ? 2.2 : 1.5} />
             <span className="text-[8px] font-medium">{t.l}</span>
@@ -732,7 +732,7 @@ const ScreenMetrics = () => (
               Detaylı analiz
             </div>
             <div className="mt-0.5 font-display text-xl font-light text-white">
-              Sağlık <span className="italic text-[#E6B530]">verilerin</span>
+              Sağlık <span className="italic text-[#C9961A]">verilerin</span>
             </div>
           </div>
           <BarChart3 className="h-4 w-4 text-white/40" />
@@ -745,7 +745,7 @@ const ScreenMetrics = () => (
           <div
             key={i}
             className={`flex-1 rounded-full py-1.5 text-center text-[10px] font-medium ${
-              i === 1 ? 'bg-[#E6B530] text-[#0A2540]' : 'text-white/60'
+              i === 1 ? 'bg-[#C9961A] text-[#0A2540]' : 'text-white/60'
             }`}
           >
             {p}
@@ -825,8 +825,8 @@ const ScreenMetrics = () => (
         {[
           { l: 'Uyku kalitesi', v: 84, c: C.cyan, sub: 'Mükemmel · 7s 24dk' },
           { l: 'Hareket', v: 72, c: C.gold, sub: 'İyi · 8.2k adım' },
-          { l: 'Zihin & stres', v: 68, c: '#0B72B9', sub: 'İyi · 3 meditasyon' },
-          { l: 'Beslenme', v: 81, c: '#E6B530', sub: 'Çok iyi · 2.1L su' },
+          { l: 'Zihin & stres', v: 68, c: '#0072B0', sub: 'İyi · 3 meditasyon' },
+          { l: 'Beslenme', v: 81, c: '#C9961A', sub: 'Çok iyi · 2.1L su' },
         ].map((m, i) => (
           <div key={i} className="rounded-xl border border-white/10 bg-white/[0.03] p-3">
             <div className="flex items-center justify-between">
@@ -848,13 +848,13 @@ const ScreenMetrics = () => (
       </div>
 
       {/* AI insight */}
-      <div className="mx-5 mt-4 mb-5 rounded-2xl border border-[#E6B530]/30 bg-gradient-to-br from-[#E6B530]/10 to-transparent p-3">
+      <div className="mx-5 mt-4 mb-5 rounded-2xl border border-[#C9961A]/30 bg-gradient-to-br from-[#C9961A]/10 to-transparent p-3">
         <div className="flex items-center gap-1.5">
-          <Sparkles className="h-3 w-3 text-[#E6B530]" />
-          <span className="text-[9px] uppercase tracking-widest text-[#E6B530]">AI İçgörü</span>
+          <Sparkles className="h-3 w-3 text-[#C9961A]" />
+          <span className="text-[9px] uppercase tracking-widest text-[#C9961A]">AI İçgörü</span>
         </div>
         <p className="mt-2 text-[11px] leading-relaxed text-white/85">
-          Uyku puanın bu hafta <span className="text-[#E6B530] font-medium">%14 yükseldi</span>.
+          Uyku puanın bu hafta <span className="text-[#C9961A] font-medium">%14 yükseldi</span>.
           Akşam meditasyonu rutinini sürdürmeni öneririm — sonuçlar harika.
         </p>
       </div>
@@ -871,7 +871,7 @@ const ScreenMetrics = () => (
         ].map((t, i) => (
           <div
             key={i}
-            className={`flex flex-col items-center gap-0.5 px-1 py-1.5 ${t.active ? 'text-[#E6B530]' : 'text-white/40'}`}
+            className={`flex flex-col items-center gap-0.5 px-1 py-1.5 ${t.active ? 'text-[#C9961A]' : 'text-white/40'}`}
           >
             <t.i className="h-4 w-4" strokeWidth={t.active ? 2.2 : 1.5} />
             <span className="text-[8px] font-medium">{t.l}</span>
@@ -888,7 +888,7 @@ const ScreenCommunity = () => (
     <div className="h-full overflow-y-auto pb-20 scrollbar-hide">
       <div className="px-5 pt-4">
         <div className="font-display text-xl font-light text-white">
-          Topluluk <span className="italic text-[#E6B530]">akışı</span>
+          Topluluk <span className="italic text-[#C9961A]">akışı</span>
         </div>
       </div>
 
@@ -896,24 +896,24 @@ const ScreenCommunity = () => (
       <div className="mt-4 flex gap-3 overflow-x-auto px-5 pb-2 scrollbar-hide">
         {[
           { l: 'Sen', accent: true, init: '+' },
-          { l: 'Burak', g: 'from-[#E6B530] to-[#C99419]', init: 'B' },
-          { l: 'Selin', g: 'from-[#14B8D4] to-[#0B72B9]', init: 'S' },
-          { l: 'Can', g: 'from-[#0B72B9] to-[#0A2540]', init: 'C' },
-          { l: 'Aslı', g: 'from-[#E6B530] to-[#14B8D4]', init: 'A' },
-          { l: 'Mert', g: 'from-[#C99419] to-[#E6B530]', init: 'M' },
+          { l: 'Burak', g: 'from-[#C9961A] to-[#C9961A]', init: 'B' },
+          { l: 'Selin', g: 'from-[#14B8D4] to-[#0072B0]', init: 'S' },
+          { l: 'Can', g: 'from-[#0072B0] to-[#0A2540]', init: 'C' },
+          { l: 'Aslı', g: 'from-[#C9961A] to-[#14B8D4]', init: 'A' },
+          { l: 'Mert', g: 'from-[#C9961A] to-[#C9961A]', init: 'M' },
         ].map((s, i) => (
           <div key={i} className="flex shrink-0 flex-col items-center gap-1">
             <div
               className={`flex h-12 w-12 items-center justify-center rounded-full p-0.5 ${
                 s.accent
-                  ? 'border border-dashed border-[#E6B530]'
-                  : 'bg-gradient-to-br from-[#E6B530] to-[#C99419]'
+                  ? 'border border-dashed border-[#C9961A]'
+                  : 'bg-gradient-to-br from-[#C9961A] to-[#C9961A]'
               }`}
             >
               <div
                 className={`flex h-full w-full items-center justify-center rounded-full ${
                   s.accent
-                    ? 'bg-[#061829] text-[#E6B530]'
+                    ? 'bg-[#061829] text-[#C9961A]'
                     : `bg-gradient-to-br ${s.g} text-white text-sm font-medium`
                 }`}
               >
@@ -926,12 +926,12 @@ const ScreenCommunity = () => (
       </div>
 
       {/* Next event card */}
-      <div className="mx-5 mt-3 overflow-hidden rounded-2xl border border-[#E6B530]/30 bg-gradient-to-br from-[#E6B530]/10 via-transparent to-[#14B8D4]/5">
+      <div className="mx-5 mt-3 overflow-hidden rounded-2xl border border-[#C9961A]/30 bg-gradient-to-br from-[#C9961A]/10 via-transparent to-[#14B8D4]/5">
         <div className="relative h-28 overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-[#0B72B9] via-[#14B8D4] to-[#E6B530]" />
+          <div className="absolute inset-0 bg-gradient-to-br from-[#0072B0] via-[#14B8D4] to-[#C9961A]" />
           <div className="absolute inset-0 bg-gradient-to-t from-[#0A2540] via-transparent to-transparent" />
           <div className="absolute left-3 top-3 flex items-center gap-1 rounded-full bg-black/40 px-2 py-0.5 backdrop-blur-md">
-            <span className="h-1.5 w-1.5 rounded-full bg-[#E6B530] animate-pulse" />
+            <span className="h-1.5 w-1.5 rounded-full bg-[#C9961A] animate-pulse" />
             <span className="text-[9px] text-white">Yarın</span>
           </div>
           <div className="absolute bottom-3 left-3">
@@ -942,13 +942,13 @@ const ScreenCommunity = () => (
         <div className="flex items-center justify-between p-3">
           <div className="flex items-center gap-2">
             <div className="flex -space-x-1.5">
-              <div className="h-5 w-5 rounded-full border-2 border-[#0A2540] bg-gradient-to-br from-[#E6B530] to-[#C99419]" />
-              <div className="h-5 w-5 rounded-full border-2 border-[#0A2540] bg-gradient-to-br from-[#14B8D4] to-[#0B72B9]" />
-              <div className="h-5 w-5 rounded-full border-2 border-[#0A2540] bg-gradient-to-br from-[#0B72B9] to-[#0A2540]" />
+              <div className="h-5 w-5 rounded-full border-2 border-[#0A2540] bg-gradient-to-br from-[#C9961A] to-[#C9961A]" />
+              <div className="h-5 w-5 rounded-full border-2 border-[#0A2540] bg-gradient-to-br from-[#14B8D4] to-[#0072B0]" />
+              <div className="h-5 w-5 rounded-full border-2 border-[#0A2540] bg-gradient-to-br from-[#0072B0] to-[#0A2540]" />
             </div>
             <span className="text-[10px] text-white/60">+24 kişi</span>
           </div>
-          <button className="rounded-full bg-[#E6B530] px-3 py-1.5 text-[10px] font-semibold text-[#0A2540]">
+          <button className="rounded-full bg-[#C9961A] px-3 py-1.5 text-[10px] font-semibold text-[#0A2540]">
             Katıl
           </button>
         </div>
@@ -957,13 +957,13 @@ const ScreenCommunity = () => (
       {/* Feed post */}
       <div className="mx-5 mt-3 rounded-2xl border border-white/10 bg-white/[0.03] p-3">
         <div className="flex items-center gap-2">
-          <div className="h-8 w-8 rounded-full bg-gradient-to-br from-[#14B8D4] to-[#0B72B9] flex items-center justify-center text-xs font-medium text-white">
+          <div className="h-8 w-8 rounded-full bg-gradient-to-br from-[#14B8D4] to-[#0072B0] flex items-center justify-center text-xs font-medium text-white">
             B
           </div>
           <div className="flex-1">
             <div className="flex items-center gap-1.5">
               <span className="text-[11px] font-semibold text-white">Burak Yılmaz</span>
-              <Award className="h-3 w-3 text-[#E6B530]" />
+              <Award className="h-3 w-3 text-[#C9961A]" />
             </div>
             <div className="text-[9px] text-white/40">2 saat önce · Sarıyer</div>
           </div>
@@ -980,14 +980,14 @@ const ScreenCommunity = () => (
             { l: '142 bpm', i: Heart },
           ].map((s, i) => (
             <div key={i} className="rounded-lg bg-white/[0.04] p-2 text-center">
-              <s.i className="mx-auto h-3 w-3 text-[#E6B530]" />
+              <s.i className="mx-auto h-3 w-3 text-[#C9961A]" />
               <div className="mt-1 text-[10px] font-medium text-white">{s.l}</div>
             </div>
           ))}
         </div>
         <div className="mt-3 flex items-center gap-4 text-[10px] text-white/50">
           <span className="flex items-center gap-1">
-            <Heart className="h-3 w-3 fill-[#E6B530] text-[#E6B530]" /> 47
+            <Heart className="h-3 w-3 fill-[#C9961A] text-[#C9961A]" /> 47
           </span>
           <span className="flex items-center gap-1">
             <MessageCircle className="h-3 w-3" /> 12
@@ -1002,7 +1002,7 @@ const ScreenCommunity = () => (
       <div className="mx-5 mt-3 mb-5 rounded-2xl border border-white/10 bg-gradient-to-br from-[#14B8D4]/10 to-transparent p-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Flame className="h-3.5 w-3.5 text-[#E6B530]" />
+            <Flame className="h-3.5 w-3.5 text-[#C9961A]" />
             <span className="text-[10px] uppercase tracking-widest text-[#14B8D4]">
               Haftalık meydan okuma
             </span>
@@ -1012,7 +1012,7 @@ const ScreenCommunity = () => (
         <h4 className="mt-2 font-display text-sm font-medium text-white">50K adım haftası 👟</h4>
         <div className="mt-2 flex items-center gap-2">
           <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-white/10">
-            <div className="h-full w-2/3 rounded-full bg-gradient-to-r from-[#14B8D4] to-[#E6B530]" />
+            <div className="h-full w-2/3 rounded-full bg-gradient-to-r from-[#14B8D4] to-[#C9961A]" />
           </div>
           <span className="text-[10px] font-medium text-white">33.4k / 50k</span>
         </div>
@@ -1030,7 +1030,7 @@ const ScreenCommunity = () => (
         ].map((t, i) => (
           <div
             key={i}
-            className={`flex flex-col items-center gap-0.5 px-1 py-1.5 ${t.active ? 'text-[#E6B530]' : 'text-white/40'}`}
+            className={`flex flex-col items-center gap-0.5 px-1 py-1.5 ${t.active ? 'text-[#C9961A]' : 'text-white/40'}`}
           >
             <t.i className="h-4 w-4" strokeWidth={t.active ? 2.2 : 1.5} />
             <span className="text-[8px] font-medium">{t.l}</span>
@@ -1053,7 +1053,7 @@ export default function BreakFreeAppPreview() {
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600&family=Manrope:wght@300;400;500;600;700&display=swap');
         .font-display { font-family: 'Fraunces', Georgia, serif; }
-        ::selection { background: #E6B530; color: #0A2540; }
+        ::selection { background: #C9961A; color: #0A2540; }
         .scrollbar-hide::-webkit-scrollbar { display: none; }
         .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
       `}</style>
@@ -1064,7 +1064,7 @@ export default function BreakFreeAppPreview() {
         <motion.div
           animate={{ x: [0, 80, 0], y: [0, -60, 0] }}
           transition={{ duration: 20, repeat: Infinity, ease: 'easeInOut' }}
-          className="absolute -top-40 -left-40 h-[500px] w-[500px] rounded-full bg-[#E6B530] opacity-10 blur-[120px]"
+          className="absolute -top-40 -left-40 h-[500px] w-[500px] rounded-full bg-[#C9961A] opacity-10 blur-[120px]"
         />
         <motion.div
           animate={{ x: [0, -60, 0], y: [0, 80, 0] }}
@@ -1092,15 +1092,15 @@ export default function BreakFreeAppPreview() {
             >
               <div className="mb-6 flex items-center gap-3">
                 <div className="relative h-9 w-9">
-                  <div className="absolute inset-0 rounded-full bg-gradient-to-br from-[#E6B530] to-[#C99419]" />
+                  <div className="absolute inset-0 rounded-full bg-gradient-to-br from-[#C9961A] to-[#C9961A]" />
                   <div className="absolute inset-[3px] rounded-full bg-[#061829] flex items-center justify-center">
-                    <div className="h-2 w-2 rounded-full bg-[#E6B530]" />
+                    <div className="h-2 w-2 rounded-full bg-[#C9961A]" />
                   </div>
                 </div>
                 <span className="font-display text-xl font-medium">
-                  BreakFree<span className="text-[#E6B530]">.</span>
+                  BreakFree<span className="text-[#C9961A]">.</span>
                 </span>
-                <span className="ml-2 rounded-full border border-[#E6B530]/30 bg-[#E6B530]/10 px-2.5 py-1 text-[10px] uppercase tracking-[0.2em] text-[#E6B530]">
+                <span className="ml-2 rounded-full border border-[#C9961A]/30 bg-[#C9961A]/10 px-2.5 py-1 text-[10px] uppercase tracking-[0.2em] text-[#C9961A]">
                   Konsept · 2026
                 </span>
               </div>
@@ -1108,7 +1108,7 @@ export default function BreakFreeAppPreview() {
               <h1 className="font-display text-[clamp(2.5rem,7vw,6rem)] font-light leading-[0.95] tracking-tight">
                 Topluluk
                 <br />
-                <span className="italic text-[#E6B530]">cebinde.</span>
+                <span className="italic text-[#C9961A]">cebinde.</span>
               </h1>
 
               <p className="mt-8 max-w-2xl text-lg font-light leading-relaxed text-white/60 md:text-xl">
@@ -1130,7 +1130,7 @@ export default function BreakFreeAppPreview() {
                     key={i}
                     className="flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3.5 py-2 text-xs text-white/70 backdrop-blur-md"
                   >
-                    <f.i className="h-3.5 w-3.5 text-[#E6B530]" />
+                    <f.i className="h-3.5 w-3.5 text-[#C9961A]" />
                     {f.l}
                   </div>
                 ))}
@@ -1143,8 +1143,8 @@ export default function BreakFreeAppPreview() {
         <section className="px-6 py-20 lg:px-16">
           <div className="mx-auto max-w-7xl">
             <div className="mb-16 flex items-center gap-3">
-              <div className="h-px w-12 bg-[#E6B530]" />
-              <span className="text-xs font-medium uppercase tracking-[0.3em] text-[#E6B530]">
+              <div className="h-px w-12 bg-[#C9961A]" />
+              <span className="text-xs font-medium uppercase tracking-[0.3em] text-[#C9961A]">
                 6 ana ekran
               </span>
             </div>
@@ -1177,14 +1177,14 @@ export default function BreakFreeAppPreview() {
           <div className="mx-auto max-w-7xl">
             <div className="mb-16 max-w-3xl">
               <div className="mb-6 flex items-center gap-3">
-                <div className="h-px w-12 bg-[#E6B530]" />
-                <span className="text-xs font-medium uppercase tracking-[0.3em] text-[#E6B530]">
+                <div className="h-px w-12 bg-[#C9961A]" />
+                <span className="text-xs font-medium uppercase tracking-[0.3em] text-[#C9961A]">
                   Ana özellikler
                 </span>
               </div>
               <h2 className="font-display text-5xl font-light leading-[1.05] tracking-tight md:text-6xl">
                 Sadece bir app değil —{' '}
-                <span className="italic text-[#E6B530]">bir yaşam katmanı.</span>
+                <span className="italic text-[#C9961A]">bir yaşam katmanı.</span>
               </h2>
             </div>
 
@@ -1248,20 +1248,20 @@ export default function BreakFreeAppPreview() {
                   whileHover={{ y: -4 }}
                   className={`group relative overflow-hidden rounded-3xl border p-6 md:p-8 ${
                     f.accent
-                      ? 'border-[#E6B530]/30 bg-gradient-to-br from-[#E6B530]/[0.08] to-transparent'
+                      ? 'border-[#C9961A]/30 bg-gradient-to-br from-[#C9961A]/[0.08] to-transparent'
                       : 'border-white/10 bg-white/[0.03]'
                   }`}
                 >
                   <div
                     className={`flex h-12 w-12 items-center justify-center rounded-2xl ${
-                      f.accent ? 'bg-[#E6B530] text-[#0A2540]' : 'bg-white/10 text-[#E6B530]'
+                      f.accent ? 'bg-[#C9961A] text-[#0A2540]' : 'bg-white/10 text-[#C9961A]'
                     }`}
                   >
                     <f.i className="h-5 w-5" strokeWidth={1.5} />
                   </div>
                   <h3 className="mt-5 font-display text-2xl font-medium leading-tight">{f.t}</h3>
                   <p className="mt-3 text-sm leading-relaxed text-white/60">{f.d}</p>
-                  <div className="absolute -right-12 -bottom-12 h-24 w-24 rounded-full bg-[#E6B530]/20 blur-2xl opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+                  <div className="absolute -right-12 -bottom-12 h-24 w-24 rounded-full bg-[#C9961A]/20 blur-2xl opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
                 </motion.div>
               ))}
             </div>
@@ -1273,13 +1273,13 @@ export default function BreakFreeAppPreview() {
           <div className="mx-auto max-w-7xl">
             <div className="mb-16">
               <div className="mb-6 flex items-center gap-3">
-                <div className="h-px w-12 bg-[#E6B530]" />
-                <span className="text-xs font-medium uppercase tracking-[0.3em] text-[#E6B530]">
+                <div className="h-px w-12 bg-[#C9961A]" />
+                <span className="text-xs font-medium uppercase tracking-[0.3em] text-[#C9961A]">
                   Yol haritası
                 </span>
               </div>
               <h2 className="max-w-3xl font-display text-5xl font-light leading-[1.05] tracking-tight md:text-6xl">
-                Üç aşamada <span className="italic text-[#E6B530]">tam ürün.</span>
+                Üç aşamada <span className="italic text-[#C9961A]">tam ürün.</span>
               </h2>
             </div>
 
@@ -1334,13 +1334,13 @@ export default function BreakFreeAppPreview() {
                   transition={{ duration: 0.7, delay: i * 0.15 }}
                   className={`relative overflow-hidden rounded-3xl p-8 ${
                     p.accent
-                      ? 'bg-gradient-to-br from-[#E6B530] to-[#C99419] text-[#0A2540]'
+                      ? 'bg-gradient-to-br from-[#C9961A] to-[#C9961A] text-[#0A2540]'
                       : 'border border-white/10 bg-white/[0.03]'
                   }`}
                 >
                   <div className="flex items-center justify-between">
                     <span
-                      className={`text-[10px] uppercase tracking-[0.25em] ${p.accent ? 'text-[#0A2540]/70' : 'text-[#E6B530]'}`}
+                      className={`text-[10px] uppercase tracking-[0.25em] ${p.accent ? 'text-[#0A2540]/70' : 'text-[#C9961A]'}`}
                     >
                       {p.phase}
                     </span>
@@ -1361,7 +1361,7 @@ export default function BreakFreeAppPreview() {
                     {p.items.map((item, j) => (
                       <li key={j} className="flex items-center gap-2">
                         <div
-                          className={`h-1 w-1 rounded-full ${p.accent ? 'bg-[#0A2540]' : 'bg-[#E6B530]'}`}
+                          className={`h-1 w-1 rounded-full ${p.accent ? 'bg-[#0A2540]' : 'bg-[#C9961A]'}`}
                         />
                         {item}
                       </li>
@@ -1370,12 +1370,12 @@ export default function BreakFreeAppPreview() {
                   <div
                     className={`mt-8 inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[10px] uppercase tracking-wider ${
                       p.accent
-                        ? 'bg-[#0A2540] text-[#E6B530]'
+                        ? 'bg-[#0A2540] text-[#C9961A]'
                         : 'border border-white/15 text-white/50'
                     }`}
                   >
                     <span
-                      className={`h-1.5 w-1.5 rounded-full ${p.accent ? 'bg-[#E6B530]' : 'bg-white/40'}`}
+                      className={`h-1.5 w-1.5 rounded-full ${p.accent ? 'bg-[#C9961A]' : 'bg-white/40'}`}
                     />
                     {p.status}
                   </div>
@@ -1391,13 +1391,13 @@ export default function BreakFreeAppPreview() {
             <div className="flex flex-col items-start justify-between gap-6 md:flex-row md:items-center">
               <div className="flex items-center gap-2">
                 <div className="relative h-7 w-7">
-                  <div className="absolute inset-0 rounded-full bg-gradient-to-br from-[#E6B530] to-[#C99419]" />
+                  <div className="absolute inset-0 rounded-full bg-gradient-to-br from-[#C9961A] to-[#C9961A]" />
                   <div className="absolute inset-[2px] rounded-full bg-[#061829] flex items-center justify-center">
-                    <div className="h-1.5 w-1.5 rounded-full bg-[#E6B530]" />
+                    <div className="h-1.5 w-1.5 rounded-full bg-[#C9961A]" />
                   </div>
                 </div>
                 <span className="font-display text-lg">
-                  BreakFree<span className="text-[#E6B530]">.</span>
+                  BreakFree<span className="text-[#C9961A]">.</span>
                 </span>
                 <span className="ml-2 text-xs text-white/40">App Concept Preview · 2026</span>
               </div>
