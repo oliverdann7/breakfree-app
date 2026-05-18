@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import {
   View,
   Text,
@@ -8,232 +8,98 @@ import {
   SafeAreaView,
   Dimensions,
 } from 'react-native';
-import { LineChart } from 'react-native-chart-kit';
-import { useAppDispatch, useAppSelector } from '../../store/hooks';
-import { fetchMetrics, setPeriod } from '../../store/slices/metricsSlice';
-import WellnessRing from '../../components/features/WellnessRing';
 import Card from '../../components/common/Card';
 import { colors } from '../../constants/designTokens';
 
-const SCREEN_WIDTH = Dimensions.get('window').width;
-
-const CHART_CONFIG = {
-  backgroundColor: 'transparent',
-  backgroundGradientFrom: colors.bgSecondary,
-  backgroundGradientTo: colors.bgSecondary,
-  backgroundGradientFromOpacity: 0,
-  backgroundGradientToOpacity: 0,
-  decimalPlaces: 0,
-  color: (opacity = 1) => `rgba(20, 184, 212, ${opacity})`,
-  labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity * 0.45})`,
-  style: { borderRadius: 12 },
-  propsForDots: {
-    r: '4',
-    strokeWidth: '2',
-    stroke: colors.cyan,
-  },
-  propsForBackgroundLines: {
-    stroke: 'rgba(255,255,255,0.06)',
-    strokeDasharray: '',
-  },
-};
-
-function MetricBar({ label, value, max, unit, color }) {
-  const pct = Math.min((value / max) * 100, 100);
-  return (
-    <View style={styles.metricBarItem}>
-      <View style={styles.metricBarHeader}>
-        <Text style={styles.metricBarLabel}>{label}</Text>
-        <Text style={styles.metricBarValue}>
-          {value} <Text style={styles.metricBarUnit}>{unit}</Text>
-        </Text>
-      </View>
-      <View style={styles.metricBarTrack}>
-        <View style={[styles.metricBarFill, { width: `${pct}%`, backgroundColor: color }]} />
-      </View>
-    </View>
-  );
-}
-
 export default function HealthMetricsScreen() {
-  const dispatch = useAppDispatch();
-  const { dailyMetrics, weeklyData, wellnessScore, selectedPeriod } = useAppSelector(
-    (state) => state.metrics
-  );
-
-  useEffect(() => {
-    dispatch(fetchMetrics());
-  }, []);
-
-  const periods = ['Gün', 'Hafta', 'Ay'];
-
-  const chartData =
-    weeklyData.length > 0
-      ? {
-          labels: weeklyData.map((d) => d.day),
-          datasets: [
-            {
-              data: weeklyData.map((d) => d.steps),
-              color: (opacity = 1) => `rgba(20, 184, 212, ${opacity})`,
-              strokeWidth: 2,
-            },
-          ],
-        }
-      : null;
-
-  const sleepChartData =
-    weeklyData.length > 0
-      ? {
-          labels: weeklyData.map((d) => d.day),
-          datasets: [
-            {
-              data: weeklyData.map((d) => d.sleep),
-              color: (opacity = 1) => `rgba(11, 114, 185, ${opacity})`,
-              strokeWidth: 2,
-            },
-          ],
-        }
-      : null;
-
-  const chartWidth = SCREEN_WIDTH - 40;
-
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
+        {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.title}>Sağlık Metrikleri</Text>
-          <View style={styles.periodRow}>
-            {periods.map((p) => (
-              <TouchableOpacity
-                key={p}
-                style={[styles.periodBtn, selectedPeriod === p && styles.periodBtnActive]}
-                onPress={() => dispatch(setPeriod(p))}
-              >
-                <Text style={[styles.periodText, selectedPeriod === p && styles.periodTextActive]}>
-                  {p}
-                </Text>
-              </TouchableOpacity>
-            ))}
+          <View>
+            <Text style={styles.headerLabel}>Detaylı analiz</Text>
+            <Text style={styles.headerTitle}>
+              Sağlık <Text style={styles.headerAccent}>verilerin</Text>
+            </Text>
           </View>
+          <Text style={styles.chartIcon}>📊</Text>
         </View>
 
-        {/* Wellness Score */}
-        <Card style={styles.scoreCard} variant="elevated">
-          <View style={styles.scoreRow}>
-            <WellnessRing score={wellnessScore || 0} size={140} />
-            <View style={styles.scoreInfo}>
-              <Text style={styles.scoreTitle}>Bugünkü Skor</Text>
-              <Text style={styles.scoreTrend}>
-                {wellnessScore >= 75
-                  ? '🌟 Harika!'
-                  : wellnessScore >= 45
-                    ? '💪 İyi'
-                    : '🎯 Gelişiyor'}
+        {/* Period Selector */}
+        <View style={styles.periodSelector}>
+          {['Gün', 'Hafta', 'Ay', 'Yıl'].map((period, i) => (
+            <TouchableOpacity
+              key={period}
+              style={[
+                styles.periodBtn,
+                i === 1 && styles.periodBtnActive,
+              ]}
+            >
+              <Text style={[styles.periodText, i === 1 && styles.periodTextActive]}>
+                {period}
               </Text>
-              <View style={styles.scoreStats}>
-                <View>
-                  <Text style={styles.scoreStatValue}>+5</Text>
-                  <Text style={styles.scoreStatLabel}>dünden fazla</Text>
-                </View>
-                <View>
-                  <Text style={styles.scoreStatValue}>{wellnessScore || 0}</Text>
-                  <Text style={styles.scoreStatLabel}>hafta ort.</Text>
-                </View>
+            </TouchableOpacity>
+          ))}
+        </View>
+
+        {/* Big Chart Card */}
+        <Card style={styles.chartCard}>
+          <View style={styles.chartHeader}>
+            <View>
+              <Text style={styles.chartLabel}>Wellness skoru</Text>
+              <View style={styles.chartValue}>
+                <Text style={styles.chartBigValue}>76</Text>
+                <Text style={styles.chartTrend}>↑ +12%</Text>
               </View>
             </View>
+            <View style={styles.chartAverage}>
+              <Text style={styles.chartAvgLabel}>Ortalama</Text>
+              <Text style={styles.chartAvgValue}>71</Text>
+            </View>
+          </View>
+
+          {/* Mini SVG Chart */}
+          <View style={styles.chartContainer}>
+            <View style={styles.miniChart} />
+          </View>
+
+          <View style={styles.chartDays}>
+            {['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'].map(day => (
+              <Text key={day} style={styles.dayLabel}>{day}</Text>
+            ))}
           </View>
         </Card>
 
-        {/* Steps Chart */}
-        {chartData && (
-          <Card style={styles.chartCard}>
-            <Text style={styles.chartTitle}>Haftalık Adımlar</Text>
-            <Text style={styles.chartSubtitle}>Son 7 gün</Text>
-            <LineChart
-              data={chartData}
-              width={chartWidth}
-              height={160}
-              chartConfig={CHART_CONFIG}
-              bezier
-              style={styles.chart}
-              withInnerLines={true}
-              withOuterLines={false}
-              withHorizontalLabels={true}
-              withVerticalLabels={true}
-              fromZero={true}
-            />
-          </Card>
-        )}
-
-        {/* Sleep Chart */}
-        {sleepChartData && (
-          <Card style={styles.chartCard}>
-            <Text style={styles.chartTitle}>Haftalık Uyku</Text>
-            <Text style={styles.chartSubtitle}>Saat cinsinden</Text>
-            <LineChart
-              data={sleepChartData}
-              width={chartWidth}
-              height={160}
-              chartConfig={{
-                ...CHART_CONFIG,
-                color: (opacity = 1) => `rgba(11, 114, 185, ${opacity})`,
-                propsForDots: { r: '4', strokeWidth: '2', stroke: colors.royal },
-              }}
-              bezier
-              style={styles.chart}
-              withInnerLines={true}
-              withOuterLines={false}
-              fromZero={false}
-              yAxisSuffix="s"
-            />
-          </Card>
-        )}
-
-        {/* Metric Bars */}
-        {dailyMetrics && (
-          <Card style={styles.barsCard}>
-            <Text style={styles.barsTitle}>Bugünkü Detaylar</Text>
-            <MetricBar
-              label="Uyku"
-              value={dailyMetrics.sleep.hours}
-              max={9}
-              unit="saat"
-              color={colors.royal}
-            />
-            <MetricBar
-              label="Kalp Atışı"
-              value={dailyMetrics.heartRate}
-              max={180}
-              unit="bpm"
-              color={colors.error}
-            />
-            <MetricBar
-              label="Adımlar"
-              value={dailyMetrics.steps}
-              max={15000}
-              unit="adım"
-              color={colors.success}
-            />
-            <MetricBar
-              label="Kalori"
-              value={dailyMetrics.calories}
-              max={3000}
-              unit="kcal"
-              color={colors.gold}
-            />
-          </Card>
-        )}
+        {/* Breakdown */}
+        <View style={styles.breakdown}>
+          {[
+            { label: 'Uyku kalitesi', value: 84, color: colors.cyan, sub: 'Mükemmel · 7s 24dk' },
+            { label: 'Hareket', value: 72, color: colors.gold, sub: 'İyi · 8.2k adım' },
+            { label: 'Zihin & stres', value: 68, color: colors.royal, sub: 'İyi · 3 meditasyon' },
+            { label: 'Beslenme', value: 81, color: colors.gold, sub: 'Çok iyi · 2.1L su' },
+          ].map((metric, i) => (
+            <Card key={i} style={styles.metricCard}>
+              <View style={styles.metricHeader}>
+                <Text style={styles.metricLabel}>{metric.label}</Text>
+                <Text style={styles.metricValue}>{metric.value}</Text>
+              </View>
+              <View style={styles.metricBarTrack}>
+                <View style={[styles.metricBarFill, { width: `${metric.value}%`, backgroundColor: metric.color }]} />
+              </View>
+              <Text style={styles.metricSub}>{metric.sub}</Text>
+            </Card>
+          ))}
+        </View>
 
         {/* AI Insight */}
-        <Card style={styles.insightCard} variant="glass">
+        <Card style={styles.insightCard}>
           <View style={styles.insightHeader}>
-            <Text style={styles.insightEmoji}>🤖</Text>
-            <Text style={styles.insightTitle}>AI Tavsiyesi</Text>
+            <Text style={styles.insightIcon}>✨</Text>
+            <Text style={styles.insightLabel}>AI İçgörü</Text>
           </View>
           <Text style={styles.insightText}>
-            Bu hafta uyku süreniz ortalamanın üzerinde. Egzersiz rutininizi daha da artırırsanız
-            wellness skorunuz 90&apos;a ulaşabilir. Kalp atış hızınız dinlenme değerleri mükemmel
-            görünüyor.
+            Uyku puanın bu hafta <Text style={styles.insightHighlight}>%14 yükseldi</Text>. Akşam meditasyonu rutinini sürdürmeni öneririm — sonuçlar harika.
           </Text>
         </Card>
 
@@ -245,53 +111,72 @@ export default function HealthMetricsScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.bgPrimary },
+  scrollContent: { paddingBottom: 20 },
   header: {
     paddingHorizontal: 20,
     paddingTop: 16,
     paddingBottom: 12,
-    gap: 12,
-  },
-  title: { fontSize: 24, fontWeight: '700', color: colors.textPrimary },
-  periodRow: {
     flexDirection: 'row',
-    backgroundColor: 'rgba(255,255,255,0.06)',
-    borderRadius: 10,
-    padding: 3,
-    gap: 2,
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
   },
-  periodBtn: { flex: 1, paddingVertical: 6, alignItems: 'center', borderRadius: 8 },
-  periodBtnActive: { backgroundColor: colors.cyan },
-  periodText: { fontSize: 13, color: colors.textSecondary },
+  headerLabel: { fontSize: 10, color: 'rgba(255,255,255,0.4)', fontWeight: '600', letterSpacing: 0.2, marginBottom: 4 },
+  headerTitle: { fontSize: 20, fontWeight: '300', color: colors.textPrimary },
+  headerAccent: { color: colors.gold, fontStyle: 'italic' },
+  chartIcon: { fontSize: 20 },
+  periodSelector: {
+    flexDirection: 'row',
+    paddingHorizontal: 20,
+    marginBottom: 20,
+    gap: 8,
+  },
+  periodBtn: {
+    flex: 1,
+    paddingVertical: 8,
+    alignItems: 'center',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.15)',
+  },
+  periodBtnActive: { backgroundColor: colors.cyan, borderColor: colors.cyan },
+  periodText: { fontSize: 12, fontWeight: '500', color: 'rgba(255,255,255,0.6)' },
   periodTextActive: { color: colors.navy, fontWeight: '600' },
-  scoreCard: { marginHorizontal: 20, marginBottom: 12 },
-  scoreRow: { flexDirection: 'row', alignItems: 'center', gap: 20 },
-  scoreInfo: { flex: 1, gap: 8 },
-  scoreTitle: { fontSize: 13, color: colors.textSecondary },
-  scoreTrend: { fontSize: 16, fontWeight: '600', color: colors.textPrimary },
-  scoreStats: { flexDirection: 'row', gap: 20 },
-  scoreStatValue: { fontSize: 20, fontWeight: '800', color: colors.textPrimary },
-  scoreStatLabel: { fontSize: 11, color: colors.textTertiary },
-  chartCard: { marginHorizontal: 20, marginBottom: 12, padding: 16 },
-  chartTitle: { fontSize: 15, fontWeight: '600', color: colors.textPrimary },
-  chartSubtitle: { fontSize: 12, color: colors.textTertiary, marginBottom: 12 },
-  chart: { borderRadius: 8, marginLeft: -16 },
-  barsCard: { marginHorizontal: 20, marginBottom: 12 },
-  barsTitle: { fontSize: 15, fontWeight: '600', color: colors.textPrimary, marginBottom: 16 },
-  metricBarItem: { marginBottom: 16 },
-  metricBarHeader: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 6 },
-  metricBarLabel: { fontSize: 13, color: colors.textPrimary },
-  metricBarValue: { fontSize: 13, fontWeight: '600', color: colors.textPrimary },
-  metricBarUnit: { fontWeight: '400', color: colors.textTertiary },
+  chartCard: { marginHorizontal: 20, marginBottom: 20, padding: 16 },
+  chartHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: 16,
+  },
+  chartLabel: { fontSize: 12, color: 'rgba(255,255,255,0.5)', fontWeight: '500', marginBottom: 6 },
+  chartValue: { gap: 4 },
+  chartBigValue: { fontSize: 28, fontWeight: '300', color: colors.textPrimary },
+  chartTrend: { fontSize: 13, color: colors.cyan, fontWeight: '500' },
+  chartAverage: { alignItems: 'flex-end' },
+  chartAvgLabel: { fontSize: 10, color: 'rgba(255,255,255,0.4)', fontWeight: '500', marginBottom: 2 },
+  chartAvgValue: { fontSize: 18, fontWeight: '600', color: colors.textPrimary },
+  chartContainer: { marginVertical: 16, height: 120, backgroundColor: 'rgba(255,255,255,0.03)', borderRadius: 8 },
+  miniChart: { flex: 1 },
+  chartDays: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 12 },
+  dayLabel: { fontSize: 10, color: 'rgba(255,255,255,0.4)', fontWeight: '500' },
+  breakdown: { paddingHorizontal: 20, gap: 12, marginBottom: 20 },
+  metricCard: { paddingVertical: 12, paddingHorizontal: 12 },
+  metricHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 },
+  metricLabel: { fontSize: 12, fontWeight: '500', color: colors.textPrimary },
+  metricValue: { fontSize: 16, fontWeight: '600', color: colors.textPrimary },
   metricBarTrack: {
     height: 6,
     backgroundColor: 'rgba(255,255,255,0.1)',
     borderRadius: 3,
     overflow: 'hidden',
+    marginBottom: 6,
   },
   metricBarFill: { height: '100%', borderRadius: 3 },
-  insightCard: { marginHorizontal: 20, gap: 8 },
-  insightHeader: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  insightEmoji: { fontSize: 24 },
-  insightTitle: { fontSize: 15, fontWeight: '700', color: colors.cyan },
-  insightText: { fontSize: 14, color: colors.textSecondary, lineHeight: 21 },
+  metricSub: { fontSize: 11, color: 'rgba(255,255,255,0.5)' },
+  insightCard: { marginHorizontal: 20, padding: 16, gap: 8 },
+  insightHeader: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 8 },
+  insightIcon: { fontSize: 18 },
+  insightLabel: { fontSize: 13, fontWeight: '600', color: colors.textPrimary },
+  insightText: { fontSize: 13, color: 'rgba(255,255,255,0.7)', lineHeight: 19 },
+  insightHighlight: { color: colors.gold, fontWeight: '600' },
 });

@@ -116,10 +116,35 @@ export default function CommunityScreen() {
   const ListHeader = () => (
     <>
       <View style={styles.header}>
-        <Text style={styles.title}>Topluluk</Text>
+        <View>
+          <Text style={styles.title}>Topluluk</Text>
+          <Text style={styles.subtitle}>
+            akışı <Text style={styles.subtitleAccent}>·</Text>
+          </Text>
+        </View>
         <TouchableOpacity style={styles.createBtn}>
           <Text style={styles.createBtnText}>+ Paylaş</Text>
         </TouchableOpacity>
+      </View>
+
+      {/* Story-like avatars */}
+      <View style={styles.avatarRow}>
+        <View style={styles.addStory}>
+          <Text style={styles.addStoryIcon}>+</Text>
+          <Text style={styles.addStoryLabel}>Sen</Text>
+        </View>
+        {[
+          { initial: 'B', name: 'Burak', color: colors.gold },
+          { initial: 'S', name: 'Selin', color: colors.cyan },
+          { initial: 'C', name: 'Can', color: colors.royal },
+          { initial: 'A', name: 'Aslı', color: colors.gold },
+          { initial: 'M', name: 'Mert', color: colors.cyan },
+        ].map((person, i) => (
+          <View key={i} style={[styles.avatarCircleStory, { backgroundColor: person.color }]}>
+            <Text style={styles.avatarInitial}>{person.initial}</Text>
+            <Text style={styles.avatarName}>{person.name}</Text>
+          </View>
+        ))}
       </View>
 
       {/* Event Banner */}
@@ -181,7 +206,9 @@ const styles = StyleSheet.create({
     paddingTop: 16,
     paddingBottom: 12,
   },
-  title: { fontSize: 24, fontWeight: '700', color: colors.textPrimary },
+  title: { fontSize: 20, fontWeight: '300', color: colors.textPrimary },
+  subtitle: { fontSize: 11, fontWeight: '300', color: 'rgba(255,255,255,0.4)', marginTop: 2 },
+  subtitleAccent: { color: colors.gold },
   createBtn: {
     paddingHorizontal: 14,
     paddingVertical: 6,
@@ -189,6 +216,54 @@ const styles = StyleSheet.create({
     borderRadius: 999,
   },
   createBtnText: { color: colors.navy, fontSize: 13, fontWeight: '600' },
+  avatarRow: {
+    flexDirection: 'row',
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    gap: 12,
+    marginBottom: 8,
+  },
+  addStory: {
+    alignItems: 'center',
+    gap: 4,
+  },
+  addStoryIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    borderWidth: 2,
+    borderColor: colors.gold,
+    borderStyle: 'dashed',
+    textAlign: 'center',
+    textAlignVertical: 'center',
+    fontSize: 20,
+    fontWeight: '600',
+    color: colors.gold,
+  },
+  addStoryLabel: {
+    fontSize: 10,
+    color: 'rgba(255,255,255,0.5)',
+    fontWeight: '500',
+  },
+  avatarCircleStory: {
+    alignItems: 'center',
+    gap: 4,
+  },
+  avatarInitial: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    textAlign: 'center',
+    textAlignVertical: 'center',
+    fontSize: 14,
+    fontWeight: '600',
+    color: colors.navy,
+  },
+  avatarName: {
+    fontSize: 10,
+    color: 'rgba(255,255,255,0.5)',
+    fontWeight: '500',
+  },
   eventBanner: { marginHorizontal: 20, marginBottom: 12, gap: 12 },
   eventBannerRow: { flexDirection: 'row', gap: 12 },
   eventEmoji: { fontSize: 40 },
