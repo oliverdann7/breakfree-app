@@ -17,9 +17,12 @@ import metricsReducer from './slices/metricsSlice';
 
 // Wrap localStorage with async interface for redux-persist compatibility
 const createAsyncStorage = () => ({
-  getItem: (key) => Promise.resolve(typeof window !== 'undefined' ? localStorage.getItem(key) : null),
-  setItem: (key, value) => Promise.resolve(typeof window !== 'undefined' && localStorage.setItem(key, value)),
-  removeItem: (key) => Promise.resolve(typeof window !== 'undefined' && localStorage.removeItem(key)),
+  getItem: (key) =>
+    Promise.resolve(typeof window !== 'undefined' ? localStorage.getItem(key) : null),
+  setItem: (key, value) =>
+    Promise.resolve(typeof window !== 'undefined' && localStorage.setItem(key, value)),
+  removeItem: (key) =>
+    Promise.resolve(typeof window !== 'undefined' && localStorage.removeItem(key)),
 });
 
 const storage = typeof window !== 'undefined' ? createAsyncStorage() : AsyncStorage;

@@ -26,17 +26,14 @@ export const login = createAsyncThunk(
   }
 );
 
-export const logout = createAsyncThunk(
-  'auth/logout',
-  async (_, { rejectWithValue }) => {
-    try {
-      await authService.logout();
-      return null;
-    } catch (error) {
-      return rejectWithValue(error.message);
-    }
+export const logout = createAsyncThunk('auth/logout', async (_, { rejectWithValue }) => {
+  try {
+    await authService.logout();
+    return null;
+  } catch (error) {
+    return rejectWithValue(error.message);
   }
-);
+});
 
 export const refreshToken = createAsyncThunk(
   'auth/refreshToken',
@@ -119,10 +116,9 @@ const authSlice = createSlice({
       });
 
     // Refresh Token
-    builder
-      .addCase(refreshToken.fulfilled, (state, action) => {
-        state.token = action.payload;
-      });
+    builder.addCase(refreshToken.fulfilled, (state, action) => {
+      state.token = action.payload;
+    });
   },
 });
 

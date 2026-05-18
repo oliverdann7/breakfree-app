@@ -17,11 +17,13 @@ import { colors } from '../../constants/designTokens';
 export default function TalkDetailScreen({ route, navigation }) {
   const { talkId } = route.params;
   const dispatch = useAppDispatch();
-  const { currentTalk, loading } = useAppSelector((state) => state.talks);
+  const { currentTalk } = useAppSelector((state) => state.talks);
 
   useEffect(() => {
     dispatch(fetchTalkById(talkId));
-    return () => { dispatch(clearCurrentTalk()); };
+    return () => {
+      dispatch(clearCurrentTalk());
+    };
   }, [talkId]);
 
   if (!currentTalk) {
@@ -34,9 +36,13 @@ export default function TalkDetailScreen({ route, navigation }) {
 
   const isLive = currentTalk.status === 'live';
   const categoryEmoji =
-    currentTalk.category === 'Zihin' ? '🧘' :
-    currentTalk.category === 'Sağlık' ? '💚' :
-    currentTalk.category === 'Hareket' ? '🏃' : '🥗';
+    currentTalk.category === 'Zihin'
+      ? '🧘'
+      : currentTalk.category === 'Sağlık'
+        ? '💚'
+        : currentTalk.category === 'Hareket'
+          ? '🏃'
+          : '🥗';
 
   return (
     <SafeAreaView style={styles.container}>
@@ -63,9 +69,7 @@ export default function TalkDetailScreen({ route, navigation }) {
           {/* Host */}
           <View style={styles.hostRow}>
             <View style={styles.hostAvatar}>
-              <Text style={styles.hostAvatarText}>
-                {currentTalk.host.name[0]}
-              </Text>
+              <Text style={styles.hostAvatarText}>{currentTalk.host.name[0]}</Text>
             </View>
             <View>
               <Text style={styles.hostName}>{currentTalk.host.name}</Text>
@@ -100,7 +104,13 @@ export default function TalkDetailScreen({ route, navigation }) {
           {/* Actions */}
           <View style={styles.actions}>
             <Button
-              title={isLive ? '🎙 Talk\'a Katıl' : currentTalk.status === 'scheduled' ? '🔔 Hatırlatıcı Kur' : '🎵 Kaydı Dinle'}
+              title={
+                isLive
+                  ? "🎙 Talk'a Katıl"
+                  : currentTalk.status === 'scheduled'
+                    ? '🔔 Hatırlatıcı Kur'
+                    : '🎵 Kaydı Dinle'
+              }
               onPress={() => Alert.alert('Yakında', 'Bu özellik çok yakında kullanıma girecek!')}
             />
             <View style={styles.secondaryActions}>
@@ -120,7 +130,12 @@ export default function TalkDetailScreen({ route, navigation }) {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.bgPrimary },
-  loading: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.bgPrimary },
+  loading: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.bgPrimary,
+  },
   loadingText: { color: colors.textSecondary },
   hero: { position: 'relative', height: 220 },
   heroImage: {
@@ -144,8 +159,20 @@ const styles = StyleSheet.create({
   liveBadge: { backgroundColor: 'rgba(239,68,68,0.8)' },
   statusText: { fontSize: 12, color: colors.white, fontWeight: '600' },
   content: { padding: 20 },
-  category: { fontSize: 12, color: colors.cyan, fontWeight: '600', marginBottom: 6, letterSpacing: 1 },
-  title: { fontSize: 24, fontWeight: '700', color: colors.textPrimary, lineHeight: 30, marginBottom: 20 },
+  category: {
+    fontSize: 12,
+    color: colors.cyan,
+    fontWeight: '600',
+    marginBottom: 6,
+    letterSpacing: 1,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: colors.textPrimary,
+    lineHeight: 30,
+    marginBottom: 20,
+  },
   hostRow: { flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 20 },
   hostAvatar: {
     width: 44,

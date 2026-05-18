@@ -36,14 +36,14 @@ export default function TalkCard({ talk, onPress, style }) {
             <Text style={styles.category}>{talk.category}</Text>
           </View>
 
-          <Text style={styles.title} numberOfLines={2}>{talk.title}</Text>
+          <Text style={styles.title} numberOfLines={2}>
+            {talk.title}
+          </Text>
           <Text style={styles.host}>{talk.host.name}</Text>
 
           <View style={styles.footer}>
             <Text style={styles.footerItem}>⏱ {talk.duration} dk</Text>
-            {talk.listeners > 0 && (
-              <Text style={styles.footerItem}>👥 {talk.listeners}</Text>
-            )}
+            {talk.listeners > 0 && <Text style={styles.footerItem}>👥 {talk.listeners}</Text>}
           </View>
         </View>
       </Card>

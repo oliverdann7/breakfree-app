@@ -1,12 +1,15 @@
 # BreakFree Backend API Specification
 
 ## Base URL
+
 - **Development**: `http://localhost:3000/api/v1`
 - **Staging**: `https://staging-api.breakfree.dev/api/v1`
 - **Production**: `https://api.breakfree.dev/api/v1`
 
 ## Authentication
+
 All requests (except auth endpoints) require:
+
 ```
 Authorization: Bearer {idToken}
 ```
@@ -18,9 +21,11 @@ Token obtained from Firebase Authentication. Refresh token automatically via int
 ## 1. Authentication Endpoints
 
 ### POST /auth/signup
+
 **Public** - Create new user account
 
 **Request**:
+
 ```json
 {
   "email": "elif@breakfree.com",
@@ -30,6 +35,7 @@ Token obtained from Firebase Authentication. Refresh token automatically via int
 ```
 
 **Response** (201):
+
 ```json
 {
   "uid": "user123",
@@ -41,15 +47,18 @@ Token obtained from Firebase Authentication. Refresh token automatically via int
 ```
 
 **Errors**:
+
 - `400` - Email already exists, weak password
 - `500` - Server error
 
 ---
 
 ### POST /auth/login
+
 **Public** - Authenticate existing user
 
 **Request**:
+
 ```json
 {
   "email": "elif@breakfree.com",
@@ -62,6 +71,7 @@ Token obtained from Firebase Authentication. Refresh token automatically via int
 ---
 
 ### POST /auth/logout
+
 **Protected** - Sign out user
 
 **Response** (200): `{ "message": "Logged out" }`
@@ -69,9 +79,11 @@ Token obtained from Firebase Authentication. Refresh token automatically via int
 ---
 
 ### POST /auth/refresh
+
 **Protected** - Refresh authentication token
 
 **Response** (200):
+
 ```json
 {
   "idToken": "new_token_123",
@@ -82,9 +94,11 @@ Token obtained from Firebase Authentication. Refresh token automatically via int
 ---
 
 ### POST /auth/reset-password
+
 **Public** - Send password reset email
 
 **Request**:
+
 ```json
 {
   "email": "elif@breakfree.com"
@@ -98,9 +112,11 @@ Token obtained from Firebase Authentication. Refresh token automatically via int
 ## 2. User Endpoints
 
 ### GET /users/:uid
+
 **Protected** - Get user profile
 
 **Response** (200):
+
 ```json
 {
   "uid": "user123",
@@ -126,9 +142,11 @@ Token obtained from Firebase Authentication. Refresh token automatically via int
 ---
 
 ### PATCH /users/:uid
+
 **Protected** - Update user profile
 
 **Request**:
+
 ```json
 {
   "displayName": "Elif K.",
@@ -145,13 +163,16 @@ Token obtained from Firebase Authentication. Refresh token automatically via int
 ---
 
 ### GET /users/:uid/metrics
+
 **Protected** - Get user health metrics
 
 **Query Params**:
+
 - `period`: `daily` | `weekly` | `monthly` (default: `daily`)
 - `days`: Number of days to retrieve (default: 7)
 
 **Response** (200):
+
 ```json
 {
   "metrics": [
@@ -173,9 +194,11 @@ Token obtained from Firebase Authentication. Refresh token automatically via int
 ---
 
 ### GET /users/:uid/badges
+
 **Protected** - Get user achievements
 
 **Response** (200):
+
 ```json
 {
   "badges": [
@@ -196,9 +219,11 @@ Token obtained from Firebase Authentication. Refresh token automatically via int
 ## 3. Talks Endpoints
 
 ### GET /talks
+
 **Protected** - List talks (browse)
 
 **Query Params**:
+
 - `category`: `Sağlık`, `Hareket`, `Zihin`, `Topluluk` (filter)
 - `status`: `scheduled`, `live`, `ended` (default: all)
 - `limit`: 10–50 (default: 20)
@@ -206,6 +231,7 @@ Token obtained from Firebase Authentication. Refresh token automatically via int
 - `search`: Search by title
 
 **Response** (200):
+
 ```json
 {
   "talks": [
@@ -234,9 +260,11 @@ Token obtained from Firebase Authentication. Refresh token automatically via int
 ---
 
 ### GET /talks/:talkId
+
 **Protected** - Get talk details
 
 **Response** (200):
+
 ```json
 {
   "talkId": "talk123",
@@ -256,9 +284,11 @@ Token obtained from Firebase Authentication. Refresh token automatically via int
 ---
 
 ### POST /talks/:talkId/join
+
 **Protected** - Join a talk (audience)
 
 **Request**:
+
 ```json
 {
   "userRole": "audience" // or "host" (only if you're the host)
@@ -266,6 +296,7 @@ Token obtained from Firebase Authentication. Refresh token automatically via int
 ```
 
 **Response** (200):
+
 ```json
 {
   "talkId": "talk123",
@@ -278,9 +309,11 @@ Token obtained from Firebase Authentication. Refresh token automatically via int
 ---
 
 ### POST /talks/:talkId/messages
+
 **Protected** - Send chat message during talk
 
 **Request**:
+
 ```json
 {
   "text": "Great talk!"
@@ -288,6 +321,7 @@ Token obtained from Firebase Authentication. Refresh token automatically via int
 ```
 
 **Response** (201):
+
 ```json
 {
   "messageId": "msg123",
@@ -301,13 +335,16 @@ Token obtained from Firebase Authentication. Refresh token automatically via int
 ---
 
 ### GET /talks/:talkId/messages
+
 **Protected** - Get talk chat messages
 
 **Query Params**:
+
 - `limit`: Max messages (default: 50)
 - `before`: Message ID for pagination
 
 **Response** (200):
+
 ```json
 {
   "messages": [
@@ -326,11 +363,13 @@ Token obtained from Firebase Authentication. Refresh token automatically via int
 ---
 
 ### POST /talks/:talkId/end
+
 **Protected** - End a talk (host only)
 
 **Request**: (empty)
 
 **Response** (200):
+
 ```json
 {
   "talkId": "talk123",
@@ -346,14 +385,17 @@ Token obtained from Firebase Authentication. Refresh token automatically via int
 ## 4. Community Endpoints
 
 ### GET /community/posts
+
 **Protected** - Get community feed
 
 **Query Params**:
+
 - `limit`: 10–50 (default: 20)
 - `offset`: Pagination
 - `userId`: Filter by user
 
 **Response** (200):
+
 ```json
 {
   "posts": [
@@ -382,9 +424,11 @@ Token obtained from Firebase Authentication. Refresh token automatically via int
 ---
 
 ### POST /community/posts
+
 **Protected** - Create a post
 
 **Request** (multipart/form-data):
+
 ```
 {
   "text": "Just completed 10K run!",
@@ -401,9 +445,11 @@ Token obtained from Firebase Authentication. Refresh token automatically via int
 ---
 
 ### POST /community/posts/:postId/like
+
 **Protected** - Like a post
 
 **Response** (200):
+
 ```json
 {
   "postId": "post123",
@@ -415,9 +461,11 @@ Token obtained from Firebase Authentication. Refresh token automatically via int
 ---
 
 ### POST /community/posts/:postId/comments
+
 **Protected** - Add comment to post
 
 **Request**:
+
 ```json
 {
   "text": "Amazing effort!"
@@ -425,6 +473,7 @@ Token obtained from Firebase Authentication. Refresh token automatically via int
 ```
 
 **Response** (201):
+
 ```json
 {
   "commentId": "comment123",
@@ -440,14 +489,17 @@ Token obtained from Firebase Authentication. Refresh token automatically via int
 ## 5. Events Endpoints
 
 ### GET /events
+
 **Protected** - List events
 
 **Query Params**:
+
 - `status`: `upcoming`, `past` (default: `upcoming`)
 - `limit`: 10–50 (default: 20)
 - `location`: Filter by location
 
 **Response** (200):
+
 ```json
 {
   "events": [
@@ -469,9 +521,11 @@ Token obtained from Firebase Authentication. Refresh token automatically via int
 ---
 
 ### POST /events/:eventId/rsvp
+
 **Protected** - RSVP to event
 
 **Request**:
+
 ```json
 {
   "status": "yes" // or "no", "maybe"
@@ -479,6 +533,7 @@ Token obtained from Firebase Authentication. Refresh token automatically via int
 ```
 
 **Response** (200):
+
 ```json
 {
   "eventId": "event123",
@@ -492,14 +547,17 @@ Token obtained from Firebase Authentication. Refresh token automatically via int
 ## 6. Mentorship Endpoints
 
 ### GET /mentors
+
 **Protected** - Browse mentors
 
 **Query Params**:
+
 - `specialty`: Filter by specialty
 - `minRating`: Min rating (default: 0)
 - `limit`: 10–50 (default: 20)
 
 **Response** (200):
+
 ```json
 {
   "mentors": [
@@ -521,9 +579,11 @@ Token obtained from Firebase Authentication. Refresh token automatically via int
 ---
 
 ### GET /mentors/:mentorId
+
 **Protected** - Get mentor details
 
 **Response** (200):
+
 ```json
 {
   "mentorId": "mentor1",
@@ -548,9 +608,11 @@ Token obtained from Firebase Authentication. Refresh token automatically via int
 ---
 
 ### POST /mentors/:mentorId/book
+
 **Protected** - Book mentorship session
 
 **Request**:
+
 ```json
 {
   "date": "2026-05-20",
@@ -560,6 +622,7 @@ Token obtained from Firebase Authentication. Refresh token automatically via int
 ```
 
 **Response** (201):
+
 ```json
 {
   "sessionId": "session123",
@@ -576,9 +639,11 @@ Token obtained from Firebase Authentication. Refresh token automatically via int
 ---
 
 ### GET /mentors/:mentorId/sessions
+
 **Protected** - Get user's sessions with mentor
 
 **Response** (200):
+
 ```json
 {
   "sessions": [
@@ -600,9 +665,11 @@ Token obtained from Firebase Authentication. Refresh token automatically via int
 ## 7. Health Metrics Endpoints
 
 ### POST /health/sync
+
 **Protected** - Manually sync health data from wearable
 
 **Request**:
+
 ```json
 {
   "source": "apple_health" // or "google_fit", "garmin"
@@ -610,6 +677,7 @@ Token obtained from Firebase Authentication. Refresh token automatically via int
 ```
 
 **Response** (200):
+
 ```json
 {
   "synced": true,
@@ -622,14 +690,17 @@ Token obtained from Firebase Authentication. Refresh token automatically via int
 ---
 
 ### GET /health/metrics
+
 **Protected** - Get health metrics (same as /users/:uid/metrics)
 
 ---
 
 ### POST /health/metrics
+
 **Protected** - Log manual metric (if not synced from device)
 
 **Request**:
+
 ```json
 {
   "date": "2026-05-17",
@@ -648,13 +719,16 @@ Token obtained from Firebase Authentication. Refresh token automatically via int
 ## 8. Challenges Endpoints
 
 ### GET /challenges
+
 **Protected** - List active challenges
 
 **Query Params**:
+
 - `status`: `active`, `completed` (default: `active`)
 - `limit`: 10–50
 
 **Response** (200):
+
 ```json
 {
   "challenges": [
@@ -676,13 +750,16 @@ Token obtained from Firebase Authentication. Refresh token automatically via int
 ---
 
 ### GET /challenges/:challengeId/leaderboard
+
 **Protected** - Get challenge leaderboard
 
 **Query Params**:
+
 - `limit`: 10–100 (default: 100)
 - `userRank`: Get user's rank
 
 **Response** (200):
+
 ```json
 {
   "challengeId": "challenge_1",
@@ -706,9 +783,11 @@ Token obtained from Firebase Authentication. Refresh token automatically via int
 ---
 
 ### POST /challenges/:challengeId/join
+
 **Protected** - Join a challenge
 
 **Response** (200):
+
 ```json
 {
   "challengeId": "challenge_1",
@@ -722,9 +801,11 @@ Token obtained from Firebase Authentication. Refresh token automatically via int
 ## 9. Payments Endpoints
 
 ### POST /payments/create-intent
+
 **Protected** - Create Stripe payment intent
 
 **Request**:
+
 ```json
 {
   "planId": "pro_monthly",
@@ -733,6 +814,7 @@ Token obtained from Firebase Authentication. Refresh token automatically via int
 ```
 
 **Response** (200):
+
 ```json
 {
   "clientSecret": "pi_1234_secret_5678",
@@ -745,9 +827,11 @@ Token obtained from Firebase Authentication. Refresh token automatically via int
 ---
 
 ### GET /payments/subscription
+
 **Protected** - Get user's current subscription
 
 **Response** (200):
+
 ```json
 {
   "subscription": {
@@ -765,9 +849,11 @@ Token obtained from Firebase Authentication. Refresh token automatically via int
 ---
 
 ### POST /payments/cancel-subscription
+
 **Protected** - Cancel subscription
 
 **Response** (200):
+
 ```json
 {
   "subscription": {
@@ -784,6 +870,7 @@ Token obtained from Firebase Authentication. Refresh token automatically via int
 ## Error Responses
 
 ### 400 Bad Request
+
 ```json
 {
   "error": "invalid_input",
@@ -793,6 +880,7 @@ Token obtained from Firebase Authentication. Refresh token automatically via int
 ```
 
 ### 401 Unauthorized
+
 ```json
 {
   "error": "unauthorized",
@@ -801,6 +889,7 @@ Token obtained from Firebase Authentication. Refresh token automatically via int
 ```
 
 ### 403 Forbidden
+
 ```json
 {
   "error": "forbidden",
@@ -809,6 +898,7 @@ Token obtained from Firebase Authentication. Refresh token automatically via int
 ```
 
 ### 404 Not Found
+
 ```json
 {
   "error": "not_found",
@@ -817,6 +907,7 @@ Token obtained from Firebase Authentication. Refresh token automatically via int
 ```
 
 ### 500 Internal Server Error
+
 ```json
 {
   "error": "server_error",
@@ -834,6 +925,7 @@ Token obtained from Firebase Authentication. Refresh token automatically via int
 - **Upload endpoints**: 5 files per minute
 
 **Headers**:
+
 ```
 X-RateLimit-Limit: 100
 X-RateLimit-Remaining: 87
@@ -845,7 +937,9 @@ X-RateLimit-Reset: 1715770800
 ## Webhooks (Stripe)
 
 ### POST /webhooks/stripe
+
 Handles payment events:
+
 - `payment_intent.succeeded` — Mark subscription active
 - `payment_intent.payment_failed` — Send retry notification
 - `customer.subscription.deleted` — Deactivate premium

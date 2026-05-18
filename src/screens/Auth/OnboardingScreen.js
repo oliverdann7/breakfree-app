@@ -1,12 +1,5 @@
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  ScrollView,
-  TouchableOpacity,
-  StyleSheet,
-  Dimensions,
-} from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { updateProfile } from '../../store/slices/userSlice';
 import Button from '../../components/common/Button';
@@ -25,7 +18,7 @@ const GOALS = [
   { id: 'stress', label: 'Stres', emoji: '🌿', desc: 'Stresi yönet' },
 ];
 
-export default function OnboardingScreen({ navigation }) {
+export default function OnboardingScreen({ _navigation }) {
   const dispatch = useAppDispatch();
   const auth = useAppSelector((state) => state.auth);
 
@@ -35,9 +28,7 @@ export default function OnboardingScreen({ navigation }) {
   const [bio, setBio] = useState('');
 
   const toggleGoal = (id) => {
-    setSelectedGoals((prev) =>
-      prev.includes(id) ? prev.filter((g) => g !== id) : [...prev, id]
-    );
+    setSelectedGoals((prev) => (prev.includes(id) ? prev.filter((g) => g !== id) : [...prev, id]));
   };
 
   const handleComplete = () => {
@@ -49,13 +40,13 @@ export default function OnboardingScreen({ navigation }) {
     // Step 0: Welcome
     <View key="welcome" style={styles.stepContainer}>
       <Text style={styles.welcomeEmoji}>🌟</Text>
-      <Text style={styles.stepTitle}>BreakFree'ye{'\n'}Hoş Geldin!</Text>
+      <Text style={styles.stepTitle}>BreakFree&apos;ye{'\n'}Hoş Geldin!</Text>
       <Text style={styles.stepDesc}>
-        Türkiye'nin en iyi wellness topluluğuna katıldın. Hedeflerine ulaşman için buradayız.
+        Türkiye&apos;nin en iyi wellness topluluğuna katıldın. Hedeflerine ulaşman için buradayız.
       </Text>
       <View style={styles.featureList}>
         {[
-          { emoji: '🎙', text: 'Uzman talk\'larına katıl' },
+          { emoji: '🎙', text: 'Uzman talk&apos;larına katıl' },
           { emoji: '📊', text: 'Sağlık metriklerini takip et' },
           { emoji: '👥', text: 'Toplulukla bağlantı kur' },
         ].map((f) => (
@@ -101,9 +92,7 @@ export default function OnboardingScreen({ navigation }) {
         Topluluk seni tanısın. Bunları daha sonra değiştirebilirsin.
       </Text>
       <View style={styles.avatarCircle}>
-        <Text style={styles.avatarText}>
-          {name ? name[0].toUpperCase() : '?'}
-        </Text>
+        <Text style={styles.avatarText}>{name ? name[0].toUpperCase() : '?'}</Text>
       </View>
       <Input
         label="Ad Soyad"
@@ -131,10 +120,7 @@ export default function OnboardingScreen({ navigation }) {
       </View>
       <View style={styles.progressBar}>
         {[0, 1, 2].map((i) => (
-          <View
-            key={i}
-            style={[styles.progressDot, i <= step && styles.progressDotActive]}
-          />
+          <View key={i} style={[styles.progressDot, i <= step && styles.progressDotActive]} />
         ))}
       </View>
 

@@ -3,11 +3,7 @@ import { View, StyleSheet } from 'react-native';
 import { colors } from '../../constants/designTokens';
 
 export default function Card({ children, style, variant = 'default' }) {
-  return (
-    <View style={[styles.base, styles[variant], style]}>
-      {children}
-    </View>
-  );
+  return <View style={[styles.base, styles[variant], style]}>{children}</View>;
 }
 
 const styles = StyleSheet.create({

@@ -51,8 +51,8 @@ export const LOGO_VARIANTS = {
 };
 
 export const LOGO_SIZES = {
-  SMALL: 'small',     // 80px
-  MEDIUM: 'medium',   // 120px
-  LARGE: 'large',     // 180px
-  XLARGE: 'xlarge',   // 240px
+  SMALL: 'small', // 80px
+  MEDIUM: 'medium', // 120px
+  LARGE: 'large', // 180px
+  XLARGE: 'xlarge', // 240px
 };

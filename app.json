@@ -31,9 +31,7 @@
       "shortName": "BreakFree",
       "description": "Premium wellness community app"
     },
-    "plugins": [
-      "expo-notifications"
-    ],
+    "plugins": ["expo-notifications"],
     "extra": {
       "eas": {
         "projectId": ""

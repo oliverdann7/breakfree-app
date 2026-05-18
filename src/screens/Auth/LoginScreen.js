@@ -43,11 +43,9 @@ export default function LoginScreen({ navigation }) {
     const result = await dispatch(login({ email, password }));
     if (login.rejected.match(result)) {
       // Mock fallback: allow any credentials in dev mode
-      Alert.alert(
-        'Giriş Başarılı (Mock)',
-        'Firebase bağlantısı olmadan devam ediyorsunuz.',
-        [{ text: 'Tamam', onPress: () => forceMockLogin() }]
-      );
+      Alert.alert('Giriş Başarılı (Mock)', 'Firebase bağlantısı olmadan devam ediyorsunuz.', [
+        { text: 'Tamam', onPress: () => forceMockLogin() },
+      ]);
     }
   };
 

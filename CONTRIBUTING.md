@@ -75,6 +75,7 @@ Use clear, descriptive commit messages following this format:
 ```
 
 **Type** should be one of:
+
 - `feat` - A new feature
 - `fix` - A bug fix
 - `docs` - Documentation only changes
@@ -84,6 +85,7 @@ Use clear, descriptive commit messages following this format:
 - `chore` - Changes to build process, dependencies, etc
 
 **Examples:**
+
 ```
 feat(auth): add social login with Google
 
@@ -142,6 +144,7 @@ docs(readme): update installation instructions
 - Use descriptive test names
 
 Example test structure:
+
 ```typescript
 describe('UserProfile', () => {
   it('should display user name', () => {
@@ -180,6 +183,7 @@ Feel free to open a discussion or ask in the issues. We're here to help!
 ## Recognition
 
 Contributors will be recognized in:
+
 - The [README.md](README.md) contributors section
 - GitHub's automatic contributor recognition
 

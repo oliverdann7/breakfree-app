@@ -26,9 +26,7 @@ export default class ErrorBoundary extends React.Component {
         <View style={styles.container}>
           <Text style={styles.emoji}>⚠️</Text>
           <Text style={styles.title}>Bir şeyler ters gitti</Text>
-          <Text style={styles.message}>
-            Beklenmedik bir hata oluştu. Lütfen tekrar deneyin.
-          </Text>
+          <Text style={styles.message}>Beklenmedik bir hata oluştu. Lütfen tekrar deneyin.</Text>
           {__DEV__ && this.state.error && (
             <Text style={styles.devError} numberOfLines={4}>
               {this.state.error.toString()}

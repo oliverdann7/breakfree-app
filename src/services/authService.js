@@ -49,7 +49,12 @@ export const login = async (email, password) => {
 
     const token = await user.getIdToken();
     return {
-      user: { uid: user.uid, email: user.email, displayName: userData?.displayName || 'User', ...userData },
+      user: {
+        uid: user.uid,
+        email: user.email,
+        displayName: userData?.displayName || 'User',
+        ...userData,
+      },
       token,
     };
   } catch (error) {

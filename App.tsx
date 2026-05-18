@@ -11,7 +11,14 @@ import ErrorBoundary from './src/components/ErrorBoundary';
 
 function LoadingScreen() {
   return (
-    <View style={{ flex: 1, backgroundColor: '#0A2540', alignItems: 'center', justifyContent: 'center' }}>
+    <View
+      style={{
+        flex: 1,
+        backgroundColor: '#0A2540',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
       <ActivityIndicator color="#14B8D4" size="large" />
     </View>
   );
