@@ -13,6 +13,7 @@ import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { login, clearError } from '../../store/slices/authSlice';
 import Button from '../../components/common/Button';
 import Input from '../../components/common/Input';
+import BreakFreeLogo from '../../components/branding/BreakFreeLogo';
 import { colors } from '../../constants/designTokens';
 
 export default function LoginScreen({ navigation }) {
@@ -67,7 +68,7 @@ export default function LoginScreen({ navigation }) {
     >
       <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
         <View style={styles.header}>
-          <Text style={styles.logo}>BREAK<Text style={styles.logoAccent}>FREE</Text></Text>
+          <BreakFreeLogo variant="full" size="medium" />
           <Text style={styles.tagline}>Sağlıklı bir yaşam topluluğu</Text>
         </View>
 
@@ -149,17 +150,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 48,
   },
-  logo: {
-    fontSize: 36,
-    fontWeight: '800',
-    color: colors.white,
-    letterSpacing: 2,
-  },
-  logoAccent: { color: colors.cyan },
   tagline: {
     fontSize: 13,
     color: colors.textSecondary,
-    marginTop: 6,
+    marginTop: 16,
+    textAlign: 'center',
   },
   form: { flex: 1 },
   title: {
