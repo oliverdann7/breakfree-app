@@ -9,7 +9,9 @@ import { auth, db } from './firebase';
 
 const checkFirebaseAvailable = () => {
   if (!auth || !db) {
-    throw new Error('Firebase not configured. Please add environment variables.');
+    throw new Error(
+      'Firebase not configured. Please copy .env.local.example to .env.local and add your Firebase credentials from https://console.firebase.google.com/'
+    );
   }
 };
 
