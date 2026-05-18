@@ -143,7 +143,7 @@ export default function WebLoginModal({ onBack }) {
 
         {/* Logo */}
         <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1.75rem' }}>
-          <BreakFreeLogo variant="full" size="small" />
+          <BreakFreeLogo variant="symbol" size="small" />
         </div>
 
         {/* Heading */}
