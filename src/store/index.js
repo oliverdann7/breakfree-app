@@ -1,20 +1,44 @@
-import { configureStore } from '@reduxjs/toolkit';
+import { configureStore, combineReducers } from '@reduxjs/toolkit';
+import {
+  persistStore,
+  persistReducer,
+  FLUSH,
+  REHYDRATE,
+  PAUSE,
+  PERSIST,
+  PURGE,
+  REGISTER,
+} from 'redux-persist';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import authReducer from './slices/authSlice';
 import userReducer from './slices/userSlice';
 import talksReducer from './slices/talksSlice';
 import metricsReducer from './slices/metricsSlice';
 
+const persistConfig = {
+  key: 'root',
+  storage: AsyncStorage,
+  // Only persist auth and user — talks/metrics are re-fetched on mount
+  whitelist: ['auth', 'user'],
+};
+
+const rootReducer = combineReducers({
+  auth: authReducer,
+  user: userReducer,
+  talks: talksReducer,
+  metrics: metricsReducer,
+});
+
+const persistedReducer = persistReducer(persistConfig, rootReducer);
+
 export const store = configureStore({
-  reducer: {
-    auth: authReducer,
-    user: userReducer,
-    talks: talksReducer,
-    metrics: metricsReducer,
-  },
+  reducer: persistedReducer,
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: {
-        ignoredActions: ['persist/PERSIST', 'persist/REHYDRATE'],
+        ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
       },
     }),
 });
+
+export const persistor = persistStore(store);

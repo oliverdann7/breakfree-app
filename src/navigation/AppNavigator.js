@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { Text, StyleSheet } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import DashboardScreen from '../screens/Home/DashboardScreen';
@@ -8,21 +8,23 @@ import TalkDetailScreen from '../screens/Talks/TalkDetailScreen';
 import HealthMetricsScreen from '../screens/Health/HealthMetricsScreen';
 import CommunityScreen from '../screens/Community/CommunityScreen';
 import ProfileScreen from '../screens/Profile/ProfileScreen';
+import EditProfileScreen from '../screens/Profile/EditProfileScreen';
 import { colors } from '../constants/designTokens';
 
 const Tab = createBottomTabNavigator();
 const TalksStack = createStackNavigator();
+const ProfileStack = createStackNavigator();
 
 function TabIcon({ label, focused }) {
   const icons = {
-    'Ana Sayfa': focused ? '⬡' : '⬡',
-    'Palestralar': focused ? '🎙' : '🎙',
-    'Sağlık': focused ? '💚' : '💚',
-    'Topluluk': focused ? '👥' : '👥',
-    'Profil': focused ? '👤' : '👤',
+    'Ana Sayfa': '⬡',
+    'Palestralar': '🎙',
+    'Sağlık': '💚',
+    'Topluluk': '👥',
+    'Profil': '👤',
   };
   return (
-    <Text style={{ fontSize: 20, opacity: focused ? 1 : 0.5 }}>
+    <Text style={{ fontSize: 20, opacity: focused ? 1 : 0.45 }}>
       {icons[label] || '●'}
     </Text>
   );
@@ -34,6 +36,15 @@ function TalksStackNavigator() {
       <TalksStack.Screen name="TalksList" component={TalksListScreen} />
       <TalksStack.Screen name="TalkDetail" component={TalkDetailScreen} />
     </TalksStack.Navigator>
+  );
+}
+
+function ProfileStackNavigator() {
+  return (
+    <ProfileStack.Navigator screenOptions={{ headerShown: false }}>
+      <ProfileStack.Screen name="ProfileMain" component={ProfileScreen} />
+      <ProfileStack.Screen name="EditProfile" component={EditProfileScreen} />
+    </ProfileStack.Navigator>
   );
 }
 
@@ -53,7 +64,7 @@ export default function AppNavigator() {
       <Tab.Screen name="Palestralar" component={TalksStackNavigator} />
       <Tab.Screen name="Sağlık" component={HealthMetricsScreen} />
       <Tab.Screen name="Topluluk" component={CommunityScreen} />
-      <Tab.Screen name="Profil" component={ProfileScreen} />
+      <Tab.Screen name="Profil" component={ProfileStackNavigator} />
     </Tab.Navigator>
   );
 }

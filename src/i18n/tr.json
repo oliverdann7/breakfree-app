@@ -1,0 +1,150 @@
+{
+  "common": {
+    "save": "Kaydet",
+    "cancel": "İptal",
+    "back": "Geri",
+    "loading": "Yükleniyor...",
+    "error": "Bir hata oluştu",
+    "retry": "Tekrar Dene",
+    "soon": "Yakında",
+    "edit": "Düzenle"
+  },
+  "greeting": {
+    "morning": "Günaydın",
+    "afternoon": "İyi günler",
+    "evening": "İyi akşamlar"
+  },
+  "auth": {
+    "login": "Giriş Yap",
+    "signup": "Kayıt Ol",
+    "logout": "Çıkış Yap",
+    "email": "E-posta",
+    "password": "Şifre",
+    "confirmPassword": "Şifre Tekrar",
+    "forgotPassword": "Şifreni mi unuttun?",
+    "noAccount": "Hesabın yok mu?",
+    "hasAccount": "Zaten hesabın var mı?",
+    "displayName": "Ad Soyad",
+    "terms": "Kullanım Koşulları",
+    "privacy": "Gizlilik Politikası",
+    "termsAccept": "ve 'nı kabul ediyorum",
+    "emailPlaceholder": "ornek@email.com",
+    "passwordPlaceholder": "En az 6 karakter",
+    "namePlaceholder": "Adın Soyadın"
+  },
+  "onboarding": {
+    "welcome": "BreakFree'ye\nHoş Geldin!",
+    "welcomeDesc": "Türkiye'nin en iyi wellness topluluğuna katıldın.",
+    "goals": "Hedeflerini\nSeç",
+    "goalsDesc": "Sana en uygun içerikleri gösterebilmemiz için hedeflerini belirt.",
+    "profile": "Profilini\nTamamla",
+    "profileDesc": "Topluluk seni tanısın.",
+    "next": "İleri",
+    "start": "Başla 🚀"
+  },
+  "tabs": {
+    "home": "Ana Sayfa",
+    "talks": "Palestralar",
+    "health": "Sağlık",
+    "community": "Topluluk",
+    "profile": "Profil"
+  },
+  "home": {
+    "todaysPlan": "Bugünkü Plan",
+    "dailyMetrics": "Günlük Metrikler",
+    "quickAccess": "Hızlı Erişim",
+    "wellnessScore": "Wellness Skoru"
+  },
+  "talks": {
+    "title": "Palestralar",
+    "searchPlaceholder": "Talk veya konuşmacı ara...",
+    "liveNow": "ŞU AN CANLI",
+    "join": "Katıl",
+    "upcoming": "YAKINDA",
+    "ended": "BİTTİ",
+    "live": "CANLI",
+    "duration": "dk",
+    "listeners": "dinleyici",
+    "host": "Konuşmacı",
+    "description": "Açıklama",
+    "noResults": "Sonuç bulunamadı.",
+    "joinTalk": "Talk'a Katıl",
+    "setReminder": "Hatırlatıcı Kur",
+    "listenRecording": "Kaydı Dinle",
+    "save": "Kaydet",
+    "share": "Paylaş",
+    "categories": {
+      "all": "Tümü",
+      "mind": "Zihin",
+      "health": "Sağlık",
+      "movement": "Hareket",
+      "nutrition": "Beslenme"
+    }
+  },
+  "health": {
+    "title": "Sağlık Metrikleri",
+    "weeklySteps": "Haftalık Adımlar",
+    "weeklySleep": "Haftalık Uyku",
+    "todayDetails": "Bugünkü Detaylar",
+    "aiAdvice": "AI Tavsiyesi",
+    "periods": {
+      "day": "Gün",
+      "week": "Hafta",
+      "month": "Ay"
+    },
+    "metrics": {
+      "sleep": "Uyku",
+      "heartRate": "Kalp Atışı",
+      "steps": "Adımlar",
+      "calories": "Kalori"
+    },
+    "units": {
+      "hours": "saat",
+      "bpm": "bpm",
+      "steps": "adım",
+      "kcal": "kcal"
+    }
+  },
+  "community": {
+    "title": "Topluluk",
+    "share": "+ Paylaş",
+    "join": "Katıl",
+    "weeklyChallenge": "🏆 Haftalık Meydan Okuma",
+    "recentPosts": "Son Paylaşımlar",
+    "distance": "Mesafe",
+    "duration": "Süre",
+    "avgBpm": "Ort. BPM"
+  },
+  "profile": {
+    "title": "Profil",
+    "editProfile": "Profili Düzenle",
+    "myGoals": "Hedeflerim",
+    "settings": "Ayarlar",
+    "account": "Hesap",
+    "language": "Dil",
+    "notifications": "Bildirimler",
+    "units": "Birimler",
+    "changePassword": "Şifre Değiştir",
+    "manageDevices": "Cihazları Yönet",
+    "privacyPolicy": "Gizlilik Politikası",
+    "logout": "Çıkış Yap",
+    "logoutConfirm": "Hesabından çıkmak istediğine emin misin?",
+    "on": "Açık",
+    "off": "Kapalı",
+    "metric": "Metrik",
+    "imperial": "Imperial",
+    "turkish": "Türkçe",
+    "english": "English",
+    "bio": "Biyografi",
+    "name": "Ad Soyad",
+    "avatarColor": "Renk Seç"
+  },
+  "goals": {
+    "sleep": "Uyku",
+    "fitness": "Fitness",
+    "mindfulness": "Zihin",
+    "nutrition": "Beslenme",
+    "community": "Topluluk",
+    "stress": "Stres"
+  }
+}

@@ -11,6 +11,7 @@ import {
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { fetchTalks } from '../../store/slices/talksSlice';
 import TalkCard from '../../components/features/TalkCard';
+import Skeleton from '../../components/common/Skeleton';
 import { colors } from '../../constants/designTokens';
 
 const CATEGORIES = ['Tümü', 'Zihin', 'Sağlık', 'Hareket', 'Beslenme'];
@@ -116,7 +117,13 @@ export default function TalksListScreen({ navigation }) {
           />
         )}
         ListEmptyComponent={
-          <Text style={styles.emptyText}>Sonuç bulunamadı.</Text>
+          loading ? (
+            <View style={{ paddingHorizontal: 20, gap: 10 }}>
+              {[1, 2, 3].map((i) => <Skeleton.TalkCard key={i} />)}
+            </View>
+          ) : (
+            <Text style={styles.emptyText}>Sonuç bulunamadı.</Text>
+          )
         }
       />
     </SafeAreaView>

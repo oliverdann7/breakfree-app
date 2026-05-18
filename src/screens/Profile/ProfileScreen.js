@@ -8,6 +8,7 @@ import {
   SafeAreaView,
   Alert,
 } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { logout } from '../../store/slices/authSlice';
 import { updatePreferences } from '../../store/slices/userSlice';
@@ -28,10 +29,14 @@ function SettingRow({ icon, label, value, onPress, rightElement, isDestructive }
   );
 }
 
-export default function ProfileScreen() {
+export default function ProfileScreen({ navigation }) {
   const dispatch = useAppDispatch();
+  const { i18n } = useTranslation();
   const { user } = useAppSelector((state) => state.auth);
-  const { preferences } = useAppSelector((state) => state.user);
+  const { preferences, profile } = useAppSelector((state) => state.user);
+
+  // Prefer persisted profile over auth user (edit profile updates profile slice)
+  const displayData = profile || user || {};
 
   const handleLogout = () => {
     Alert.alert('Çıkış Yap', 'Hesabından çıkmak istediğine emin misin?', [
@@ -41,12 +46,12 @@ export default function ProfileScreen() {
   };
 
   const toggleLanguage = () => {
-    dispatch(updatePreferences({
-      language: preferences.language === 'tr' ? 'en' : 'tr',
-    }));
+    const next = preferences.language === 'tr' ? 'en' : 'tr';
+    dispatch(updatePreferences({ language: next }));
+    i18n.changeLanguage(next);
   };
 
-  const displayName = user?.displayName || 'Kullanıcı';
+  const displayName = displayData.displayName || 'Kullanıcı';
   const initials = displayName.split(' ').map((w) => w[0]).join('').toUpperCase().slice(0, 2);
 
   return (
@@ -58,7 +63,10 @@ export default function ProfileScreen() {
             <Text style={styles.avatarInitials}>{initials}</Text>
           </View>
           <Text style={styles.userName}>{displayName}</Text>
-          <Text style={styles.userEmail}>{user?.email}</Text>
+          <Text style={styles.userEmail}>{displayData.email || user?.email}</Text>
+          {displayData.bio ? (
+            <Text style={styles.userBio}>{displayData.bio}</Text>
+          ) : null}
 
           {/* Stats */}
           <View style={styles.statsRow}>
@@ -74,7 +82,10 @@ export default function ProfileScreen() {
             ))}
           </View>
 
-          <TouchableOpacity style={styles.editBtn}>
+          <TouchableOpacity
+            style={styles.editBtn}
+            onPress={() => navigation.navigate('EditProfile')}
+          >
             <Text style={styles.editBtnText}>Profili Düzenle</Text>
           </TouchableOpacity>
         </View>
@@ -83,7 +94,7 @@ export default function ProfileScreen() {
         <Card style={styles.goalsCard}>
           <Text style={styles.sectionTitle}>Hedeflerim</Text>
           <View style={styles.goalsRow}>
-            {(user?.goals || ['sleep', 'fitness', 'mindfulness']).map((g) => (
+            {(displayData.goals?.length ? displayData.goals : ['sleep', 'fitness', 'mindfulness']).map((g) => (
               <View key={g} style={styles.goalChip}>
                 <Text style={styles.goalChipText}>{g}</Text>
               </View>
@@ -160,10 +171,12 @@ const styles = StyleSheet.create({
   },
   avatarInitials: { fontSize: 32, fontWeight: '800', color: colors.navy },
   userName: { fontSize: 22, fontWeight: '700', color: colors.textPrimary },
-  userEmail: { fontSize: 13, color: colors.textTertiary, marginTop: 2, marginBottom: 20 },
+  userEmail: { fontSize: 13, color: colors.textTertiary, marginTop: 2 },
+  userBio: { fontSize: 13, color: colors.textSecondary, marginTop: 6, marginBottom: 20, textAlign: 'center', paddingHorizontal: 16 },
   statsRow: {
     flexDirection: 'row',
     gap: 32,
+    marginTop: 12,
     marginBottom: 20,
   },
   statItem: { alignItems: 'center' },

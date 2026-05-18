@@ -1,0 +1,150 @@
+{
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "back": "Back",
+    "loading": "Loading...",
+    "error": "Something went wrong",
+    "retry": "Try Again",
+    "soon": "Coming Soon",
+    "edit": "Edit"
+  },
+  "greeting": {
+    "morning": "Good morning",
+    "afternoon": "Good afternoon",
+    "evening": "Good evening"
+  },
+  "auth": {
+    "login": "Log In",
+    "signup": "Sign Up",
+    "logout": "Log Out",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "forgotPassword": "Forgot your password?",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?",
+    "displayName": "Full Name",
+    "terms": "Terms of Service",
+    "privacy": "Privacy Policy",
+    "termsAccept": "I accept the and",
+    "emailPlaceholder": "example@email.com",
+    "passwordPlaceholder": "At least 6 characters",
+    "namePlaceholder": "Your Full Name"
+  },
+  "onboarding": {
+    "welcome": "Welcome to\nBreakFree!",
+    "welcomeDesc": "You've joined Turkey's best wellness community.",
+    "goals": "Choose Your\nGoals",
+    "goalsDesc": "Tell us your goals so we can show the most relevant content.",
+    "profile": "Complete Your\nProfile",
+    "profileDesc": "Let the community get to know you.",
+    "next": "Next",
+    "start": "Get Started 🚀"
+  },
+  "tabs": {
+    "home": "Home",
+    "talks": "Talks",
+    "health": "Health",
+    "community": "Community",
+    "profile": "Profile"
+  },
+  "home": {
+    "todaysPlan": "Today's Plan",
+    "dailyMetrics": "Daily Metrics",
+    "quickAccess": "Quick Access",
+    "wellnessScore": "Wellness Score"
+  },
+  "talks": {
+    "title": "Talks",
+    "searchPlaceholder": "Search talks or speakers...",
+    "liveNow": "LIVE NOW",
+    "join": "Join",
+    "upcoming": "UPCOMING",
+    "ended": "ENDED",
+    "live": "LIVE",
+    "duration": "min",
+    "listeners": "listeners",
+    "host": "Speaker",
+    "description": "Description",
+    "noResults": "No results found.",
+    "joinTalk": "Join Talk 🎙",
+    "setReminder": "Set Reminder 🔔",
+    "listenRecording": "Listen to Recording 🎵",
+    "save": "Save",
+    "share": "Share",
+    "categories": {
+      "all": "All",
+      "mind": "Mind",
+      "health": "Health",
+      "movement": "Movement",
+      "nutrition": "Nutrition"
+    }
+  },
+  "health": {
+    "title": "Health Metrics",
+    "weeklySteps": "Weekly Steps",
+    "weeklySleep": "Weekly Sleep",
+    "todayDetails": "Today's Details",
+    "aiAdvice": "AI Insight",
+    "periods": {
+      "day": "Day",
+      "week": "Week",
+      "month": "Month"
+    },
+    "metrics": {
+      "sleep": "Sleep",
+      "heartRate": "Heart Rate",
+      "steps": "Steps",
+      "calories": "Calories"
+    },
+    "units": {
+      "hours": "hrs",
+      "bpm": "bpm",
+      "steps": "steps",
+      "kcal": "kcal"
+    }
+  },
+  "community": {
+    "title": "Community",
+    "share": "+ Post",
+    "join": "Join",
+    "weeklyChallenge": "🏆 Weekly Challenge",
+    "recentPosts": "Recent Posts",
+    "distance": "Distance",
+    "duration": "Duration",
+    "avgBpm": "Avg BPM"
+  },
+  "profile": {
+    "title": "Profile",
+    "editProfile": "Edit Profile",
+    "myGoals": "My Goals",
+    "settings": "Settings",
+    "account": "Account",
+    "language": "Language",
+    "notifications": "Notifications",
+    "units": "Units",
+    "changePassword": "Change Password",
+    "manageDevices": "Manage Devices",
+    "privacyPolicy": "Privacy Policy",
+    "logout": "Log Out",
+    "logoutConfirm": "Are you sure you want to log out?",
+    "on": "On",
+    "off": "Off",
+    "metric": "Metric",
+    "imperial": "Imperial",
+    "turkish": "Türkçe",
+    "english": "English",
+    "bio": "Bio",
+    "name": "Full Name",
+    "avatarColor": "Choose Color"
+  },
+  "goals": {
+    "sleep": "Sleep",
+    "fitness": "Fitness",
+    "mindfulness": "Mindfulness",
+    "nutrition": "Nutrition",
+    "community": "Community",
+    "stress": "Stress"
+  }
+}
