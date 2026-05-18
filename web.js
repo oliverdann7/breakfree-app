@@ -17,10 +17,11 @@ function WebAppContent() {
     return <WebDashboard />;
   }
 
-  return showLogin ? (
-    <WebLoginModal onBack={() => setShowLogin(false)} />
-  ) : (
-    <BreakFreeLanding onStart={() => setShowLogin(true)} />
+  return (
+    <>
+      <BreakFreeLanding onStart={() => setShowLogin(true)} />
+      {showLogin && <WebLoginModal onBack={() => setShowLogin(false)} />}
+    </>
   );
 }
 
