@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 
 const BreakFreeLogo = ({ size = 36, className = '' }) => (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 178.9 263.7" width={size} height={size} className={className} aria-label="BreakFree">
