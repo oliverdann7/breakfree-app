@@ -15,8 +15,14 @@ import userReducer from './slices/userSlice';
 import talksReducer from './slices/talksSlice';
 import metricsReducer from './slices/metricsSlice';
 
-// Use localStorage for web, AsyncStorage for native
-const storage = typeof window !== 'undefined' ? localStorage : AsyncStorage;
+// Wrap localStorage with async interface for redux-persist compatibility
+const createAsyncStorage = () => ({
+  getItem: (key) => Promise.resolve(typeof window !== 'undefined' ? localStorage.getItem(key) : null),
+  setItem: (key, value) => Promise.resolve(typeof window !== 'undefined' && localStorage.setItem(key, value)),
+  removeItem: (key) => Promise.resolve(typeof window !== 'undefined' && localStorage.removeItem(key)),
+});
+
+const storage = typeof window !== 'undefined' ? createAsyncStorage() : AsyncStorage;
 
 const persistConfig = {
   key: 'root',
