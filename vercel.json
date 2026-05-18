@@ -1,7 +1,6 @@
 {
-  "buildCommand": "npx expo export --platform web",
+  "buildCommand": "mkdir -p dist && cp breakfree-landing-web.html dist/",
   "outputDirectory": "dist",
-  "installCommand": "npm install --legacy-peer-deps",
-  "framework": null,
-  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
+  "installCommand": null,
+  "framework": null
 }
