@@ -1,9 +1,16 @@
 import React, { useEffect } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet, SafeAreaView, Dimensions } from 'react-native';
+import {
+  View,
+  Text,
+  ScrollView,
+  TouchableOpacity,
+  StyleSheet,
+  SafeAreaView,
+  Dimensions,
+} from 'react-native';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { fetchMetrics } from '../../store/slices/metricsSlice';
 import WellnessRing from '../../components/features/WellnessRing';
-import MetricCard from '../../components/features/MetricCard';
 import Card from '../../components/common/Card';
 import { colors } from '../../constants/designTokens';
 
@@ -17,14 +24,35 @@ function greeting() {
 }
 
 const TODAY_PLAN = [
-  { time: '07:00', title: 'Sabah meditasyonu', duration: '10dk', done: true, icon: '🧘', accent: false },
-  { time: '17:30', title: 'Fitness · Üst beden', duration: '45dk', done: false, icon: '💪', accent: false },
-  { time: '20:00', title: 'Wellness palestrası', duration: '30dk', done: false, icon: '🎙', accent: true },
+  {
+    time: '07:00',
+    title: 'Sabah meditasyonu',
+    duration: '10dk',
+    done: true,
+    icon: '🧘',
+    accent: false,
+  },
+  {
+    time: '17:30',
+    title: 'Fitness · Üst beden',
+    duration: '45dk',
+    done: false,
+    icon: '💪',
+    accent: false,
+  },
+  {
+    time: '20:00',
+    title: 'Wellness palestrası',
+    duration: '30dk',
+    done: false,
+    icon: '🎙',
+    accent: true,
+  },
 ];
 
 export default function DashboardScreen() {
   const dispatch = useAppDispatch();
-  const { dailyMetrics, wellnessScore } = useAppSelector((state) => state.metrics);
+  const { wellnessScore } = useAppSelector((state) => state.metrics);
   const { user } = useAppSelector((state) => state.auth);
 
   useEffect(() => {
@@ -97,7 +125,18 @@ export default function DashboardScreen() {
         {/* Metrics Grid */}
         <View style={styles.metricsGrid}>
           {metrics.map((m) => (
-            <Card key={m.label} style={styles.metricCard}>
+            <Card
+              key={m.label}
+              style={[
+                styles.metricCard,
+                {
+                  borderLeftWidth: 3,
+                  borderLeftColor: m.color,
+                  backgroundColor: 'rgba(20, 184, 212, 0.06)',
+                },
+                m.color === '#C9961A' && { backgroundColor: 'rgba(201, 150, 26, 0.06)' },
+              ]}
+            >
               <Text style={{ fontSize: 14, color: m.color }}>●</Text>
               <Text style={styles.metricValue}>{m.value}</Text>
               <Text style={styles.metricLabel}>{m.label}</Text>
@@ -107,49 +146,41 @@ export default function DashboardScreen() {
         </View>
 
         {/* Today's Plan */}
-        <View style={styles.planSection}>
-          <View style={styles.planHeader}>
-            <Text style={styles.sectionTitle}>Bugünkü plan</Text>
-            <Text style={styles.planArrow}>→</Text>
-          </View>
-          <View style={styles.planList}>
-            {TODAY_PLAN.map((item, i) => (
-              <View key={item.time}>
-                <View
-                  style={[
-                    styles.planItem,
-                    item.accent && styles.planItemAccent,
-                  ]}
-                >
-                  <View style={[styles.planIconBox, item.accent && styles.planIconBoxAccent]}>
-                    {item.done ? (
-                      <Text style={styles.planCheck}>✓</Text>
-                    ) : (
-                      <Text style={styles.planEmoji}>{item.icon}</Text>
+        <View style={styles.planSectionWrapper}>
+          <View style={styles.planSection}>
+            <View style={styles.planHeader}>
+              <Text style={styles.sectionTitle}>Bugünkü plan</Text>
+              <Text style={styles.planArrow}>→</Text>
+            </View>
+            <View style={styles.planList}>
+              {TODAY_PLAN.map((item, i) => (
+                <View key={item.time}>
+                  <View style={[styles.planItem, item.accent && styles.planItemAccent]}>
+                    <View style={[styles.planIconBox, item.accent && styles.planIconBoxAccent]}>
+                      {item.done ? (
+                        <Text style={styles.planCheck}>✓</Text>
+                      ) : (
+                        <Text style={styles.planEmoji}>{item.icon}</Text>
+                      )}
+                    </View>
+                    <View style={styles.planContent}>
+                      <Text style={[styles.planTitle, item.done && styles.planTitleDone]}>
+                        {item.title}
+                      </Text>
+                      <Text style={styles.planTime}>
+                        {item.time} · {item.duration}
+                      </Text>
+                    </View>
+                    {item.accent && (
+                      <View style={styles.planLiveTag}>
+                        <Text style={styles.planLiveText}>Canlı</Text>
+                      </View>
                     )}
                   </View>
-                  <View style={styles.planContent}>
-                    <Text
-                      style={[
-                        styles.planTitle,
-                        item.done && styles.planTitleDone,
-                      ]}
-                    >
-                      {item.title}
-                    </Text>
-                    <Text style={styles.planTime}>
-                      {item.time} · {item.duration}
-                    </Text>
-                  </View>
-                  {item.accent && (
-                    <View style={styles.planLiveTag}>
-                      <Text style={styles.planLiveText}>Canlı</Text>
-                    </View>
-                  )}
+                  {i < TODAY_PLAN.length - 1 && <View style={styles.planDivider} />}
                 </View>
-                {i < TODAY_PLAN.length - 1 && <View style={styles.planDivider} />}
-              </View>
-            ))}
+              ))}
+            </View>
           </View>
         </View>
 
@@ -183,7 +214,7 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   greeting: {
-    fontSize: 20,
+    fontSize: 24,
     color: colors.textPrimary,
     fontWeight: '300',
   },
@@ -276,6 +307,11 @@ const styles = StyleSheet.create({
     fontSize: 8,
     color: 'rgba(255,255,255,0.5)',
   },
+  planSectionWrapper: {
+    backgroundColor: 'rgba(20, 184, 212, 0.03)',
+    paddingTop: 20,
+    paddingBottom: 24,
+  },
   planSection: {
     paddingHorizontal: 20,
   },
@@ -286,7 +322,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   sectionTitle: {
-    fontSize: 12,
+    fontSize: 20,
     fontWeight: '700',
     color: colors.textPrimary,
   },
