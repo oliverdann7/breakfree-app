@@ -30,4 +30,28 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.border,
   },
+  cyanAccent: {
+    backgroundColor: 'rgba(20, 184, 212, 0.08)',
+    borderLeftWidth: 4,
+    borderLeftColor: colors.cyan,
+    borderTopWidth: 0,
+    borderRightWidth: 0,
+    borderBottomWidth: 0,
+  },
+  goldAccent: {
+    backgroundColor: 'rgba(201, 150, 26, 0.08)',
+    borderLeftWidth: 4,
+    borderLeftColor: colors.gold,
+    borderTopWidth: 0,
+    borderRightWidth: 0,
+    borderBottomWidth: 0,
+  },
+  greenAccent: {
+    backgroundColor: 'rgba(0, 255, 136, 0.05)',
+    borderLeftWidth: 4,
+    borderLeftColor: '#00FF88',
+    borderTopWidth: 0,
+    borderRightWidth: 0,
+    borderBottomWidth: 0,
+  },
 });

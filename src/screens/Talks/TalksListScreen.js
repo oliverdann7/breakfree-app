@@ -28,7 +28,8 @@ export default function TalksListScreen() {
             <Text style={styles.liveCount}>347 dinleyici</Text>
           </View>
           <Text style={styles.liveTitle}>
-            Yorgunluğun ardındaki{'\n'}<Text style={styles.liveAccent}>gerçek hikaye</Text>
+            Yorgunluğun ardındaki{'\n'}
+            <Text style={styles.liveAccent}>gerçek hikaye</Text>
           </Text>
           <View style={styles.liveHosts}>
             <View style={styles.hostAvatar1} />
@@ -42,18 +43,17 @@ export default function TalksListScreen() {
         </Card>
 
         {/* Categories */}
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.categoriesScroll}>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={styles.categoriesScroll}
+        >
           {['Tümü', 'Beslenme', 'Zihin', 'Hareket', 'Uyku', 'Bağlantı'].map((cat, i) => (
             <TouchableOpacity
               key={cat}
-              style={[
-                styles.categoryBtn,
-                i === 0 && styles.categoryBtnActive,
-              ]}
+              style={[styles.categoryBtn, i === 0 && styles.categoryBtnActive]}
             >
-              <Text style={[styles.categoryText, i === 0 && styles.categoryTextActive]}>
-                {cat}
-              </Text>
+              <Text style={[styles.categoryText, i === 0 && styles.categoryTextActive]}>{cat}</Text>
             </TouchableOpacity>
           ))}
         </ScrollView>
@@ -81,26 +81,48 @@ export default function TalksListScreen() {
         </View>
 
         {/* Talks List */}
-        <View style={styles.listSection}>
-          <View style={styles.listHeader}>
-            <Text style={styles.sectionTitle}>Senin için</Text>
-            <Text style={styles.arrow}>→</Text>
+        <View style={styles.listSectionWrapper}>
+          <View style={styles.listSection}>
+            <View style={styles.listHeader}>
+              <Text style={styles.sectionTitle}>Senin için</Text>
+              <Text style={styles.arrow}>→</Text>
+            </View>
+            {[
+              {
+                cat: 'Zihin',
+                title: 'Anksiyeteyi anlamak',
+                dur: '28dk',
+                host: 'Dr. Ayşe',
+                color1: colors.cyan,
+              },
+              {
+                cat: 'Hareket',
+                title: 'Koşunun bilimi',
+                dur: '35dk',
+                host: 'Mehmet Ç.',
+                color1: colors.gold,
+              },
+              {
+                cat: 'Uyku',
+                title: 'Derin uykuya yolculuk',
+                dur: '22dk',
+                host: 'Dr. Levent',
+                color1: colors.royal,
+              },
+            ].map((talk, i) => (
+              <TouchableOpacity key={i} style={[styles.talkItem, { borderLeftColor: talk.color1 }]}>
+                <View style={[styles.talkThumbnail, { backgroundColor: talk.color1 }]} />
+                <View style={styles.talkContent}>
+                  <Text style={styles.talkCategory}>{talk.cat}</Text>
+                  <Text style={styles.talkTitle}>{talk.title}</Text>
+                  <Text style={styles.talkMeta}>
+                    {talk.host} · {talk.dur}
+                  </Text>
+                </View>
+                <Text style={styles.plusIcon}>+</Text>
+              </TouchableOpacity>
+            ))}
           </View>
-          {[
-            { cat: 'Zihin', title: 'Anksiyeteyi anlamak', dur: '28dk', host: 'Dr. Ayşe', color1: colors.cyan },
-            { cat: 'Hareket', title: 'Koşunun bilimi', dur: '35dk', host: 'Mehmet Ç.', color1: colors.gold },
-            { cat: 'Uyku', title: 'Derin uykuya yolculuk', dur: '22dk', host: 'Dr. Levent', color1: colors.royal },
-          ].map((talk, i) => (
-            <TouchableOpacity key={i} style={styles.talkItem}>
-              <View style={[styles.talkThumbnail, { backgroundColor: talk.color1 }]} />
-              <View style={styles.talkContent}>
-                <Text style={styles.talkCategory}>{talk.cat}</Text>
-                <Text style={styles.talkTitle}>{talk.title}</Text>
-                <Text style={styles.talkMeta}>{talk.host} · {talk.dur}</Text>
-              </View>
-              <Text style={styles.plusIcon}>+</Text>
-            </TouchableOpacity>
-          ))}
         </View>
 
         <View style={{ height: 24 }} />
@@ -112,7 +134,7 @@ export default function TalksListScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.bgSecondary,
+    backgroundColor: colors.bgPrimary,
   },
   scrollContent: {
     paddingBottom: 20,
@@ -126,8 +148,8 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
   },
   headerTitle: {
-    fontSize: 20,
-    fontWeight: '300',
+    fontSize: 24,
+    fontWeight: '700',
     color: colors.textPrimary,
   },
   headerAccent: {
@@ -274,7 +296,7 @@ const styles = StyleSheet.create({
   },
   featuredThumbnail: {
     width: '100%',
-    aspectRatio: 16/9,
+    aspectRatio: 16 / 9,
     backgroundColor: '#0B72B9',
   },
   featuredDuration: {
@@ -341,6 +363,11 @@ const styles = StyleSheet.create({
     fontSize: 9,
     color: 'rgba(255,255,255,0.5)',
   },
+  listSectionWrapper: {
+    backgroundColor: 'rgba(20, 184, 212, 0.03)',
+    paddingTop: 20,
+    paddingBottom: 8,
+  },
   listSection: {
     paddingHorizontal: 20,
   },
@@ -351,7 +378,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   sectionTitle: {
-    fontSize: 12,
+    fontSize: 20,
     fontWeight: '700',
     color: colors.textPrimary,
   },
@@ -365,9 +392,11 @@ const styles = StyleSheet.create({
     padding: 12,
     marginBottom: 8,
     borderRadius: 11,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.08)',
-    backgroundColor: 'rgba(255,255,255,0.03)',
+    borderLeftWidth: 3,
+    borderTopWidth: 0,
+    borderRightWidth: 0,
+    borderBottomWidth: 0,
+    backgroundColor: 'rgba(20, 184, 212, 0.06)',
   },
   talkThumbnail: {
     width: 48,

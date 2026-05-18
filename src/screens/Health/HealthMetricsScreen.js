@@ -1,13 +1,5 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  ScrollView,
-  TouchableOpacity,
-  StyleSheet,
-  SafeAreaView,
-  Dimensions,
-} from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, SafeAreaView } from 'react-native';
 import Card from '../../components/common/Card';
 import { colors } from '../../constants/designTokens';
 
@@ -31,14 +23,9 @@ export default function HealthMetricsScreen() {
           {['Gün', 'Hafta', 'Ay', 'Yıl'].map((period, i) => (
             <TouchableOpacity
               key={period}
-              style={[
-                styles.periodBtn,
-                i === 1 && styles.periodBtnActive,
-              ]}
+              style={[styles.periodBtn, i === 1 && styles.periodBtnActive]}
             >
-              <Text style={[styles.periodText, i === 1 && styles.periodTextActive]}>
-                {period}
-              </Text>
+              <Text style={[styles.periodText, i === 1 && styles.periodTextActive]}>{period}</Text>
             </TouchableOpacity>
           ))}
         </View>
@@ -65,31 +52,52 @@ export default function HealthMetricsScreen() {
           </View>
 
           <View style={styles.chartDays}>
-            {['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'].map(day => (
-              <Text key={day} style={styles.dayLabel}>{day}</Text>
+            {['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'].map((day) => (
+              <Text key={day} style={styles.dayLabel}>
+                {day}
+              </Text>
             ))}
           </View>
         </Card>
 
         {/* Breakdown */}
-        <View style={styles.breakdown}>
-          {[
-            { label: 'Uyku kalitesi', value: 84, color: colors.cyan, sub: 'Mükemmel · 7s 24dk' },
-            { label: 'Hareket', value: 72, color: colors.gold, sub: 'İyi · 8.2k adım' },
-            { label: 'Zihin & stres', value: 68, color: colors.royal, sub: 'İyi · 3 meditasyon' },
-            { label: 'Beslenme', value: 81, color: colors.gold, sub: 'Çok iyi · 2.1L su' },
-          ].map((metric, i) => (
-            <Card key={i} style={styles.metricCard}>
-              <View style={styles.metricHeader}>
-                <Text style={styles.metricLabel}>{metric.label}</Text>
-                <Text style={styles.metricValue}>{metric.value}</Text>
-              </View>
-              <View style={styles.metricBarTrack}>
-                <View style={[styles.metricBarFill, { width: `${metric.value}%`, backgroundColor: metric.color }]} />
-              </View>
-              <Text style={styles.metricSub}>{metric.sub}</Text>
-            </Card>
-          ))}
+        <View style={styles.breakdownWrapper}>
+          <View style={styles.breakdown}>
+            {[
+              { label: 'Uyku kalitesi', value: 84, color: colors.cyan, sub: 'Mükemmel · 7s 24dk' },
+              { label: 'Hareket', value: 72, color: colors.gold, sub: 'İyi · 8.2k adım' },
+              { label: 'Zihin & stres', value: 68, color: colors.royal, sub: 'İyi · 3 meditasyon' },
+              { label: 'Beslenme', value: 81, color: colors.gold, sub: 'Çok iyi · 2.1L su' },
+            ].map((metric, i) => (
+              <Card
+                key={i}
+                style={[
+                  styles.metricCard,
+                  {
+                    borderLeftWidth: 3,
+                    borderLeftColor: metric.color,
+                    backgroundColor: 'rgba(20, 184, 212, 0.06)',
+                  },
+                  metric.color === colors.gold && { backgroundColor: 'rgba(201, 150, 26, 0.06)' },
+                  metric.color === colors.royal && { backgroundColor: 'rgba(0, 114, 176, 0.06)' },
+                ]}
+              >
+                <View style={styles.metricHeader}>
+                  <Text style={styles.metricLabel}>{metric.label}</Text>
+                  <Text style={styles.metricValue}>{metric.value}</Text>
+                </View>
+                <View style={styles.metricBarTrack}>
+                  <View
+                    style={[
+                      styles.metricBarFill,
+                      { width: `${metric.value}%`, backgroundColor: metric.color },
+                    ]}
+                  />
+                </View>
+                <Text style={styles.metricSub}>{metric.sub}</Text>
+              </Card>
+            ))}
+          </View>
         </View>
 
         {/* AI Insight */}
@@ -99,7 +107,8 @@ export default function HealthMetricsScreen() {
             <Text style={styles.insightLabel}>AI İçgörü</Text>
           </View>
           <Text style={styles.insightText}>
-            Uyku puanın bu hafta <Text style={styles.insightHighlight}>%14 yükseldi</Text>. Akşam meditasyonu rutinini sürdürmeni öneririm — sonuçlar harika.
+            Uyku puanın bu hafta <Text style={styles.insightHighlight}>%14 yükseldi</Text>. Akşam
+            meditasyonu rutinini sürdürmeni öneririm — sonuçlar harika.
           </Text>
         </Card>
 
@@ -120,8 +129,14 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'flex-start',
   },
-  headerLabel: { fontSize: 10, color: 'rgba(255,255,255,0.4)', fontWeight: '600', letterSpacing: 0.2, marginBottom: 4 },
-  headerTitle: { fontSize: 20, fontWeight: '300', color: colors.textPrimary },
+  headerLabel: {
+    fontSize: 10,
+    color: 'rgba(255,255,255,0.4)',
+    fontWeight: '600',
+    letterSpacing: 0.2,
+    marginBottom: 4,
+  },
+  headerTitle: { fontSize: 24, fontWeight: '700', color: colors.textPrimary },
   headerAccent: { color: colors.gold, fontStyle: 'italic' },
   chartIcon: { fontSize: 20 },
   periodSelector: {
@@ -153,15 +168,35 @@ const styles = StyleSheet.create({
   chartBigValue: { fontSize: 28, fontWeight: '300', color: colors.textPrimary },
   chartTrend: { fontSize: 13, color: colors.cyan, fontWeight: '500' },
   chartAverage: { alignItems: 'flex-end' },
-  chartAvgLabel: { fontSize: 10, color: 'rgba(255,255,255,0.4)', fontWeight: '500', marginBottom: 2 },
+  chartAvgLabel: {
+    fontSize: 10,
+    color: 'rgba(255,255,255,0.4)',
+    fontWeight: '500',
+    marginBottom: 2,
+  },
   chartAvgValue: { fontSize: 18, fontWeight: '600', color: colors.textPrimary },
-  chartContainer: { marginVertical: 16, height: 120, backgroundColor: 'rgba(255,255,255,0.03)', borderRadius: 8 },
+  chartContainer: {
+    marginVertical: 16,
+    height: 120,
+    backgroundColor: 'rgba(255,255,255,0.03)',
+    borderRadius: 8,
+  },
   miniChart: { flex: 1 },
   chartDays: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 12 },
   dayLabel: { fontSize: 10, color: 'rgba(255,255,255,0.4)', fontWeight: '500' },
-  breakdown: { paddingHorizontal: 20, gap: 12, marginBottom: 20 },
+  breakdownWrapper: {
+    backgroundColor: 'rgba(20, 184, 212, 0.03)',
+    paddingTop: 20,
+    paddingBottom: 24,
+  },
+  breakdown: { paddingHorizontal: 20, gap: 12, marginBottom: 0 },
   metricCard: { paddingVertical: 12, paddingHorizontal: 12 },
-  metricHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 },
+  metricHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
   metricLabel: { fontSize: 12, fontWeight: '500', color: colors.textPrimary },
   metricValue: { fontSize: 16, fontWeight: '600', color: colors.textPrimary },
   metricBarTrack: {
@@ -173,7 +208,14 @@ const styles = StyleSheet.create({
   },
   metricBarFill: { height: '100%', borderRadius: 3 },
   metricSub: { fontSize: 11, color: 'rgba(255,255,255,0.5)' },
-  insightCard: { marginHorizontal: 20, padding: 16, gap: 8 },
+  insightCard: {
+    marginHorizontal: 20,
+    padding: 16,
+    gap: 8,
+    borderLeftWidth: 4,
+    borderLeftColor: '#00FF88',
+    backgroundColor: 'rgba(0, 255, 136, 0.05)',
+  },
   insightHeader: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 8 },
   insightIcon: { fontSize: 18 },
   insightLabel: { fontSize: 13, fontWeight: '600', color: colors.textPrimary },
