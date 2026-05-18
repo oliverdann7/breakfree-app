@@ -1,6 +1,6 @@
 {
   "buildCommand": "mkdir -p dist && cp breakfree-landing-web.html dist/",
   "outputDirectory": "dist",
-  "installCommand": null,
+  "installCommand": "echo 'Static file — no dependencies needed'",
   "framework": null
 }
