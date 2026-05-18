@@ -29,7 +29,8 @@
       "output": "single",
       "name": "BreakFree",
       "shortName": "BreakFree",
-      "description": "Premium wellness community app"
+      "description": "Premium wellness community app",
+      "entryPoint": "./web.js"
     },
     "plugins": ["expo-notifications"],
     "extra": {
