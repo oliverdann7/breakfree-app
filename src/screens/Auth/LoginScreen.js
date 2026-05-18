@@ -38,14 +38,25 @@ export default function LoginScreen({ navigation }) {
     dispatch(clearError());
     if (!validate()) return;
 
-    // For mock mode: bypass Firebase and go directly to authenticated state
-    // Dispatch a mock login - in real mode this calls Firebase
     const result = await dispatch(login({ email, password }));
     if (login.rejected.match(result)) {
-      // Mock fallback: allow any credentials in dev mode
-      Alert.alert('Giriş Başarılı (Mock)', 'Firebase bağlantısı olmadan devam ediyorsunuz.', [
-        { text: 'Tamam', onPress: () => forceMockLogin() },
-      ]);
+      // Firebase is not configured - offer mock login for testing
+      const errorMsg = result.payload;
+      if (errorMsg?.includes('Firebase not configured')) {
+        Alert.alert(
+          'Firebase Yapılandırılmadı',
+          'Lütfen .env.local dosyasına Firebase kimlik bilgilerinizi ekleyin.\n\nTest için mock girişi kullanmak ister misiniz?',
+          [
+            { text: 'İptal', onPress: () => {} },
+            { text: 'Test (Mock)', onPress: () => forceMockLogin() },
+          ]
+        );
+      } else {
+        // Firebase error - likely invalid credentials
+        Alert.alert('Giriş Başarısız', errorMsg || 'E-posta veya şifre yanlış.', [
+          { text: 'Tamam', onPress: () => {} },
+        ]);
+      }
     }
   };
 

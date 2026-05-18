@@ -47,6 +47,10 @@ npm install
 
 # or with yarn
 yarn install
+
+# Setup Firebase configuration
+cp .env.local.example .env.local
+# Edit .env.local and add your Firebase credentials
 ```
 
 ### Development
@@ -121,20 +125,29 @@ breakfree-app/
 
 ## Environment Variables
 
-Create a `.env.local` file in the root directory:
+### Firebase Setup
+
+To enable authentication and data storage, you need to configure Firebase:
+
+1. Create a Firebase project at [console.firebase.google.com](https://console.firebase.google.com/)
+2. Copy `.env.local.example` to `.env.local`
+3. Add your Firebase credentials to `.env.local`:
 
 ```env
-# Firebase
-REACT_APP_FIREBASE_API_KEY=your_key_here
-REACT_APP_FIREBASE_AUTH_DOMAIN=your_domain_here
-REACT_APP_FIREBASE_PROJECT_ID=your_project_id_here
-# ... other Firebase config
-
-# API
-REACT_APP_API_URL=https://api.example.com
+EXPO_PUBLIC_FIREBASE_API_KEY=your_api_key
+EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
+EXPO_PUBLIC_FIREBASE_PROJECT_ID=your_project_id
+EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET=your_project.appspot.com
+EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_messaging_sender_id
+EXPO_PUBLIC_FIREBASE_APP_ID=your_app_id
 ```
 
-**Never commit `.env` files containing secrets!**
+You can find these values in your Firebase Console under Project Settings > Your apps > Web > BreakFree.
+
+**Important:** Never commit `.env.local` to version control! The `.env.local` file is already in `.gitignore`.
+
+### Testing Without Firebase
+If you don't have Firebase configured yet, the app will show a helpful message on the login screen allowing you to use mock credentials for testing purposes.
 
 ## Contributing
 
