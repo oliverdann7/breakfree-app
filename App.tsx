@@ -26,8 +26,6 @@ function LoadingScreen() {
   );
 }
 
-const isWeb = Platform.OS === 'web';
-
 function MobileApp() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
@@ -44,5 +42,8 @@ function MobileApp() {
 }
 
 export default function App() {
-  return isWeb ? <WebApp /> : <MobileApp />;
+  if (Platform.OS === 'web') {
+    return <WebApp />;
+  }
+  return <MobileApp />;
 }
