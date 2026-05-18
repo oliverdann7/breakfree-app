@@ -15,9 +15,12 @@ import userReducer from './slices/userSlice';
 import talksReducer from './slices/talksSlice';
 import metricsReducer from './slices/metricsSlice';
 
+// Use localStorage for web, AsyncStorage for native
+const storage = typeof window !== 'undefined' ? localStorage : AsyncStorage;
+
 const persistConfig = {
   key: 'root',
-  storage: AsyncStorage,
+  storage,
   // Only persist auth and user — talks/metrics are re-fetched on mount
   whitelist: ['auth', 'user'],
 };
