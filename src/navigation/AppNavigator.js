@@ -7,6 +7,7 @@ import TalksListScreen from '../screens/Talks/TalksListScreen';
 import TalkDetailScreen from '../screens/Talks/TalkDetailScreen';
 import HealthMetricsScreen from '../screens/Health/HealthMetricsScreen';
 import CommunityScreen from '../screens/Community/CommunityScreen';
+import MentorScreen from '../screens/Mentor/MentorScreen';
 import ProfileScreen from '../screens/Profile/ProfileScreen';
 import EditProfileScreen from '../screens/Profile/EditProfileScreen';
 import { colors } from '../constants/designTokens';
@@ -21,6 +22,7 @@ function TabIcon({ label, focused }) {
     Palestralar: '🎙',
     Sağlık: '💚',
     Topluluk: '👥',
+    Mentör: '🤝',
     Profil: '👤',
   };
   return <Text style={{ fontSize: 20, opacity: focused ? 1 : 0.45 }}>{icons[label] || '●'}</Text>;
@@ -60,6 +62,7 @@ export default function AppNavigator() {
       <Tab.Screen name="Palestralar" component={TalksStackNavigator} />
       <Tab.Screen name="Sağlık" component={HealthMetricsScreen} />
       <Tab.Screen name="Topluluk" component={CommunityScreen} />
+      <Tab.Screen name="Mentör" component={MentorScreen} />
       <Tab.Screen name="Profil" component={ProfileStackNavigator} />
     </Tab.Navigator>
   );
@@ -70,12 +73,12 @@ const styles = StyleSheet.create({
     backgroundColor: colors.bgSecondary,
     borderTopColor: colors.border,
     borderTopWidth: 1,
-    height: 60,
+    height: 64,
     paddingBottom: 8,
     paddingTop: 4,
   },
   tabLabel: {
-    fontSize: 10,
+    fontSize: 9,
     fontWeight: '500',
   },
 });
