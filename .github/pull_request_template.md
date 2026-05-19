@@ -2,12 +2,13 @@
 
 <!-- What does this PR do? 1-3 bullet points. -->
 
-- 
-- 
+-
+-
 
 ## Related Issues
 
 <!-- Link issues this PR closes or references -->
+
 Closes #
 Refs #
 
@@ -36,7 +37,7 @@ Refs #
 <!-- For UI changes, include before/after screenshots or a recording -->
 
 | Before | After |
-|--------|-------|
+| ------ | ----- |
 |        |       |
 
 ## Checklist

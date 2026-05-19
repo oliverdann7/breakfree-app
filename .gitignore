@@ -25,11 +25,23 @@ android/.gradle/
 *.keystore
 *.p12
 *.pem
+*.key
+*.cert
+*.crt
+secrets/
+*secret*
+*credential*
+firebase-adminsdk*.json
+google-services.json
+GoogleService-Info.plist
+serviceAccountKey.json
 .env
 .env.*
 .env.local
 .env.development
 .env.production
+# Allow the example template
+!.env.local.example
 
 # OS
 .DS_Store

@@ -43,4 +43,3 @@ jobs:
           cache: 'npm'
       - run: npm install --legacy-peer-deps
       - run: npm test -- --coverage --watchAll=false
-

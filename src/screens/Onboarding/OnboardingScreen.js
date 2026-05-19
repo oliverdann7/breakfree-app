@@ -1,11 +1,5 @@
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  SafeAreaView,
-} from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView } from 'react-native';
 import { colors } from '../../constants/designTokens';
 
 export default function OnboardingScreen({ navigation }) {
@@ -16,7 +10,7 @@ export default function OnboardingScreen({ navigation }) {
       icon: '✨',
       title: 'Özgürlüğüne',
       subtitle: 'hoş geldin.',
-      description: 'Türkiye\'nin en bağlı wellness topluluğu cebinde.',
+      description: "Türkiye'nin en bağlı wellness topluluğu cebinde.",
       tags: [
         { icon: '❤️', label: 'Sağlık' },
         { icon: '👥', label: 'Topluluk' },
@@ -38,7 +32,7 @@ export default function OnboardingScreen({ navigation }) {
       icon: '🌟',
       title: 'Topluluğa',
       subtitle: 'katıl.',
-      description: 'Türkiye\'nin wellness liderleriyle bağlantı kur ve inspir ol.',
+      description: "Türkiye'nin wellness liderleriyle bağlantı kur ve inspir ol.",
       tags: [
         { icon: '🎙', label: 'Sunumlar' },
         { icon: '💬', label: 'Mentorlar' },
@@ -98,7 +92,8 @@ export default function OnboardingScreen({ navigation }) {
         {/* Text Content */}
         <View style={styles.textSection}>
           <Text style={styles.title}>
-            {page.title}{'\n'}
+            {page.title}
+            {'\n'}
             <Text style={styles.titleAccent}>{page.subtitle}</Text>
           </Text>
           <Text style={styles.description}>{page.description}</Text>
@@ -119,10 +114,7 @@ export default function OnboardingScreen({ navigation }) {
           {pages.map((_, i) => (
             <View
               key={i}
-              style={[
-                styles.dot,
-                i === currentPage ? styles.dotActive : styles.dotInactive,
-              ]}
+              style={[styles.dot, i === currentPage ? styles.dotActive : styles.dotInactive]}
             />
           ))}
         </View>

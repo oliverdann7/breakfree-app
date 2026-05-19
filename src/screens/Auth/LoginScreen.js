@@ -78,14 +78,10 @@ export default function LoginScreen({ navigation }) {
     if (login.rejected.match(result)) {
       const errorMsg = result.payload;
       if (errorMsg?.includes('Firebase not configured')) {
-        Alert.alert(
-          'Firebase Yapılandırılmadı',
-          'Test için mock girişi kullanmak ister misiniz?',
-          [
-            { text: 'İptal' },
-            { text: 'Test (Mock)', onPress: () => forceMockLogin() },
-          ]
-        );
+        Alert.alert('Firebase Yapılandırılmadı', 'Test için mock girişi kullanmak ister misiniz?', [
+          { text: 'İptal' },
+          { text: 'Test (Mock)', onPress: () => forceMockLogin() },
+        ]);
       } else {
         Alert.alert('Giriş Başarısız', errorMsg || 'E-posta veya şifre yanlış.');
       }
