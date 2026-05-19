@@ -1,4 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { collection, getDocs, doc, getDoc, query, orderBy } from 'firebase/firestore';
+import { db } from '../../services/firebase';
 
 const MOCK_TALKS = [
   {
@@ -53,7 +55,11 @@ const MOCK_TALKS = [
 
 export const fetchTalks = createAsyncThunk('talks/fetchAll', async (_, { rejectWithValue }) => {
   try {
-    return MOCK_TALKS;
+    if (!db) return MOCK_TALKS;
+    const q = query(collection(db, 'talks'), orderBy('scheduledAt', 'desc'));
+    const snap = await getDocs(q);
+    if (snap.empty) return MOCK_TALKS;
+    return snap.docs.map((d) => ({ talkId: d.id, ...d.data() }));
   } catch (error) {
     return rejectWithValue(error.message);
   }
@@ -63,9 +69,14 @@ export const fetchTalkById = createAsyncThunk(
   'talks/fetchById',
   async (talkId, { rejectWithValue }) => {
     try {
-      const talk = MOCK_TALKS.find((t) => t.talkId === talkId);
-      if (!talk) throw new Error('Talk not found');
-      return talk;
+      if (!db) {
+        const talk = MOCK_TALKS.find((t) => t.talkId === talkId);
+        if (!talk) throw new Error('Talk not found');
+        return talk;
+      }
+      const snap = await getDoc(doc(db, 'talks', talkId));
+      if (!snap.exists()) throw new Error('Talk not found');
+      return { talkId: snap.id, ...snap.data() };
     } catch (error) {
       return rejectWithValue(error.message);
     }

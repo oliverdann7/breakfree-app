@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -13,7 +13,14 @@ import {
   ScrollView,
 } from 'react-native';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
-import { updateProfile } from '../../store/slices/userSlice';
+import { updateProfile, updateProfileFirestore } from '../../store/slices/userSlice';
+import {
+  fetchPosts,
+  createPost,
+  toggleLike,
+  fetchComments,
+  addComment,
+} from '../../store/slices/communitySlice';
 import Card from '../../components/common/Card';
 import { colors } from '../../constants/designTokens';
 
@@ -27,75 +34,6 @@ const AVATAR_COLORS = [
   '#10B981',
   '#F59E0B',
   '#EC4899',
-];
-
-const MOCK_POSTS = [
-  {
-    postId: 'p1',
-    author: 'Burak Yılmaz',
-    emoji: '🏃',
-    bg: colors.royal,
-    text: "Sabah 06:30'da 10K koşuyu bitirdim! Haftaya yarışmaya hazırım 💪",
-    sharedStats: { wellness: 88, steps: 14200, sleep: 7.5 },
-    likes: 47,
-    liked: false,
-    comments: [
-      {
-        id: 'c1',
-        author: 'Elif Kaya',
-        emoji: '🌸',
-        bg: colors.gold,
-        text: 'Harika Burak! 🌅',
-        time: '1 saat önce',
-      },
-    ],
-    time: '2 saat önce',
-  },
-  {
-    postId: 'p2',
-    author: 'Elif Kaya',
-    emoji: '🌸',
-    bg: colors.gold,
-    text: "Dr. Ayşe'nin anksiyete talk'ı muhteşemdi. Farkındalık egzersizleri hayatıma girdi 🧘‍♀️",
-    sharedStats: null,
-    likes: 32,
-    liked: true,
-    comments: [],
-    time: '4 saat önce',
-  },
-  {
-    postId: 'p3',
-    author: 'Mert Arslan',
-    emoji: '🏆',
-    bg: '#F59E0B',
-    text: '30 günlük beslenme meydan okuması tamamlandı! -4 kg 🎯',
-    sharedStats: { wellness: 92, steps: 10100, sleep: 8.2 },
-    likes: 89,
-    liked: false,
-    comments: [],
-    time: '1 gün önce',
-  },
-  {
-    postId: 'p4',
-    author: 'Zeynep Öz',
-    emoji: '🌿',
-    bg: '#10B981',
-    text: "Uyku takibini başlattım — 3 haftada 6.2s'den 7.6 saate çıktım 🌙",
-    sharedStats: { wellness: 78, steps: 7800, sleep: 7.6 },
-    likes: 61,
-    liked: false,
-    comments: [
-      {
-        id: 'c4',
-        author: 'Burak Yılmaz',
-        emoji: '🏃',
-        bg: colors.royal,
-        text: 'Harika ilerleme! 🙌',
-        time: '20 saat önce',
-      },
-    ],
-    time: '2 gün önce',
-  },
 ];
 
 function Avatar({ emoji, bg, size = 40 }) {
@@ -132,24 +70,19 @@ function StatsRow({ stats }) {
   );
 }
 
-function PostCard({ post, onLike, myProfile }) {
+function PostCard({ post, onLike, onAddComment, onFetchComments, comments = [], myProfile }) {
   const [expanded, setExpanded] = useState(false);
   const [commentText, setCommentText] = useState('');
-  const [comments, setComments] = useState(post.comments);
+
+  const handleExpand = () => {
+    const next = !expanded;
+    setExpanded(next);
+    if (next) onFetchComments(post.postId);
+  };
 
   const submitComment = () => {
     if (!commentText.trim()) return;
-    setComments((prev) => [
-      ...prev,
-      {
-        id: Date.now().toString(),
-        author: myProfile.nickname,
-        emoji: myProfile.emoji,
-        bg: myProfile.bg,
-        text: commentText.trim(),
-        time: 'şimdi',
-      },
-    ]);
+    onAddComment(post.postId, commentText.trim());
     setCommentText('');
   };
 
@@ -174,7 +107,7 @@ function PostCard({ post, onLike, myProfile }) {
             {post.likes}
           </Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.actionBtn} onPress={() => setExpanded((e) => !e)}>
+        <TouchableOpacity style={styles.actionBtn} onPress={handleExpand}>
           <Text style={styles.actionIcon}>💬</Text>
           <Text style={[styles.actionCount, expanded && { color: colors.cyan }]}>
             {comments.length} {expanded ? '▲' : '▼'}
@@ -185,12 +118,19 @@ function PostCard({ post, onLike, myProfile }) {
       {expanded && (
         <View style={styles.commentsSection}>
           {comments.map((c) => (
-            <View key={c.id} style={styles.commentRow}>
-              <Avatar emoji={c.emoji} bg={c.bg} size={28} />
+            <View key={c.commentId || c.id} style={styles.commentRow}>
+              <Avatar emoji={c.authorEmoji || c.emoji} bg={c.authorBg || c.bg} size={28} />
               <View style={styles.commentBubble}>
-                <Text style={styles.commentAuthor}>{c.author}</Text>
+                <Text style={styles.commentAuthor}>{c.authorName || c.author}</Text>
                 <Text style={styles.commentText}>{c.text}</Text>
-                <Text style={styles.commentTime}>{c.time}</Text>
+                <Text style={styles.commentTime}>
+                  {c.createdAt
+                    ? new Date(c.createdAt).toLocaleTimeString('tr-TR', {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })
+                    : c.time}
+                </Text>
               </View>
             </View>
           ))}
@@ -220,16 +160,21 @@ export default function CommunityScreen() {
   const { user } = useAppSelector((state) => state.auth);
   const { profile: reduxProfile } = useAppSelector((state) => state.user);
   const { dailyMetrics, wellnessScore } = useAppSelector((state) => state.metrics);
+  const { posts, commentsByPost } = useAppSelector((state) => state.community);
 
   const initProfile = {
-    nickname: reduxProfile?.nickname || user?.displayName || 'Demo Kullanıcı',
-    bio: reduxProfile?.bio || 'Wellness enthusiast from Istanbul 🌿',
+    nickname:
+      reduxProfile?.nickname || reduxProfile?.displayName || user?.displayName || 'Kullanıcı',
+    bio: reduxProfile?.bio || '',
     emoji: reduxProfile?.avatarEmoji || '🧘',
     bg: reduxProfile?.avatarBg || colors.royal,
   };
 
   const [myProfile, setMyProfile] = useState(initProfile);
-  const [posts, setPosts] = useState(MOCK_POSTS);
+
+  useEffect(() => {
+    dispatch(fetchPosts(user?.uid));
+  }, [user?.uid]);
 
   // Profile edit modal
   const [profileVisible, setProfileVisible] = useState(false);
@@ -247,50 +192,62 @@ export default function CommunityScreen() {
   const saveProfile = () => {
     setMyProfile(draft);
     setProfileVisible(false);
-    dispatch(
-      updateProfile({
-        nickname: draft.nickname,
-        bio: draft.bio,
-        avatarEmoji: draft.emoji,
-        avatarBg: draft.bg,
-      })
-    );
+    const profileData = {
+      nickname: draft.nickname,
+      displayName: draft.nickname,
+      bio: draft.bio,
+      avatarEmoji: draft.emoji,
+      avatarBg: draft.bg,
+    };
+    dispatch(updateProfile(profileData));
+    if (user?.uid) {
+      dispatch(updateProfileFirestore({ uid: user.uid, ...profileData }));
+    }
   };
 
   const submitPost = () => {
     if (!postText.trim()) return;
     const dm = dailyMetrics;
-    setPosts((prev) => [
-      {
-        postId: Date.now().toString(),
-        author: myProfile.nickname,
-        emoji: myProfile.emoji,
-        bg: myProfile.bg,
+    dispatch(
+      createPost({
+        uid: user?.uid,
+        authorName: myProfile.nickname,
+        authorEmoji: myProfile.emoji,
+        authorBg: myProfile.bg,
         text: postText.trim(),
         sharedStats:
           shareStats && dm
-            ? { wellness: wellnessScore, steps: dm.steps, sleep: dm.sleep.hours }
+            ? { wellness: wellnessScore, steps: dm.steps, sleep: dm.sleep?.hours }
             : null,
-        likes: 0,
-        liked: false,
-        comments: [],
-        time: 'şimdi',
-      },
-      ...prev,
-    ]);
+      })
+    );
     setPostText('');
     setShareStats(false);
     setPostVisible(false);
   };
 
-  const toggleLike = (postId) =>
-    setPosts((prev) =>
-      prev.map((p) =>
-        p.postId === postId
-          ? { ...p, liked: !p.liked, likes: p.liked ? p.likes - 1 : p.likes + 1 }
-          : p
-      )
+  const handleToggleLike = (postId, currentlyLiked) => {
+    if (!user?.uid) return;
+    dispatch(toggleLike({ postId, uid: user.uid, currentlyLiked }));
+  };
+
+  const handleAddComment = (postId, text) => {
+    if (!user?.uid) return;
+    dispatch(
+      addComment({
+        postId,
+        uid: user.uid,
+        authorName: myProfile.nickname,
+        authorEmoji: myProfile.emoji,
+        authorBg: myProfile.bg,
+        text,
+      })
     );
+  };
+
+  const handleFetchComments = (postId) => {
+    dispatch(fetchComments(postId));
+  };
 
   const ListHeader = () => (
     <>
@@ -330,7 +287,8 @@ export default function CommunityScreen() {
         <View>
           <Text style={styles.title}>Topluluk</Text>
           <Text style={styles.subtitle}>
-            akışı <Text style={{ color: colors.gold }}>·</Text> 1,847 üye
+            akışı <Text style={{ color: colors.gold }}>·</Text>{' '}
+            {posts.length > 0 ? `${posts.length} gönderi` : 'yükleniyor...'}
           </Text>
         </View>
         <TouchableOpacity style={styles.createBtn} onPress={() => setPostVisible(true)}>
@@ -364,7 +322,14 @@ export default function CommunityScreen() {
         showsVerticalScrollIndicator={false}
         ListHeaderComponent={<ListHeader />}
         renderItem={({ item }) => (
-          <PostCard post={item} myProfile={myProfile} onLike={() => toggleLike(item.postId)} />
+          <PostCard
+            post={item}
+            myProfile={myProfile}
+            onLike={() => handleToggleLike(item.postId, item.liked)}
+            onAddComment={handleAddComment}
+            onFetchComments={handleFetchComments}
+            comments={commentsByPost[item.postId] || []}
+          />
         )}
       />
 

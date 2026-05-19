@@ -1,36 +1,49 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import {
+  doc,
+  getDoc,
+  setDoc,
+  collection,
+  getDocs,
+  query,
+  orderBy,
+  limit,
+} from 'firebase/firestore';
+import { db } from '../../services/firebase';
 
-const generateWeeklyData = () => {
-  const days = ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'];
-  return days.map((day) => ({
-    day,
-    sleep: parseFloat((6 + Math.random() * 3).toFixed(1)),
-    steps: Math.floor(4000 + Math.random() * 8000),
-    heartRate: Math.floor(58 + Math.random() * 20),
-    calories: Math.floor(1400 + Math.random() * 800),
-    wellnessScore: Math.floor(55 + Math.random() * 40),
-  }));
-};
-
-export const fetchMetrics = createAsyncThunk('metrics/fetch', async (_, { rejectWithValue }) => {
+export const fetchMetrics = createAsyncThunk('metrics/fetch', async (uid, { rejectWithValue }) => {
   try {
-    const weeklyData = generateWeeklyData();
-    const today = weeklyData[weeklyData.length - 1];
+    if (!db || !uid) return { dailyMetrics: null, weeklyData: [], wellnessScore: 0 };
+    const today = new Date().toISOString().split('T')[0];
+    const todaySnap = await getDoc(doc(db, 'users', uid, 'metrics', today));
+    const weekQ = query(collection(db, 'users', uid, 'metrics'), orderBy('date', 'desc'), limit(7));
+    const weekSnap = await getDocs(weekQ);
+    const weeklyData = weekSnap.docs.map((d) => d.data()).reverse();
+    const daily = todaySnap.exists() ? todaySnap.data() : null;
     return {
-      dailyMetrics: {
-        date: new Date().toISOString().split('T')[0],
-        sleep: { hours: today.sleep, quality: today.sleep >= 7 ? 'İyi' : 'Orta' },
-        heartRate: today.heartRate,
-        steps: today.steps,
-        calories: today.calories,
-      },
+      dailyMetrics: daily,
       weeklyData,
-      wellnessScore: today.wellnessScore,
+      wellnessScore: daily?.wellnessScore ?? 0,
     };
   } catch (error) {
     return rejectWithValue(error.message);
   }
 });
+
+export const logMetric = createAsyncThunk(
+  'metrics/log',
+  async ({ uid, data }, { rejectWithValue }) => {
+    try {
+      if (!db) throw new Error('Firebase not configured');
+      const date = new Date().toISOString().split('T')[0];
+      const entry = { ...data, date, updatedAt: Date.now() };
+      await setDoc(doc(db, 'users', uid, 'metrics', date), entry, { merge: true });
+      return entry;
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
 
 const metricsSlice = createSlice({
   name: 'metrics',
@@ -62,6 +75,10 @@ const metricsSlice = createSlice({
       .addCase(fetchMetrics.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+      })
+      .addCase(logMetric.fulfilled, (state, action) => {
+        state.dailyMetrics = { ...state.dailyMetrics, ...action.payload };
+        state.wellnessScore = action.payload.wellnessScore ?? state.wellnessScore;
       });
   },
 });

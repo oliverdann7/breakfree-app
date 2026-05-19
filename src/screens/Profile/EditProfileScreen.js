@@ -11,7 +11,7 @@ import {
   Alert,
 } from 'react-native';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
-import { updateProfile } from '../../store/slices/userSlice';
+import { updateProfile, updateProfileFirestore } from '../../store/slices/userSlice';
 import Input from '../../components/common/Input';
 import Button from '../../components/common/Button';
 import Card from '../../components/common/Card';
@@ -74,10 +74,17 @@ export default function EditProfileScreen({ navigation }) {
     if (!validate()) return;
     setSaving(true);
     try {
-      dispatch(
-        updateProfile({ displayName: displayName.trim(), bio: bio.trim(), goals: selectedGoals })
-      );
-      // TODO: sync to Firestore when connected
+      const profileData = {
+        displayName: displayName.trim(),
+        bio: bio.trim(),
+        goals: selectedGoals,
+        avatar: avatarColor,
+      };
+      dispatch(updateProfile(profileData));
+      const uid = user?.uid;
+      if (uid) {
+        await dispatch(updateProfileFirestore({ uid, ...profileData })).unwrap();
+      }
       navigation.goBack();
     } catch {
       Alert.alert('Hata', 'Profil kaydedilemedi, tekrar deneyin.');

@@ -1,19 +1,28 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { db } from '../../services/firebase';
 
 export const fetchUserProfile = createAsyncThunk(
   'user/fetchProfile',
   async (uid, { rejectWithValue }) => {
     try {
-      // Mock data — replace with Firestore call when Firebase is connected
-      return {
-        uid,
-        displayName: 'Elif Kaya',
-        email: 'elif@breakfree.com',
-        avatar: null,
-        bio: 'Wellness enthusiast from Istanbul 🌿',
-        goals: ['sleep', 'fitness', 'mindfulness'],
-        preferences: { language: 'tr', units: 'metric', notifications: true },
-      };
+      if (!db) throw new Error('Firebase not configured');
+      const snap = await getDoc(doc(db, 'users', uid));
+      if (!snap.exists()) throw new Error('Profile not found');
+      return snap.data();
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+export const updateProfileFirestore = createAsyncThunk(
+  'user/updateProfileFirestore',
+  async ({ uid, ...data }, { rejectWithValue }) => {
+    try {
+      if (!db) throw new Error('Firebase not configured');
+      await updateDoc(doc(db, 'users', uid), { ...data, updatedAt: Date.now() });
+      return data;
     } catch (error) {
       return rejectWithValue(error.message);
     }
@@ -54,6 +63,18 @@ const userSlice = createSlice({
         state.preferences = action.payload.preferences || state.preferences;
       })
       .addCase(fetchUserProfile.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(updateProfileFirestore.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateProfileFirestore.fulfilled, (state, action) => {
+        state.loading = false;
+        state.profile = { ...state.profile, ...action.payload };
+      })
+      .addCase(updateProfileFirestore.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });

@@ -146,8 +146,8 @@ const features = [
   },
   {
     icon: '🤖',
-    title: 'AI Wellness Koçu',
-    desc: '24/7 kişiselleştirilmiş tavsiyeler. Yapay zeka koçun her an yanında.',
+    title: 'Günlük Meydan Okumalar',
+    desc: 'Her gün yeni bir meydan okuma. Toplulukla birlikte alışkanlıklarını geliştir.',
     color: C.gold,
   },
   {
@@ -455,7 +455,7 @@ export default function BreakFreeLanding({ onStart }) {
                   textTransform: 'uppercase',
                 }}
               >
-                Türkiye&apos;nin #1 Wellness Platformu
+                BreakFree Topluluk Platformu
               </span>
             </div>
 
@@ -484,8 +484,8 @@ export default function BreakFreeLanding({ onStart }) {
                 margin: '0 0 40px',
               }}
             >
-              Uyku, stres, beslenme ve mental sağlık için yapay zeka koçu, canlı mentor ve gerçek
-              topluluk desteği — tek bir platformda.
+              Meydan okumalar, etkinlikler ve gerçek bir toplulukla sağlıklı yaşam yolculuğuna
+              katıl.
             </p>
 
             <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
@@ -508,38 +508,6 @@ export default function BreakFreeLanding({ onStart }) {
               >
                 Nasıl çalışır?
               </button>
-            </div>
-
-            <div style={{ display: 'flex', gap: 32, marginTop: 48 }}>
-              {[
-                ['12K+', 'Aktif Üye'],
-                ['98%', 'Memnuniyet'],
-                ['150+', 'Uzman'],
-              ].map(([n, l]) => (
-                <div key={l}>
-                  <div
-                    style={{
-                      fontFamily: "'Fraunces', serif",
-                      fontSize: 28,
-                      fontWeight: 400,
-                      color: C.gold,
-                    }}
-                  >
-                    {n}
-                  </div>
-                  <div
-                    style={{
-                      fontSize: 12,
-                      color: 'rgba(255,255,255,0.5)',
-                      marginTop: 2,
-                      fontWeight: 500,
-                      letterSpacing: '0.02em',
-                    }}
-                  >
-                    {l}
-                  </div>
-                </div>
-              ))}
             </div>
           </div>
 
@@ -862,7 +830,7 @@ export default function BreakFreeLanding({ onStart }) {
               Kullanıcı Yorumları
             </h2>
             <p style={{ fontSize: 16, color: 'rgba(255,255,255,0.5)', margin: 0 }}>
-              12.000+ üyemiz bize güveniyor.
+              Topluluğumuza katılarak sağlıklı yaşam yolculuğuna başla.
             </p>
           </div>
 
@@ -1024,7 +992,7 @@ export default function BreakFreeLanding({ onStart }) {
                 }}
               >
                 {[
-                  'AI Wellness Koçu (24/7)',
+                  'Günlük Meydan Okumalar',
                   'Sınırsız Canlı Talks',
                   '1-on-1 Mentörlük oturumları',
                   'Detaylı sağlık analitiği',
@@ -1256,7 +1224,7 @@ export default function BreakFreeLanding({ onStart }) {
                 position: 'relative',
               }}
             >
-              12.000+ kişi sağlığının sahibi olmak için zaten burada.
+              Topluluğa katıl, meydan okumalarla sağlıklı alışkanlıklar kazan.
             </p>
             <button
               onClick={onStart}
