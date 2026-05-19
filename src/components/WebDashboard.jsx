@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { logout } from '../store/slices/authSlice';
+import { fetchMetrics } from '../store/slices/metricsSlice';
 
 const C = {
   navyDeep: '#061829',
@@ -20,6 +21,13 @@ const CSS = `
   * { box-sizing: border-box; -webkit-font-smoothing: antialiased; }
   .wd-root { font-family: 'Manrope', system-ui, sans-serif; }
   .wd-display { font-family: 'Fraunces', Georgia, serif; }
+
+  /* Scrollbar */
+  .wd-scroll::-webkit-scrollbar { width: 4px; }
+  .wd-scroll::-webkit-scrollbar-track { background: transparent; }
+  .wd-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 2px; }
+
+  /* Cards */
   .wd-card {
     background: rgba(20,184,212,0.07);
     border-left: 4px solid ${C.cyan};
@@ -27,7 +35,7 @@ const CSS = `
     padding: 20px;
     transition: transform 0.2s, border-color 0.2s;
   }
-  .wd-card:hover { transform: translateY(-2px); border-color: ${C.cyan}; }
+  .wd-card:hover { transform: translateY(-2px); }
   .wd-card-gold {
     background: rgba(201,150,26,0.07);
     border-left: 4px solid ${C.gold};
@@ -41,18 +49,34 @@ const CSS = `
     border-left: 4px solid ${C.green};
     border-radius: 16px;
     padding: 20px;
-    transition: transform 0.2s;
   }
+
+  /* Bottom tab nav (mobile) */
   .wd-tab-btn {
-    flex: 1; padding: 14px 8px; text-align: center;
+    flex: 1; padding: 12px 8px; text-align: center;
     background: none; border: none; border-bottom: 2px solid transparent;
     color: rgba(255,255,255,0.5); cursor: pointer;
     font-family: 'Manrope', system-ui, sans-serif;
-    font-size: 12px; font-weight: 600;
+    font-size: 11px; font-weight: 600;
     transition: all 0.2s;
   }
   .wd-tab-btn:hover { color: rgba(255,255,255,0.85); }
   .wd-tab-btn.active { border-bottom-color: ${C.gold}; color: ${C.gold}; }
+
+  /* Sidebar nav item (desktop) */
+  .wd-nav-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 11px 16px; border-radius: 12px;
+    cursor: pointer; border: none; background: none; width: 100%;
+    color: rgba(255,255,255,0.5);
+    font-family: 'Manrope', system-ui, sans-serif;
+    font-size: 14px; font-weight: 600;
+    transition: all 0.2s; text-align: left; margin-bottom: 4px;
+  }
+  .wd-nav-item:hover { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.85); }
+  .wd-nav-item.active { background: rgba(201,150,26,0.12); color: ${C.gold}; }
+
+  /* Misc */
   .wd-post-card {
     background: rgba(20,184,212,0.06);
     border-left: 4px solid ${C.cyan};
@@ -78,9 +102,57 @@ const CSS = `
     transition: background 0.15s; border-radius: 8px;
   }
   .wd-setting-row:hover { background: rgba(255,255,255,0.04); }
-  @media (max-width: 640px) {
-    .wd-tab-label { display: none; }
+
+  /* Responsive layout */
+  .wd-layout { display: flex; min-height: 100vh; }
+  .wd-sidebar {
+    width: 220px; flex-shrink: 0;
+    background: rgba(255,255,255,0.025);
+    border-right: 1px solid ${C.border};
+    position: fixed; top: 0; left: 0; bottom: 0;
+    display: flex; flex-direction: column;
+    padding: 24px 12px;
+    z-index: 100;
+  }
+  .wd-main-desktop { margin-left: 220px; flex: 1; min-height: 100vh; }
+  .wd-bottom-nav {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: rgba(10,37,64,0.96);
+    backdrop-filter: blur(20px);
+    border-top: 1px solid ${C.border};
+    display: none; z-index: 100;
+  }
+
+  /* Desktop: show sidebar, hide bottom nav */
+  @media (min-width: 768px) {
+    .wd-sidebar { display: flex; }
+    .wd-main-desktop { display: block; }
+    .wd-bottom-nav { display: none !important; }
+    .wd-mobile-header { display: none !important; }
+  }
+
+  /* Mobile: hide sidebar, show bottom nav */
+  @media (max-width: 767px) {
+    .wd-sidebar { display: none !important; }
+    .wd-main-desktop { margin-left: 0; }
+    .wd-bottom-nav { display: block; }
     .wd-stats-grid { grid-template-columns: 1fr 1fr !important; }
+  }
+
+  /* Content max-width varies by breakpoint */
+  .wd-content-inner {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 32px 32px 100px;
+  }
+  @media (max-width: 767px) {
+    .wd-content-inner { padding: 20px 18px 90px; }
+  }
+
+  /* Desktop grid layouts */
+  @media (min-width: 900px) {
+    .wd-home-grid { display: grid; grid-template-columns: 1fr 320px; gap: 24px; align-items: start; }
+    .wd-health-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
   }
 `;
 
@@ -140,13 +212,123 @@ const TABS = [
   { id: 'profile', label: 'Profil', icon: '👤' },
 ];
 
-function HomeTab({ user }) {
-  const metrics = [
-    { emoji: '😴', label: 'Uyku', value: '7s 24dk', sub: 'İyi', color: C.cyan },
-    { emoji: '❤️', label: 'Nabız', value: '64 bpm', sub: 'Dinlenme', color: C.gold },
-    { emoji: '👟', label: 'Adım', value: '8.2k', sub: 'Hedef %82', color: C.cyan },
-    { emoji: '🔥', label: 'Kalori', value: '1,847', sub: 'Aktif', color: C.gold },
+// Mini bar chart using real weekly data
+function WeeklyChart({ data, metric, color, label, format }) {
+  if (!data || data.length === 0) return null;
+  const values = data.map((d) => d[metric]);
+  const max = Math.max(...values);
+  const min = Math.min(...values);
+  const range = max - min || 1;
+
+  return (
+    <div>
+      <p
+        style={{
+          fontSize: 11,
+          color: C.textTertiary,
+          fontWeight: 600,
+          margin: '0 0 10px',
+          textTransform: 'uppercase',
+          letterSpacing: 0.5,
+        }}
+      >
+        {label} — 7 gün
+      </p>
+      <div style={{ display: 'flex', alignItems: 'flex-end', gap: 5, height: 52 }}>
+        {data.map((d, i) => {
+          const pct = ((d[metric] - min) / range) * 0.75 + 0.25;
+          const isToday = i === data.length - 1;
+          return (
+            <div
+              key={d.day}
+              style={{
+                flex: 1,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: 4,
+              }}
+            >
+              <div style={{ width: '100%', height: 42, display: 'flex', alignItems: 'flex-end' }}>
+                <div
+                  style={{
+                    width: '100%',
+                    height: `${pct * 100}%`,
+                    background: isToday ? color : `${color}55`,
+                    borderRadius: '3px 3px 0 0',
+                    transition: 'height 0.4s ease',
+                    position: 'relative',
+                  }}
+                >
+                  {isToday && (
+                    <div
+                      style={{
+                        position: 'absolute',
+                        top: -18,
+                        left: '50%',
+                        transform: 'translateX(-50%)',
+                        fontSize: 9,
+                        color,
+                        fontWeight: 700,
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
+                      {format(d[metric])}
+                    </div>
+                  )}
+                </div>
+              </div>
+              <span
+                style={{
+                  fontSize: 9,
+                  color: isToday ? color : C.textTertiary,
+                  fontWeight: isToday ? 700 : 400,
+                }}
+              >
+                {d.day}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function HomeTab({ user, metrics, weeklyData, wellnessScore, loading }) {
+  const dm = metrics?.dailyMetrics;
+
+  const metricCards = [
+    {
+      emoji: '😴',
+      label: 'Uyku',
+      value: dm ? `${dm.sleep.hours}s` : '—',
+      sub: dm?.sleep.quality || '—',
+      color: C.cyan,
+    },
+    {
+      emoji: '❤️',
+      label: 'Nabız',
+      value: dm ? `${dm.heartRate} bpm` : '—',
+      sub: 'Dinlenme',
+      color: C.gold,
+    },
+    {
+      emoji: '👟',
+      label: 'Adım',
+      value: dm ? `${(dm.steps / 1000).toFixed(1)}k` : '—',
+      sub: dm ? `Hedef %${Math.min(100, Math.round(dm.steps / 100))}` : '—',
+      color: C.cyan,
+    },
+    {
+      emoji: '🔥',
+      label: 'Kalori',
+      value: dm ? `${dm.calories.toLocaleString()}` : '—',
+      sub: 'Aktif',
+      color: C.gold,
+    },
   ];
+
   const plan = [
     { time: '07:00', title: 'Sabah meditasyonu', dur: '10dk', done: true, icon: '🧘' },
     { time: '17:30', title: 'Fitness · Üst beden', dur: '45dk', done: false, icon: '💪' },
@@ -159,6 +341,8 @@ function HomeTab({ user }) {
       live: true,
     },
   ];
+
+  const score = wellnessScore || 0;
 
   return (
     <div>
@@ -180,7 +364,7 @@ function HomeTab({ user }) {
         <h2
           className="wd-display"
           style={{
-            fontSize: 28,
+            fontSize: 30,
             fontWeight: 300,
             color: C.textPrimary,
             margin: 0,
@@ -192,165 +376,234 @@ function HomeTab({ user }) {
         </h2>
       </div>
 
-      {/* Wellness card */}
-      <div
-        className="wd-card-gold"
-        style={{ marginBottom: 20, display: 'flex', alignItems: 'center', gap: 20 }}
-      >
-        <div
-          style={{
-            width: 64,
-            height: 64,
-            borderRadius: '50%',
-            background: `conic-gradient(${C.gold} 0% 76%, rgba(255,255,255,0.10) 76% 100%)`,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            flexShrink: 0,
-          }}
-        >
-          <div
-            style={{
-              width: 50,
-              height: 50,
-              borderRadius: '50%',
-              background: C.navy,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <span style={{ fontSize: 15, fontWeight: 700, color: C.gold }}>76</span>
-          </div>
-        </div>
+      <div className="wd-home-grid">
+        {/* Left column */}
         <div>
-          <p style={{ fontSize: 10, color: C.textTertiary, fontWeight: 500, margin: '0 0 4px' }}>
-            Wellness skorun
-          </p>
-          <p style={{ fontSize: 17, color: C.textPrimary, fontWeight: 300, margin: 0 }}>
-            Bugün <span style={{ color: C.gold, fontWeight: 700 }}>hazırsın.</span>
-          </p>
-        </div>
-      </div>
-
-      {/* Metrics grid */}
-      <div
-        className="wd-stats-grid"
-        style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 28 }}
-      >
-        {metrics.map((m) => (
+          {/* Wellness score */}
           <div
-            key={m.label}
-            style={{
-              background: m.color === C.gold ? 'rgba(201,150,26,0.07)' : 'rgba(20,184,212,0.07)',
-              borderLeft: `3px solid ${m.color}`,
-              borderRadius: 14,
-              padding: '14px 14px 12px',
-            }}
+            className="wd-card-gold"
+            style={{ marginBottom: 20, display: 'flex', alignItems: 'center', gap: 20 }}
           >
-            <span style={{ fontSize: 13, color: m.color }}>●</span>
-            <p style={{ fontSize: 20, fontWeight: 300, color: C.textPrimary, margin: '6px 0 2px' }}>
-              {m.value}
-            </p>
-            <p style={{ fontSize: 10, color: C.textTertiary, fontWeight: 600, margin: 0 }}>
-              {m.label}
-            </p>
-            <p style={{ fontSize: 9, color: C.textSecondary, margin: '2px 0 0' }}>{m.sub}</p>
-          </div>
-        ))}
-      </div>
-
-      {/* Today's plan */}
-      <div style={{ background: 'rgba(20,184,212,0.03)', borderRadius: 16, padding: '20px' }}>
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            marginBottom: 14,
-          }}
-        >
-          <p style={{ fontSize: 20, fontWeight: 700, color: C.textPrimary, margin: 0 }}>
-            Bugünkü plan
-          </p>
-          <span style={{ fontSize: 13, color: C.textTertiary }}>→</span>
-        </div>
-        <div
-          style={{
-            borderRadius: 14,
-            border: `1px solid rgba(255,255,255,0.08)`,
-            overflow: 'hidden',
-          }}
-        >
-          {plan.map((item, i) => (
-            <div key={item.time}>
+            <div
+              style={{
+                width: 72,
+                height: 72,
+                borderRadius: '50%',
+                background: `conic-gradient(${C.gold} 0% ${score}%, rgba(255,255,255,0.10) ${score}% 100%)`,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0,
+              }}
+            >
               <div
                 style={{
+                  width: 56,
+                  height: 56,
+                  borderRadius: '50%',
+                  background: C.navy,
                   display: 'flex',
                   alignItems: 'center',
-                  gap: 12,
-                  padding: '12px 14px',
-                  background: item.live ? 'rgba(201,150,26,0.05)' : 'rgba(255,255,255,0.02)',
+                  justifyContent: 'center',
                 }}
               >
-                <div
-                  style={{
-                    width: 36,
-                    height: 36,
-                    borderRadius: 8,
-                    background: item.live
-                      ? C.gold
-                      : item.done
-                        ? 'rgba(20,184,212,0.15)'
-                        : 'rgba(255,255,255,0.08)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    flexShrink: 0,
-                  }}
-                >
-                  {item.done ? (
-                    <span style={{ color: C.cyan, fontWeight: 700, fontSize: 15 }}>✓</span>
-                  ) : (
-                    <span style={{ fontSize: 17 }}>{item.icon}</span>
-                  )}
-                </div>
-                <div style={{ flex: 1 }}>
-                  <p
-                    style={{
-                      fontSize: 13,
-                      color: item.done ? C.textTertiary : C.textPrimary,
-                      fontWeight: 500,
-                      margin: '0 0 2px',
-                      textDecoration: item.done ? 'line-through' : 'none',
-                    }}
-                  >
-                    {item.title}
-                  </p>
-                  <p style={{ fontSize: 10, color: C.textTertiary, margin: 0 }}>
-                    {item.time} · {item.dur}
-                  </p>
-                </div>
-                {item.live && (
-                  <span
-                    style={{
-                      background: C.gold,
-                      color: C.navy,
-                      fontSize: 8,
-                      fontWeight: 700,
-                      padding: '3px 8px',
-                      borderRadius: 999,
-                    }}
-                  >
-                    CANLI
-                  </span>
-                )}
+                <span style={{ fontSize: 16, fontWeight: 700, color: C.gold }}>
+                  {loading ? '…' : score}
+                </span>
               </div>
-              {i < plan.length - 1 && (
-                <div style={{ height: 1, background: 'rgba(255,255,255,0.07)' }} />
+            </div>
+            <div>
+              <p
+                style={{ fontSize: 10, color: C.textTertiary, fontWeight: 500, margin: '0 0 4px' }}
+              >
+                Wellness skorun
+              </p>
+              <p style={{ fontSize: 17, color: C.textPrimary, fontWeight: 300, margin: '0 0 6px' }}>
+                Bugün{' '}
+                <span style={{ color: C.gold, fontWeight: 700 }}>
+                  {score >= 80 ? 'mükemmelsin' : score >= 65 ? 'hazırsın' : 'gelişme var'}
+                </span>
+                .
+              </p>
+              {weeklyData.length > 0 && (
+                <p style={{ fontSize: 11, color: C.textTertiary, margin: 0 }}>
+                  Haftalık ort:{' '}
+                  {Math.round(
+                    weeklyData.reduce((s, d) => s + d.wellnessScore, 0) / weeklyData.length
+                  )}
+                </p>
               )}
             </div>
-          ))}
+          </div>
+
+          {/* Metrics grid */}
+          <div
+            className="wd-stats-grid"
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(4, 1fr)',
+              gap: 10,
+              marginBottom: 24,
+            }}
+          >
+            {metricCards.map((m) => (
+              <div
+                key={m.label}
+                style={{
+                  background:
+                    m.color === C.gold ? 'rgba(201,150,26,0.07)' : 'rgba(20,184,212,0.07)',
+                  borderLeft: `3px solid ${m.color}`,
+                  borderRadius: 14,
+                  padding: '14px 12px 12px',
+                }}
+              >
+                <span style={{ fontSize: 18 }}>{m.emoji}</span>
+                <p
+                  style={{
+                    fontSize: 19,
+                    fontWeight: 300,
+                    color: C.textPrimary,
+                    margin: '6px 0 2px',
+                  }}
+                >
+                  {loading ? <span style={{ color: C.textTertiary }}>—</span> : m.value}
+                </p>
+                <p style={{ fontSize: 10, color: C.textTertiary, fontWeight: 600, margin: 0 }}>
+                  {m.label}
+                </p>
+                <p style={{ fontSize: 9, color: C.textSecondary, margin: '2px 0 0' }}>{m.sub}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* Weekly steps chart */}
+          {weeklyData.length > 0 && (
+            <div
+              style={{
+                background: 'rgba(20,184,212,0.04)',
+                borderRadius: 16,
+                padding: 20,
+                marginBottom: 20,
+              }}
+            >
+              <WeeklyChart
+                data={weeklyData}
+                metric="steps"
+                color={C.cyan}
+                label="Adım sayısı"
+                format={(v) => `${(v / 1000).toFixed(1)}k`}
+              />
+            </div>
+          )}
+        </div>
+
+        {/* Right column: Today's plan */}
+        <div>
+          <div style={{ background: 'rgba(20,184,212,0.03)', borderRadius: 16, padding: 20 }}>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginBottom: 14,
+              }}
+            >
+              <p style={{ fontSize: 18, fontWeight: 700, color: C.textPrimary, margin: 0 }}>
+                Bugünkü plan
+              </p>
+              <span style={{ fontSize: 13, color: C.textTertiary }}>→</span>
+            </div>
+            <div
+              style={{
+                borderRadius: 14,
+                border: `1px solid rgba(255,255,255,0.08)`,
+                overflow: 'hidden',
+              }}
+            >
+              {plan.map((item, i) => (
+                <div key={item.time}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 12,
+                      padding: '12px 14px',
+                      background: item.live ? 'rgba(201,150,26,0.05)' : 'rgba(255,255,255,0.02)',
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: 36,
+                        height: 36,
+                        borderRadius: 8,
+                        background: item.live
+                          ? C.gold
+                          : item.done
+                            ? 'rgba(20,184,212,0.15)'
+                            : 'rgba(255,255,255,0.08)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        flexShrink: 0,
+                      }}
+                    >
+                      {item.done ? (
+                        <span style={{ color: C.cyan, fontWeight: 700, fontSize: 15 }}>✓</span>
+                      ) : (
+                        <span style={{ fontSize: 17 }}>{item.icon}</span>
+                      )}
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <p
+                        style={{
+                          fontSize: 13,
+                          color: item.done ? C.textTertiary : C.textPrimary,
+                          fontWeight: 500,
+                          margin: '0 0 2px',
+                          textDecoration: item.done ? 'line-through' : 'none',
+                        }}
+                      >
+                        {item.title}
+                      </p>
+                      <p style={{ fontSize: 10, color: C.textTertiary, margin: 0 }}>
+                        {item.time} · {item.dur}
+                      </p>
+                    </div>
+                    {item.live && (
+                      <span
+                        style={{
+                          background: C.gold,
+                          color: C.navy,
+                          fontSize: 8,
+                          fontWeight: 700,
+                          padding: '3px 8px',
+                          borderRadius: 999,
+                        }}
+                      >
+                        CANLI
+                      </span>
+                    )}
+                  </div>
+                  {i < plan.length - 1 && (
+                    <div style={{ height: 1, background: 'rgba(255,255,255,0.07)' }} />
+                  )}
+                </div>
+              ))}
+            </div>
+
+            {/* Sleep chart */}
+            {weeklyData.length > 0 && (
+              <div style={{ marginTop: 20, paddingTop: 20, borderTop: `1px solid ${C.border}` }}>
+                <WeeklyChart
+                  data={weeklyData}
+                  metric="sleep"
+                  color={C.gold}
+                  label="Uyku (saat)"
+                  format={(v) => `${v}s`}
+                />
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>
@@ -359,32 +612,62 @@ function HomeTab({ user }) {
 
 function TalksTab() {
   const talks = [
-    { cat: 'Zihin', title: 'Anksiyeteyi anlamak', dur: '28dk', host: 'Dr. Ayşe', color: C.cyan },
-    { cat: 'Hareket', title: 'Koşunun bilimi', dur: '35dk', host: 'Mehmet Ç.', color: C.gold },
+    {
+      cat: 'Zihin',
+      title: 'Anksiyeteyi anlamak',
+      dur: '28dk',
+      host: 'Dr. Ayşe Demir',
+      color: C.cyan,
+      listeners: 347,
+    },
+    {
+      cat: 'Hareket',
+      title: 'Koşunun bilimi',
+      dur: '35dk',
+      host: 'Mehmet Çelik',
+      color: C.gold,
+      listeners: 218,
+    },
     {
       cat: 'Uyku',
       title: 'Derin uykuya yolculuk',
       dur: '22dk',
-      host: 'Dr. Levent',
+      host: 'Dr. Levent Arslan',
       color: C.royal,
+      listeners: 189,
     },
-    { cat: 'Beslenme', title: 'Sezgisel beslenme', dur: '42dk', host: 'Selin Kaya', color: C.cyan },
+    {
+      cat: 'Beslenme',
+      title: 'Sezgisel beslenme',
+      dur: '42dk',
+      host: 'Selin Kaya',
+      color: C.cyan,
+      listeners: 412,
+    },
+    {
+      cat: 'Motivasyon',
+      title: 'Küçük adımların gücü',
+      dur: '31dk',
+      host: 'Coach Burak',
+      color: C.gold,
+      listeners: 563,
+    },
   ];
 
   return (
     <div>
       <h2
         className="wd-display"
-        style={{ fontSize: 28, fontWeight: 700, color: C.textPrimary, margin: '0 0 6px' }}
+        style={{ fontSize: 30, fontWeight: 700, color: C.textPrimary, margin: '0 0 6px' }}
       >
         Palestralar
       </h2>
-      <p style={{ fontSize: 13, color: C.textSecondary, margin: '0 0 24px' }}>
+      <p style={{ fontSize: 13, color: C.textSecondary, margin: '0 0 28px' }}>
         Türkiye&apos;nin en güçlü zihinleri
       </p>
 
       {/* Live card */}
-      <div className="wd-card-gold" style={{ marginBottom: 24 }}>
+      <div className="wd-card-gold" style={{ marginBottom: 28 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
           <span
             style={{
@@ -398,22 +681,22 @@ function TalksTab() {
           >
             ● CANLI
           </span>
-          <span style={{ fontSize: 11, color: C.textTertiary }}>347 dinleyici</span>
+          <span style={{ fontSize: 11, color: C.textTertiary }}>347 dinleyici şu an bağlı</span>
         </div>
         <p
           style={{
-            fontSize: 18,
+            fontSize: 20,
             fontWeight: 300,
             color: C.textPrimary,
-            margin: '0 0 12px',
+            margin: '0 0 6px',
             lineHeight: 1.4,
           }}
         >
           Yorgunluğun ardındaki{' '}
           <span style={{ color: C.gold, fontStyle: 'italic' }}>gerçek hikaye</span>
         </p>
-        <p style={{ fontSize: 11, color: C.textTertiary, margin: '0 0 14px' }}>
-          Dr. Ayşe Demir · Coach Burak
+        <p style={{ fontSize: 11, color: C.textTertiary, margin: '0 0 16px' }}>
+          Dr. Ayşe Demir · Coach Burak · 47:12
         </p>
         <button
           style={{
@@ -422,8 +705,8 @@ function TalksTab() {
             color: C.navy,
             border: 'none',
             borderRadius: 999,
-            padding: '11px 0',
-            fontSize: 13,
+            padding: '12px 0',
+            fontSize: 14,
             fontWeight: 700,
             cursor: 'pointer',
             fontFamily: 'inherit',
@@ -433,14 +716,35 @@ function TalksTab() {
         </button>
       </div>
 
-      <p style={{ fontSize: 20, fontWeight: 700, color: C.textPrimary, margin: '0 0 14px' }}>
+      <p style={{ fontSize: 18, fontWeight: 700, color: C.textPrimary, margin: '0 0 14px' }}>
         Senin için
       </p>
       {talks.map((t, i) => (
         <div key={i} className="wd-talk-item" style={{ borderLeftColor: t.color }}>
           <div
-            style={{ width: 48, height: 48, borderRadius: 10, background: t.color, flexShrink: 0 }}
-          />
+            style={{
+              width: 48,
+              height: 48,
+              borderRadius: 10,
+              background: `${t.color}33`,
+              flexShrink: 0,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <span style={{ fontSize: 22 }}>
+              {t.cat === 'Zihin'
+                ? '🧠'
+                : t.cat === 'Hareket'
+                  ? '🏃'
+                  : t.cat === 'Uyku'
+                    ? '🌙'
+                    : t.cat === 'Beslenme'
+                      ? '🥗'
+                      : '🎯'}
+            </span>
+          </div>
           <div style={{ flex: 1 }}>
             <p
               style={{
@@ -454,33 +758,66 @@ function TalksTab() {
             >
               {t.cat}
             </p>
-            <p style={{ fontSize: 13, fontWeight: 500, color: C.textPrimary, margin: '0 0 2px' }}>
+            <p style={{ fontSize: 14, fontWeight: 500, color: C.textPrimary, margin: '0 0 2px' }}>
               {t.title}
             </p>
             <p style={{ fontSize: 10, color: C.textTertiary, margin: 0 }}>
               {t.host} · {t.dur}
             </p>
           </div>
-          <span style={{ fontSize: 20, color: C.textTertiary }}>+</span>
+          <div style={{ textAlign: 'right' }}>
+            <span style={{ fontSize: 10, color: C.textTertiary }}>
+              {t.listeners.toLocaleString()}
+            </span>
+            <br />
+            <span style={{ fontSize: 10, color: C.textTertiary }}>dinleyici</span>
+          </div>
         </div>
       ))}
     </div>
   );
 }
 
-function HealthTab() {
+function HealthTab({ metrics, weeklyData, wellnessScore, loading }) {
+  const dm = metrics?.dailyMetrics;
+  const score = wellnessScore || 0;
+
   const breakdown = [
-    { label: 'Uyku kalitesi', value: 84, color: C.cyan, sub: 'Mükemmel · 7s 24dk' },
-    { label: 'Hareket', value: 72, color: C.gold, sub: 'İyi · 8.2k adım' },
-    { label: 'Zihin & stres', value: 68, color: C.royal, sub: 'İyi · 3 meditasyon' },
-    { label: 'Beslenme', value: 81, color: C.gold, sub: 'Çok iyi · 2.1L su' },
+    {
+      label: 'Uyku kalitesi',
+      value: dm ? Math.round((dm.sleep.hours / 9) * 100) : 0,
+      color: C.cyan,
+      sub: dm ? `${dm.sleep.quality} · ${dm.sleep.hours}s uyku` : '—',
+      icon: '😴',
+    },
+    {
+      label: 'Hareket',
+      value: dm ? Math.min(100, Math.round(dm.steps / 100)) : 0,
+      color: C.gold,
+      sub: dm ? `${(dm.steps / 1000).toFixed(1)}k adım` : '—',
+      icon: '👟',
+    },
+    {
+      label: 'Zihin & stres',
+      value: dm ? Math.round(68 + (dm.heartRate < 70 ? 10 : 0)) : 0,
+      color: C.royal,
+      sub: '3 meditasyon',
+      icon: '🧘',
+    },
+    {
+      label: 'Kalori dengesi',
+      value: dm ? Math.round((dm.calories / 2200) * 100) : 0,
+      color: C.gold,
+      sub: dm ? `${dm.calories.toLocaleString()} kcal aktif` : '—',
+      icon: '🔥',
+    },
   ];
 
   return (
     <div>
       <h2
         className="wd-display"
-        style={{ fontSize: 28, fontWeight: 700, color: C.textPrimary, margin: '0 0 6px' }}
+        style={{ fontSize: 30, fontWeight: 700, color: C.textPrimary, margin: '0 0 6px' }}
       >
         Sağlık <span style={{ color: C.gold, fontStyle: 'italic' }}>verilerin</span>
       </h2>
@@ -490,27 +827,76 @@ function HealthTab() {
           color: C.textTertiary,
           fontWeight: 600,
           letterSpacing: 0.2,
-          margin: '0 0 24px',
+          margin: '0 0 28px',
         }}
       >
-        DETAYLI ANALİZ
+        DETAYLI ANALİZ · {dm ? new Date(dm.date).toLocaleDateString('tr-TR') : '—'}
       </p>
 
-      {/* Score card */}
-      <div className="wd-card" style={{ marginBottom: 20 }}>
-        <p style={{ fontSize: 12, color: C.textTertiary, fontWeight: 500, margin: '0 0 6px' }}>
-          Wellness skoru
-        </p>
-        <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginBottom: 4 }}>
-          <span style={{ fontSize: 40, fontWeight: 300, color: C.textPrimary, lineHeight: 1 }}>
-            76
-          </span>
-          <span style={{ fontSize: 14, color: C.cyan, fontWeight: 500 }}>↑ +12%</span>
+      <div className="wd-health-grid" style={{ marginBottom: 24 }}>
+        {/* Wellness score */}
+        <div className="wd-card">
+          <p style={{ fontSize: 12, color: C.textTertiary, fontWeight: 500, margin: '0 0 6px' }}>
+            Wellness skoru
+          </p>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginBottom: 4 }}>
+            <span style={{ fontSize: 48, fontWeight: 300, color: C.textPrimary, lineHeight: 1 }}>
+              {loading ? '…' : score}
+            </span>
+            <span style={{ fontSize: 14, color: C.cyan, fontWeight: 500 }}>
+              {weeklyData.length > 1
+                ? `${score >= weeklyData[weeklyData.length - 2]?.wellnessScore ? '+' : ''}${score - (weeklyData[weeklyData.length - 2]?.wellnessScore || score)} puan`
+                : ''}
+            </span>
+          </div>
+          <div className="wd-metric-bar">
+            <div
+              style={{
+                height: '100%',
+                width: `${score}%`,
+                background: C.cyan,
+                borderRadius: 3,
+                transition: 'width 0.6s ease',
+              }}
+            />
+          </div>
+          <p style={{ fontSize: 11, color: C.textTertiary, margin: '4px 0 0' }}>
+            Haftalık ort:{' '}
+            {weeklyData.length > 0
+              ? Math.round(weeklyData.reduce((s, d) => s + d.wellnessScore, 0) / weeklyData.length)
+              : '—'}
+          </p>
         </div>
-        <div className="wd-metric-bar">
-          <div style={{ height: '100%', width: '76%', background: C.cyan, borderRadius: 3 }} />
+
+        {/* Heart rate card */}
+        <div className="wd-card-gold">
+          <p style={{ fontSize: 12, color: C.textTertiary, fontWeight: 500, margin: '0 0 6px' }}>
+            Nabız
+          </p>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginBottom: 4 }}>
+            <span style={{ fontSize: 48, fontWeight: 300, color: C.textPrimary, lineHeight: 1 }}>
+              {loading ? '…' : (dm?.heartRate ?? '—')}
+            </span>
+            <span style={{ fontSize: 14, color: C.gold }}>bpm</span>
+          </div>
+          <div className="wd-metric-bar">
+            <div
+              style={{
+                height: '100%',
+                width: `${dm ? Math.min(100, (dm.heartRate / 100) * 100) : 0}%`,
+                background: C.gold,
+                borderRadius: 3,
+              }}
+            />
+          </div>
+          <p style={{ fontSize: 11, color: C.textTertiary, margin: '4px 0 0' }}>
+            {dm?.heartRate < 65
+              ? 'Mükemmel dinlenme nabzı'
+              : dm?.heartRate < 75
+                ? 'Normal dinlenme'
+                : 'Yüksek — dinlen'}
+          </p>
         </div>
-        <p style={{ fontSize: 11, color: C.textTertiary, margin: 0 }}>Bu hafta ortalaması: 71</p>
       </div>
 
       {/* Breakdown */}
@@ -522,50 +908,80 @@ function HealthTab() {
           marginBottom: 20,
         }}
       >
-        <p style={{ fontSize: 20, fontWeight: 700, color: C.textPrimary, margin: '0 0 16px' }}>
-          Detay
+        <p style={{ fontSize: 18, fontWeight: 700, color: C.textPrimary, margin: '0 0 16px' }}>
+          Kategori detayı
         </p>
-        {breakdown.map((m, i) => (
-          <div
-            key={i}
-            style={{
-              background:
-                m.color === C.cyan
-                  ? 'rgba(20,184,212,0.06)'
-                  : m.color === C.royal
-                    ? 'rgba(0,114,176,0.06)'
-                    : 'rgba(201,150,26,0.06)',
-              borderLeft: `3px solid ${m.color}`,
-              borderRadius: 12,
-              padding: '12px 14px',
-              marginBottom: 10,
-            }}
-          >
+        <div className="wd-health-grid">
+          {breakdown.map((m) => (
             <div
+              key={m.label}
               style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                marginBottom: 6,
+                background:
+                  m.color === C.cyan
+                    ? 'rgba(20,184,212,0.06)'
+                    : m.color === C.royal
+                      ? 'rgba(0,114,176,0.06)'
+                      : 'rgba(201,150,26,0.06)',
+                borderLeft: `3px solid ${m.color}`,
+                borderRadius: 12,
+                padding: '14px 16px',
               }}
             >
-              <span style={{ fontSize: 13, fontWeight: 500, color: C.textPrimary }}>{m.label}</span>
-              <span style={{ fontSize: 16, fontWeight: 600, color: C.textPrimary }}>{m.value}</span>
-            </div>
-            <div className="wd-metric-bar">
               <div
                 style={{
-                  height: '100%',
-                  width: `${m.value}%`,
-                  background: m.color,
-                  borderRadius: 3,
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  marginBottom: 6,
                 }}
-              />
+              >
+                <span style={{ fontSize: 13, fontWeight: 500, color: C.textPrimary }}>
+                  {m.icon} {m.label}
+                </span>
+                <span style={{ fontSize: 18, fontWeight: 600, color: C.textPrimary }}>
+                  {m.value}
+                </span>
+              </div>
+              <div className="wd-metric-bar">
+                <div
+                  style={{
+                    height: '100%',
+                    width: `${m.value}%`,
+                    background: m.color,
+                    borderRadius: 3,
+                    transition: 'width 0.6s ease',
+                  }}
+                />
+              </div>
+              <p style={{ fontSize: 11, color: C.textTertiary, margin: 0 }}>{m.sub}</p>
             </div>
-            <p style={{ fontSize: 11, color: C.textTertiary, margin: 0 }}>{m.sub}</p>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
+
+      {/* Weekly charts */}
+      {weeklyData.length > 0 && (
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 20 }}>
+          <div style={{ background: 'rgba(20,184,212,0.04)', borderRadius: 14, padding: 16 }}>
+            <WeeklyChart
+              data={weeklyData}
+              metric="sleep"
+              color={C.cyan}
+              label="Uyku"
+              format={(v) => `${v}s`}
+            />
+          </div>
+          <div style={{ background: 'rgba(201,150,26,0.04)', borderRadius: 14, padding: 16 }}>
+            <WeeklyChart
+              data={weeklyData}
+              metric="heartRate"
+              color={C.gold}
+              label="Nabız"
+              format={(v) => `${v}`}
+            />
+          </div>
+        </div>
+      )}
 
       {/* AI Insight */}
       <div className="wd-card-green">
@@ -574,8 +990,18 @@ function HealthTab() {
           <span style={{ fontSize: 13, fontWeight: 600, color: C.textPrimary }}>AI İçgörü</span>
         </div>
         <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.7)', lineHeight: 1.6, margin: 0 }}>
-          Uyku puanın bu hafta <span style={{ color: C.gold, fontWeight: 600 }}>%14 yükseldi</span>.
-          Akşam meditasyonu rutinini sürdürmeni öneririm — sonuçlar harika.
+          {dm && dm.sleep.hours >= 7 ? (
+            <>
+              Uyku kalitenin{' '}
+              <span style={{ color: C.gold, fontWeight: 600 }}>hedefin üzerinde</span>. Akşam
+              meditasyonu rutinini sürdür — sonuçlar harika görünüyor.
+            </>
+          ) : (
+            <>
+              Uyku süren <span style={{ color: C.gold, fontWeight: 600 }}>hedefin altında</span>. Bu
+              akşam erken yatmayı dene; 7+ saat hedefle.
+            </>
+          )}
         </p>
       </div>
     </div>
@@ -614,6 +1040,16 @@ function CommunityTab() {
       liked: false,
       time: '1 gün önce',
     },
+    {
+      id: 'p4',
+      name: 'Zeynep Öz',
+      initial: 'Z',
+      text: 'Uyku takibini kullanmaya başladım — 3 haftada ortalama 6.2 saatten 7.6 saate çıktım 🌙',
+      likes: 61,
+      comments: 15,
+      liked: false,
+      time: '2 gün önce',
+    },
   ]);
 
   const toggle = (id) =>
@@ -630,18 +1066,18 @@ function CommunityTab() {
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'flex-start',
-          marginBottom: 24,
+          marginBottom: 28,
         }}
       >
         <div>
           <h2
             className="wd-display"
-            style={{ fontSize: 28, fontWeight: 700, color: C.textPrimary, margin: '0 0 4px' }}
+            style={{ fontSize: 30, fontWeight: 700, color: C.textPrimary, margin: '0 0 4px' }}
           >
             Topluluk
           </h2>
           <p style={{ fontSize: 11, fontWeight: 300, color: C.textTertiary, margin: 0 }}>
-            akışı <span style={{ color: C.gold }}>·</span>
+            akışı <span style={{ color: C.gold }}>·</span> 1,847 aktif üye
           </p>
         </div>
         <button
@@ -650,7 +1086,7 @@ function CommunityTab() {
             color: C.navy,
             border: 'none',
             borderRadius: 999,
-            padding: '7px 16px',
+            padding: '9px 20px',
             fontSize: 13,
             fontWeight: 600,
             cursor: 'pointer',
@@ -662,7 +1098,7 @@ function CommunityTab() {
       </div>
 
       {/* Challenge */}
-      <div className="wd-card-gold" style={{ marginBottom: 20 }}>
+      <div className="wd-card-gold" style={{ marginBottom: 24 }}>
         <div
           style={{
             display: 'flex',
@@ -682,10 +1118,13 @@ function CommunityTab() {
         <div className="wd-metric-bar">
           <div style={{ height: '100%', width: '57%', background: C.gold, borderRadius: 3 }} />
         </div>
-        <p style={{ fontSize: 11, color: C.textTertiary, margin: '4px 0 0' }}>4/7 gün tamamlandı</p>
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4 }}>
+          <p style={{ fontSize: 11, color: C.textTertiary, margin: 0 }}>4/7 gün tamamlandı</p>
+          <p style={{ fontSize: 11, color: C.textTertiary, margin: 0 }}>234 katılımcı</p>
+        </div>
       </div>
 
-      <p style={{ fontSize: 20, fontWeight: 700, color: C.textPrimary, margin: '0 0 14px' }}>
+      <p style={{ fontSize: 18, fontWeight: 700, color: C.textPrimary, margin: '0 0 14px' }}>
         Son Paylaşımlar
       </p>
       {posts.map((post) => (
@@ -725,7 +1164,7 @@ function CommunityTab() {
                 display: 'flex',
                 alignItems: 'center',
                 gap: 6,
-                color: C.textSecondary,
+                color: post.liked ? C.gold : C.textSecondary,
                 fontSize: 13,
                 fontFamily: 'inherit',
               }}
@@ -754,10 +1193,15 @@ function CommunityTab() {
   );
 }
 
-function ProfileTab({ user, onLogout }) {
+function ProfileTab({ user, onLogout, weeklyData }) {
+  const totalTalks = 12;
+  const streak = 47;
+  const points =
+    890 + (weeklyData.length > 0 ? weeklyData.reduce((s, d) => s + d.wellnessScore, 0) : 0);
+
   return (
     <div>
-      {/* Avatar + name */}
+      {/* Avatar */}
       <div
         style={{
           display: 'flex',
@@ -770,8 +1214,8 @@ function ProfileTab({ user, onLogout }) {
       >
         <div
           style={{
-            width: 92,
-            height: 92,
+            width: 96,
+            height: 96,
             borderRadius: '50%',
             background: C.cyan,
             display: 'flex',
@@ -779,10 +1223,10 @@ function ProfileTab({ user, onLogout }) {
             justifyContent: 'center',
             marginBottom: 14,
             border: `3px solid ${C.gold}`,
-            boxShadow: `0 0 24px rgba(20,184,212,0.35)`,
+            boxShadow: `0 0 28px rgba(20,184,212,0.35)`,
           }}
         >
-          <span style={{ fontSize: 32, fontWeight: 800, color: C.navy }}>
+          <span style={{ fontSize: 34, fontWeight: 800, color: C.navy }}>
             {(user?.displayName || 'U')
               .split(' ')
               .map((w) => w[0])
@@ -798,15 +1242,15 @@ function ProfileTab({ user, onLogout }) {
           {user?.displayName || 'Kullanıcı'}
         </h2>
         <p style={{ fontSize: 13, color: C.textTertiary, margin: '0 0 20px' }}>{user?.email}</p>
-        <div style={{ display: 'flex', gap: 36 }}>
+        <div style={{ display: 'flex', gap: 40 }}>
           {[
-            { label: 'Talk', value: '12' },
-            { label: 'Gün', value: '47' },
-            { label: 'Puan', value: '890' },
+            { label: 'Talk', value: totalTalks },
+            { label: 'Gün serisi', value: streak },
+            { label: 'Puan', value: points },
           ].map((s) => (
             <div key={s.label} style={{ textAlign: 'center' }}>
-              <p style={{ fontSize: 22, fontWeight: 800, color: C.textPrimary, margin: '0 0 2px' }}>
-                {s.value}
+              <p style={{ fontSize: 24, fontWeight: 800, color: C.textPrimary, margin: '0 0 2px' }}>
+                {s.value.toLocaleString()}
               </p>
               <p style={{ fontSize: 12, color: C.textTertiary, margin: 0 }}>{s.label}</p>
             </div>
@@ -818,16 +1262,17 @@ function ProfileTab({ user, onLogout }) {
       <div className="wd-card" style={{ marginBottom: 24 }}>
         <p style={{ fontSize: 13, color: C.textSecondary, margin: '0 0 12px' }}>Hedeflerim</p>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-          {['sleep', 'fitness', 'mindfulness'].map((g) => (
+          {['Uyku iyileştirme', 'Fitness', 'Farkındalık', 'Beslenme'].map((g) => (
             <span
               key={g}
               style={{
-                padding: '4px 14px',
+                padding: '5px 16px',
                 borderRadius: 999,
                 background: 'rgba(20,184,212,0.12)',
                 border: `1px solid rgba(20,184,212,0.3)`,
                 color: C.cyan,
                 fontSize: 12,
+                fontWeight: 600,
               }}
             >
               {g}
@@ -835,6 +1280,26 @@ function ProfileTab({ user, onLogout }) {
           ))}
         </div>
       </div>
+
+      {/* Wellness trend */}
+      {weeklyData.length > 0 && (
+        <div
+          style={{
+            background: 'rgba(20,184,212,0.04)',
+            borderRadius: 16,
+            padding: 20,
+            marginBottom: 24,
+          }}
+        >
+          <WeeklyChart
+            data={weeklyData}
+            metric="wellnessScore"
+            color={C.cyan}
+            label="Wellness trend"
+            format={(v) => `${v}`}
+          />
+        </div>
+      )}
 
       {/* Settings */}
       <p
@@ -854,6 +1319,7 @@ function ProfileTab({ user, onLogout }) {
           { icon: '🌍', label: 'Dil', value: 'Türkçe' },
           { icon: '🔔', label: 'Bildirimler', value: 'Açık' },
           { icon: '📏', label: 'Birimler', value: 'Metrik' },
+          { icon: '🔒', label: 'Gizlilik', value: '' },
         ].map((row, i, arr) => (
           <div key={row.label}>
             <div className="wd-setting-row">
@@ -897,7 +1363,14 @@ function ProfileTab({ user, onLogout }) {
 export default function WebDashboard() {
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state.auth);
+  const { dailyMetrics, weeklyData, wellnessScore, loading } = useAppSelector(
+    (state) => state.metrics
+  );
   const [activeTab, setActiveTab] = useState('home');
+
+  useEffect(() => {
+    dispatch(fetchMetrics());
+  }, [dispatch]);
 
   const handleLogout = () => {
     if (window.confirm('Hesabından çıkmak istediğine emin misin?')) {
@@ -905,18 +1378,20 @@ export default function WebDashboard() {
     }
   };
 
+  const metricsProps = { metrics: { dailyMetrics }, weeklyData, wellnessScore, loading };
+
   const renderContent = () => {
     switch (activeTab) {
       case 'home':
-        return <HomeTab user={user} />;
+        return <HomeTab user={user} {...metricsProps} />;
       case 'talks':
         return <TalksTab />;
       case 'health':
-        return <HealthTab />;
+        return <HealthTab {...metricsProps} />;
       case 'community':
         return <CommunityTab />;
       case 'profile':
-        return <ProfileTab user={user} onLogout={handleLogout} />;
+        return <ProfileTab user={user} onLogout={handleLogout} weeklyData={weeklyData} />;
       default:
         return null;
     }
@@ -929,38 +1404,184 @@ export default function WebDashboard() {
     >
       <style>{CSS}</style>
 
-      {/* Header */}
+      {/* ── Desktop sidebar ─────────────────────────────────── */}
+      <aside className="wd-sidebar">
+        {/* Logo */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '0 4px 28px' }}>
+          <Logo size={34} />
+          <span
+            className="wd-display"
+            style={{ fontSize: 19, fontWeight: 500, color: C.textPrimary }}
+          >
+            Break<span style={{ color: C.gold, fontStyle: 'italic' }}>Free</span>
+          </span>
+        </div>
+
+        {/* Nav items */}
+        <nav style={{ flex: 1 }}>
+          {TABS.map((tab) => (
+            <button
+              key={tab.id}
+              className={`wd-nav-item${activeTab === tab.id ? ' active' : ''}`}
+              onClick={() => setActiveTab(tab.id)}
+            >
+              <span style={{ fontSize: 18, width: 24, textAlign: 'center' }}>{tab.icon}</span>
+              {tab.label}
+            </button>
+          ))}
+        </nav>
+
+        {/* User chip at bottom */}
+        {user && (
+          <div
+            style={{
+              padding: '16px 8px 0',
+              borderTop: `1px solid ${C.border}`,
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <div
+                style={{
+                  width: 34,
+                  height: 34,
+                  borderRadius: '50%',
+                  background: C.cyan,
+                  flexShrink: 0,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  border: `2px solid ${C.gold}`,
+                }}
+              >
+                <span style={{ fontSize: 12, fontWeight: 800, color: C.navy }}>
+                  {(user.displayName || 'U')
+                    .split(' ')
+                    .map((w) => w[0])
+                    .join('')
+                    .toUpperCase()
+                    .slice(0, 2)}
+                </span>
+              </div>
+              <div style={{ overflow: 'hidden' }}>
+                <p
+                  style={{
+                    fontSize: 12,
+                    fontWeight: 600,
+                    color: C.textPrimary,
+                    margin: 0,
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                  }}
+                >
+                  {user.displayName || 'Kullanıcı'}
+                </p>
+                <p
+                  style={{
+                    fontSize: 10,
+                    color: C.textTertiary,
+                    margin: 0,
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                  }}
+                >
+                  {user.email}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+      </aside>
+
+      {/* ── Mobile header ───────────────────────────────────── */}
       <div
+        className="wd-mobile-header"
         style={{
           borderBottom: `1px solid ${C.border}`,
           background: `linear-gradient(180deg, rgba(255,255,255,0.04) 0%, transparent 100%)`,
+          position: 'sticky',
+          top: 0,
+          zIndex: 50,
         }}
       >
         <div
           style={{
-            maxWidth: 480,
-            margin: '0 auto',
-            padding: '16px 24px',
+            padding: '14px 20px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <Logo size={32} />
+            <Logo size={28} />
             <span
               className="wd-display"
-              style={{ fontSize: 18, fontWeight: 500, color: C.textPrimary }}
+              style={{ fontSize: 17, fontWeight: 500, color: C.textPrimary }}
             >
               Break<span style={{ color: C.gold, fontStyle: 'italic' }}>Free</span>
             </span>
           </div>
           <div
             style={{
-              width: 36,
-              height: 36,
+              width: 34,
+              height: 34,
               borderRadius: '50%',
               background: 'rgba(255,255,255,0.08)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <span style={{ fontSize: 14 }}>🔔</span>
+          </div>
+        </div>
+      </div>
+
+      {/* ── Main content ────────────────────────────────────── */}
+      <div className="wd-main-desktop">
+        {/* Desktop top bar */}
+        <div
+          style={{
+            borderBottom: `1px solid ${C.border}`,
+            background: `linear-gradient(180deg, rgba(255,255,255,0.03) 0%, transparent 100%)`,
+            padding: '0 32px',
+          }}
+          className="wd-desktop-topbar"
+        >
+          <style>{`.wd-desktop-topbar { display: none; } @media (min-width: 768px) { .wd-desktop-topbar { display: flex; align-items: center; justify-content: flex-end; padding: 14px 32px; gap: 14px; } }`}</style>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <span style={{ fontSize: 12, color: C.textTertiary }}>
+              {new Date().toLocaleDateString('tr-TR', {
+                weekday: 'long',
+                day: 'numeric',
+                month: 'long',
+              })}
+            </span>
+          </div>
+          <div style={{ width: 1, height: 16, background: C.border }} />
+          <div
+            style={{
+              background: loading ? 'rgba(20,184,212,0.1)' : `rgba(20,184,212,0.12)`,
+              border: `1px solid rgba(20,184,212,0.25)`,
+              borderRadius: 999,
+              padding: '5px 14px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6,
+            }}
+          >
+            <span style={{ fontSize: 10, color: C.cyan }}>●</span>
+            <span style={{ fontSize: 12, color: C.cyan, fontWeight: 600 }}>
+              Wellness: {loading ? '…' : wellnessScore}
+            </span>
+          </div>
+          <div
+            style={{
+              width: 34,
+              height: 34,
+              borderRadius: '50%',
+              background: 'rgba(255,255,255,0.07)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -970,34 +1591,24 @@ export default function WebDashboard() {
             <span style={{ fontSize: 15 }}>🔔</span>
           </div>
         </div>
+
+        {/* Scrollable content */}
+        <div className="wd-content-inner wd-scroll" style={{ overflowY: 'auto' }}>
+          {renderContent()}
+        </div>
       </div>
 
-      {/* Content */}
-      <div style={{ maxWidth: 480, margin: '0 auto', padding: '28px 24px 100px' }}>
-        {renderContent()}
-      </div>
-
-      {/* Bottom nav */}
-      <div
-        style={{
-          position: 'fixed',
-          bottom: 0,
-          left: 0,
-          right: 0,
-          background: `${C.navy}F5`,
-          backdropFilter: 'blur(20px)',
-          borderTop: `1px solid ${C.border}`,
-        }}
-      >
-        <div style={{ maxWidth: 480, margin: '0 auto', display: 'flex' }}>
+      {/* ── Mobile bottom nav ────────────────────────────────── */}
+      <div className="wd-bottom-nav">
+        <div style={{ display: 'flex' }}>
           {TABS.map((tab) => (
             <button
               key={tab.id}
               className={`wd-tab-btn${activeTab === tab.id ? ' active' : ''}`}
               onClick={() => setActiveTab(tab.id)}
             >
-              <div style={{ fontSize: 20, marginBottom: 4 }}>{tab.icon}</div>
-              <div className="wd-tab-label">{tab.label}</div>
+              <div style={{ fontSize: 20, marginBottom: 3 }}>{tab.icon}</div>
+              <div>{tab.label}</div>
             </button>
           ))}
         </div>
