@@ -14,6 +14,7 @@ import authReducer from './slices/authSlice';
 import userReducer from './slices/userSlice';
 import talksReducer from './slices/talksSlice';
 import metricsReducer from './slices/metricsSlice';
+import communityReducer from './slices/communitySlice';
 
 // Wrap localStorage with async interface for redux-persist compatibility
 const createAsyncStorage = () => ({
@@ -39,6 +40,7 @@ const rootReducer = combineReducers({
   user: userReducer,
   talks: talksReducer,
   metrics: metricsReducer,
+  community: communityReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

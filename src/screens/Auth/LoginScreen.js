@@ -78,10 +78,15 @@ export default function LoginScreen({ navigation }) {
     if (login.rejected.match(result)) {
       const errorMsg = result.payload;
       if (errorMsg?.includes('Firebase not configured')) {
-        Alert.alert('Firebase Yapılandırılmadı', 'Test için mock girişi kullanmak ister misiniz?', [
-          { text: 'İptal' },
-          { text: 'Test (Mock)', onPress: () => forceMockLogin() },
-        ]);
+        const buttons = [{ text: 'İptal' }];
+        if (__DEV__) {
+          buttons.push({ text: 'Test (Mock)', onPress: () => forceMockLogin() });
+        }
+        Alert.alert(
+          'Firebase Yapılandırılmadı',
+          'Lütfen .env.local dosyasını yapılandırın.',
+          buttons
+        );
       } else {
         Alert.alert('Giriş Başarısız', errorMsg || 'E-posta veya şifre yanlış.');
       }
@@ -165,7 +170,10 @@ export default function LoginScreen({ navigation }) {
           <View style={styles.fieldWrapper}>
             <View style={styles.labelRow}>
               <Text style={styles.fieldLabel}>Şifre</Text>
-              <TouchableOpacity hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+              <TouchableOpacity
+                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                onPress={() => navigation.navigate('ForgotPassword')}
+              >
                 <Text style={styles.forgotLink}>Unuttun mu?</Text>
               </TouchableOpacity>
             </View>

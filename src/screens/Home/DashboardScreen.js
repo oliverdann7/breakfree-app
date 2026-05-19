@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { fetchMetrics } from '../../store/slices/metricsSlice';
+import { fetchUserProfile } from '../../store/slices/userSlice';
 import WellnessRing from '../../components/features/WellnessRing';
 import Card from '../../components/common/Card';
 import { colors } from '../../constants/designTokens';
@@ -23,68 +24,87 @@ function greeting() {
   return 'İyi akşamlar';
 }
 
-const TODAY_PLAN = [
-  {
-    time: '07:00',
-    title: 'Sabah meditasyonu',
-    duration: '10dk',
-    done: true,
-    icon: '🧘',
-    accent: false,
-  },
-  {
-    time: '17:30',
-    title: 'Fitness · Üst beden',
-    duration: '45dk',
-    done: false,
-    icon: '💪',
-    accent: false,
-  },
-  {
-    time: '20:00',
-    title: 'Wellness palestrası',
-    duration: '30dk',
-    done: false,
-    icon: '🎙',
-    accent: true,
-  },
-];
+const GOAL_TASKS = {
+  sleep: { title: 'Uyku Takibi', icon: '😴', duration: '5dk', accent: false },
+  fitness: { title: '30dk Antrenman', icon: '💪', duration: '30dk', accent: false },
+  mindfulness: { title: 'Meditasyon', icon: '🧘', duration: '10dk', accent: false },
+  nutrition: { title: 'Su İçmeyi Takip Et', icon: '💧', duration: '1dk', accent: false },
+  community: { title: 'Gönderi Paylaş', icon: '🤝', duration: '5dk', accent: false },
+  stress: { title: 'Nefes Egzersizi', icon: '🌿', duration: '5dk', accent: false },
+};
+
+function todayLabel() {
+  const d = new Date();
+  const days = ['Pazar', 'Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi'];
+  const months = [
+    'Ocak',
+    'Şubat',
+    'Mart',
+    'Nisan',
+    'Mayıs',
+    'Haziran',
+    'Temmuz',
+    'Ağustos',
+    'Eylül',
+    'Ekim',
+    'Kasım',
+    'Aralık',
+  ];
+  return `${days[d.getDay()]}, ${d.getDate()} ${months[d.getMonth()]}`;
+}
 
 export default function DashboardScreen() {
   const dispatch = useAppDispatch();
-  const { wellnessScore } = useAppSelector((state) => state.metrics);
+  const { wellnessScore, dailyMetrics } = useAppSelector((state) => state.metrics);
   const { user } = useAppSelector((state) => state.auth);
+  const { profile } = useAppSelector((state) => state.user);
 
   useEffect(() => {
-    dispatch(fetchMetrics());
-  }, []);
+    if (user?.uid) {
+      dispatch(fetchMetrics(user.uid));
+      if (!profile) dispatch(fetchUserProfile(user.uid));
+    }
+  }, [user?.uid]);
 
+  const goals = profile?.goals || user?.goals || [];
+  const todayPlan =
+    goals.length > 0
+      ? goals.map((g) => GOAL_TASKS[g]).filter(Boolean)
+      : [
+          GOAL_TASKS.mindfulness,
+          GOAL_TASKS.fitness,
+          { title: 'Wellness Palestrası', icon: '🎙', duration: '30dk', accent: true },
+        ];
+
+  const dm = dailyMetrics;
   const metrics = [
     {
       emoji: '😴',
       label: 'Uyku',
-      value: '7s 24dk',
-      sub: 'İyi',
+      value: dm?.sleep?.hours ? `${dm.sleep.hours}s` : '—',
+      sub: dm?.sleep?.quality || 'Kayıt yok',
       color: colors.cyan,
     },
     {
       emoji: '❤️',
       label: 'Nabız',
-      value: '64',
+      value: dm?.heartRate ? String(dm.heartRate) : '—',
       sub: 'Dinlenme',
       color: colors.gold,
     },
     {
       emoji: '👟',
       label: 'Adım',
-      value: '8.2k',
-      sub: 'Hedef %82',
+      value: dm?.steps ? `${(dm.steps / 1000).toFixed(1)}k` : '—',
+      sub: dm?.steps
+        ? `Hedef %${Math.min(100, Math.round((dm.steps / 10000) * 100))}`
+        : 'Kayıt yok',
       color: colors.cyan,
     },
     {
       emoji: '🔥',
       label: 'Kalori',
-      value: '1,847',
+      value: dm?.calories ? dm.calories.toLocaleString() : '—',
       sub: 'Aktif',
       color: colors.gold,
     },
@@ -96,7 +116,7 @@ export default function DashboardScreen() {
         {/* Header */}
         <View style={styles.header}>
           <View>
-            <Text style={styles.date}>Pazar, 15 Haziran</Text>
+            <Text style={styles.date}>{todayLabel()}</Text>
             <Text style={styles.greeting}>
               {greeting()}, <Text style={styles.name}>{user?.displayName || 'Elif'}</Text>
             </Text>
@@ -153,8 +173,8 @@ export default function DashboardScreen() {
               <Text style={styles.planArrow}>→</Text>
             </View>
             <View style={styles.planList}>
-              {TODAY_PLAN.map((item, i) => (
-                <View key={item.time}>
+              {todayPlan.map((item, i) => (
+                <View key={item.title + i}>
                   <View style={[styles.planItem, item.accent && styles.planItemAccent]}>
                     <View style={[styles.planIconBox, item.accent && styles.planIconBoxAccent]}>
                       {item.done ? (
@@ -177,7 +197,7 @@ export default function DashboardScreen() {
                       </View>
                     )}
                   </View>
-                  {i < TODAY_PLAN.length - 1 && <View style={styles.planDivider} />}
+                  {i < todayPlan.length - 1 && <View style={styles.planDivider} />}
                 </View>
               ))}
             </View>
