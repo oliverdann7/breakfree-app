@@ -24,7 +24,7 @@
       "package": "com.breakfree.app"
     },
     "web": {
-      "favicon": "./assets/favicon.png",
+      "favicon": "./favicon.svg",
       "bundler": "metro",
       "output": "single",
       "name": "BreakFree",
