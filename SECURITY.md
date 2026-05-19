@@ -3,7 +3,7 @@
 ## Supported Versions
 
 | Version | Supported |
-|---------|-----------|
+| ------- | --------- |
 | 1.x     | ✅        |
 
 ## Reporting a Vulnerability
@@ -11,6 +11,7 @@
 **Please do not open a public GitHub issue for security vulnerabilities.**
 
 Email **danezolv@gmail.com** with:
+
 - A clear description of the vulnerability
 - Steps to reproduce
 - Potential impact

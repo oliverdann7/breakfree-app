@@ -13,7 +13,7 @@ A clear and concise description of the feature you'd like to see.
 ## Problem / Motivation
 
 What problem does this solve? What user need does it address?
-*e.g. "As a BreakFree user, I find it difficult to track my progress because..."*
+_e.g. "As a BreakFree user, I find it difficult to track my progress because..."_
 
 ## Proposed Solution
 

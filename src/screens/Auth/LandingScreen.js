@@ -1,12 +1,5 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  ScrollView,
-  TouchableOpacity,
-  StyleSheet,
-  SafeAreaView,
-} from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, SafeAreaView } from 'react-native';
 import BreakFreeLogo from '../../components/branding/BreakFreeLogo';
 import Button from '../../components/common/Button';
 import { colors } from '../../constants/designTokens';
@@ -161,11 +154,13 @@ export default function LandingScreen({ navigation }) {
         <View style={styles.sectionPadded}>
           <Text style={styles.sectionTitle}>Aktiviteler</Text>
           <View style={styles.activitiesGrid}>
-            {['🧘 Yoga', '🏃 Koşu', '🧠 Meditasyon', '💪 Güç', '🤸 Esneklik', '✨ Wellness'].map((activity) => (
-              <View key={activity} style={styles.activityCard}>
-                <Text style={styles.activityText}>{activity}</Text>
-              </View>
-            ))}
+            {['🧘 Yoga', '🏃 Koşu', '🧠 Meditasyon', '💪 Güç', '🤸 Esneklik', '✨ Wellness'].map(
+              (activity) => (
+                <View key={activity} style={styles.activityCard}>
+                  <Text style={styles.activityText}>{activity}</Text>
+                </View>
+              )
+            )}
           </View>
         </View>
 
@@ -191,9 +186,7 @@ export default function LandingScreen({ navigation }) {
         {/* Social Contact Section */}
         <View style={styles.contactSection}>
           <Text style={styles.footerTitle}>Bize Ulaşın</Text>
-          <Text style={styles.footerDesc}>
-            Sorularınız var mı? Sosyal medyada bize takip edin
-          </Text>
+          <Text style={styles.footerDesc}>Sorularınız var mı? Sosyal medyada bize takip edin</Text>
 
           <View style={styles.socialButtons}>
             <TouchableOpacity

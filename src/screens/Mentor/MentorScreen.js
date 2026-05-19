@@ -1,12 +1,5 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  ScrollView,
-  TouchableOpacity,
-  StyleSheet,
-  SafeAreaView,
-} from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, SafeAreaView } from 'react-native';
 import Card from '../../components/common/Card';
 import { colors } from '../../constants/designTokens';
 
@@ -90,7 +83,8 @@ export default function MentorScreen() {
             </View>
             <View style={styles.messageContent}>
               <Text style={styles.messageText}>
-                Elif, bu haftaki ilerlemen harika 🌟 Pazartesi seansımızda uyku verilerine birlikte bakalım.
+                Elif, bu haftaki ilerlemen harika 🌟 Pazartesi seansımızda uyku verilerine birlikte
+                bakalım.
               </Text>
             </View>
           </View>
@@ -164,7 +158,13 @@ const styles = StyleSheet.create({
     borderColor: colors.bgPrimary,
   },
   mentorInfo: { flex: 1, justifyContent: 'flex-end', paddingBottom: 4 },
-  mentorLabel: { fontSize: 10, color: 'rgba(255,255,255,0.5)', fontWeight: '600', letterSpacing: 0.5, marginBottom: 2 },
+  mentorLabel: {
+    fontSize: 10,
+    color: 'rgba(255,255,255,0.5)',
+    fontWeight: '600',
+    letterSpacing: 0.5,
+    marginBottom: 2,
+  },
   mentorName: { fontSize: 16, fontWeight: '500', color: colors.textPrimary, marginBottom: 2 },
   mentorRole: { fontSize: 10, color: 'rgba(255,255,255,0.6)' },
   quickActions: {
@@ -197,7 +197,13 @@ const styles = StyleSheet.create({
   },
   focusHeader: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   focusIcon: { fontSize: 14 },
-  focusTitle: { fontSize: 10, fontWeight: '600', color: colors.gold, letterSpacing: 0.5, textTransform: 'uppercase' },
+  focusTitle: {
+    fontSize: 10,
+    fontWeight: '600',
+    color: colors.gold,
+    letterSpacing: 0.5,
+    textTransform: 'uppercase',
+  },
   focusGoal: { fontSize: 14, fontWeight: '500', color: colors.textPrimary, lineHeight: 19 },
   focusHighlight: { color: colors.gold, fontStyle: 'italic' },
   goalsList: { gap: 8 },
@@ -222,7 +228,13 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   messageHeader: { flexDirection: 'row', justifyContent: 'space-between' },
-  messageLabel: { fontSize: 10, color: 'rgba(255,255,255,0.3)', fontWeight: '600', textTransform: 'uppercase', letterSpacing: 0.3 },
+  messageLabel: {
+    fontSize: 10,
+    color: 'rgba(255,255,255,0.3)',
+    fontWeight: '600',
+    textTransform: 'uppercase',
+    letterSpacing: 0.3,
+  },
   messageTime: { fontSize: 9, color: 'rgba(255,255,255,0.3)' },
   messageBubble: { flexDirection: 'row', gap: 8, marginTop: 4 },
   senderAvatar: {

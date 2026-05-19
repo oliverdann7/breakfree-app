@@ -28,6 +28,7 @@ All known problems and planned features must be tracked in
 Before opening a new issue, search existing ones to avoid duplicates.
 
 Use the GitHub templates (automatically shown when you open an issue):
+
 - **Bug Report** — for unexpected behaviour, crashes, or visual defects
 - **Feature Request** — for new functionality or improvements
 
@@ -41,6 +42,7 @@ The raw templates also live in
 A clear description of the bug.
 
 **Steps to Reproduce**
+
 1. Go to '...'
 2. Tap on '...'
 3. See error
@@ -52,6 +54,7 @@ What you expected to happen.
 What actually happened.
 
 **Environment**
+
 - Platform: iOS / Android / Web
 - OS Version: e.g. iOS 17.4
 - App Version: e.g. 1.0.0
@@ -59,7 +62,9 @@ What actually happened.
 
 **Logs / Error Output**
 ```
+
 Paste console logs here
+
 ```
 
 **Screenshots**
@@ -79,6 +84,7 @@ What user problem does this solve?
 How it should work.
 
 **Acceptance Criteria**
+
 - [ ] Criterion 1
 - [ ] Criterion 2
 
@@ -93,15 +99,15 @@ Wireframes or links to examples.
 All work happens on short-lived feature branches off `main`. Name branches using
 a **type prefix** followed by a brief kebab-case description:
 
-| Prefix | Use for |
-|--------|---------|
-| `feat/` | New features |
-| `fix/` | Bug fixes |
-| `docs/` | Documentation only |
-| `refactor/` | Code restructuring (no behaviour change) |
-| `test/` | Adding or fixing tests |
-| `chore/` | Dependency updates, build config, tooling |
-| `hotfix/` | Critical production fixes that need fast-track review |
+| Prefix      | Use for                                               |
+| ----------- | ----------------------------------------------------- |
+| `feat/`     | New features                                          |
+| `fix/`      | Bug fixes                                             |
+| `docs/`     | Documentation only                                    |
+| `refactor/` | Code restructuring (no behaviour change)              |
+| `test/`     | Adding or fixing tests                                |
+| `chore/`    | Dependency updates, build config, tooling             |
+| `hotfix/`   | Critical production fixes that need fast-track review |
 
 **Examples:**
 
@@ -113,6 +119,7 @@ git checkout -b chore/upgrade-expo-51
 ```
 
 **Rules:**
+
 - Use kebab-case only (no underscores, no capitals)
 - Keep descriptions short (2–4 words)
 - Include the issue number when applicable: `fix/123-login-crash`
@@ -137,17 +144,17 @@ This enables automatic changelogs and makes `git log` useful.
 
 ### Types
 
-| Type | When to use |
-|------|-------------|
-| `feat` | New feature visible to users |
-| `fix` | Bug fix |
-| `docs` | Documentation changes only |
-| `style` | Formatting, whitespace — no logic change |
-| `refactor` | Code restructuring, no behaviour change |
-| `test` | Adding or updating tests |
-| `chore` | Build process, dependencies, tooling |
-| `perf` | Performance improvement |
-| `ci` | CI/CD configuration changes |
+| Type       | When to use                              |
+| ---------- | ---------------------------------------- |
+| `feat`     | New feature visible to users             |
+| `fix`      | Bug fix                                  |
+| `docs`     | Documentation changes only               |
+| `style`    | Formatting, whitespace — no logic change |
+| `refactor` | Code restructuring, no behaviour change  |
+| `test`     | Adding or updating tests                 |
+| `chore`    | Build process, dependencies, tooling     |
+| `perf`     | Performance improvement                  |
+| `ci`       | CI/CD configuration changes              |
 
 ### Scopes (optional but encouraged)
 
@@ -158,7 +165,7 @@ This enables automatic changelogs and makes `git log` useful.
 
 - Subject line is **imperative mood**, max 72 chars: `add`, `fix`, `update` — not `added`, `fixed`
 - No period at the end of the subject line
-- Body explains *why*, not *what*
+- Body explains _why_, not _what_
 - Reference issues in the footer: `Closes #42`
 
 ### Examples
@@ -181,6 +188,7 @@ Closes #87
 ## Pull Request Workflow
 
 1. **Create a branch** from the latest `main`:
+
    ```bash
    git fetch origin
    git checkout -b feat/your-feature origin/main
@@ -189,15 +197,18 @@ Closes #87
 2. **Make focused commits** — each commit should be a logical unit of work.
 
 3. **Run checks locally** before pushing:
+
    ```bash
    npm run lint:fix        # ESLint auto-fix
    npm run format          # Prettier
    npx tsc --noEmit        # TypeScript type check
    npm test                # Full test suite
    ```
+
    The pre-commit hook runs these automatically on staged files.
 
 4. **Push and open a PR** against `main`:
+
    ```bash
    git push -u origin feat/your-feature
    gh pr create --fill
@@ -218,14 +229,14 @@ Closes #87
 
 Branch protection on `main` enforces:
 
-| Requirement | Setting |
-|-------------|---------|
-| Required reviewers | **1 approval** minimum |
-| Dismiss stale reviews | Yes — new commits invalidate old approvals |
-| Required CI checks | `lint`, `type-check`, `test` (all must pass) |
-| Up-to-date branch | PR must be current with `main` before merge |
-| Direct push to `main` | **Blocked** — PRs only |
-| Force push to `main` | **Blocked** |
+| Requirement           | Setting                                      |
+| --------------------- | -------------------------------------------- |
+| Required reviewers    | **1 approval** minimum                       |
+| Dismiss stale reviews | Yes — new commits invalidate old approvals   |
+| Required CI checks    | `lint`, `type-check`, `test` (all must pass) |
+| Up-to-date branch     | PR must be current with `main` before merge  |
+| Direct push to `main` | **Blocked** — PRs only                       |
+| Force push to `main`  | **Blocked**                                  |
 
 ### Reviewer guidelines
 
@@ -280,6 +291,7 @@ git push --force-with-lease origin feat/your-feature
 ### When to use `merge` instead of `rebase`
 
 Use `git merge origin/main` (not rebase) if:
+
 - You're on a **long-lived branch** shared with others
 - You've already had your PR reviewed and don't want to invalidate approvals
 
@@ -288,12 +300,12 @@ the diff.
 
 ### Common conflict scenarios
 
-| Scenario | Resolution |
-|----------|-----------|
-| Same line edited differently | Manually combine the intent of both changes |
-| One branch deleted a file, other edited it | Decide if the deletion or edit should win; communicate in the PR |
-| `package-lock.json` conflict | Accept one side, then run `npm install --legacy-peer-deps` to regenerate |
-| Import order conflicts | Run `npm run format` after resolving to let Prettier normalise |
+| Scenario                                   | Resolution                                                               |
+| ------------------------------------------ | ------------------------------------------------------------------------ |
+| Same line edited differently               | Manually combine the intent of both changes                              |
+| One branch deleted a file, other edited it | Decide if the deletion or edit should win; communicate in the PR         |
+| `package-lock.json` conflict               | Accept one side, then run `npm install --legacy-peer-deps` to regenerate |
+| Import order conflicts                     | Run `npm run format` after resolving to let Prettier normalise           |
 
 ### Preventing conflicts
 
@@ -313,11 +325,11 @@ before they reach CI.
 
 ### What runs on every commit
 
-| Check | Scope | Tool |
-|-------|-------|------|
-| ESLint (auto-fix) | Staged `.js`, `.jsx`, `.ts`, `.tsx` files | `eslint --fix` |
-| Prettier | Staged `.js`, `.jsx`, `.ts`, `.tsx`, `.json` | `prettier --write` |
-| TypeScript | Whole project | `tsc --noEmit` |
+| Check             | Scope                                        | Tool               |
+| ----------------- | -------------------------------------------- | ------------------ |
+| ESLint (auto-fix) | Staged `.js`, `.jsx`, `.ts`, `.tsx` files    | `eslint --fix`     |
+| Prettier          | Staged `.js`, `.jsx`, `.ts`, `.tsx`, `.json` | `prettier --write` |
+| TypeScript        | Whole project                                | `tsc --noEmit`     |
 
 ### Installing the hooks
 
@@ -346,11 +358,11 @@ Never skip hooks on a commit intended for PR review.
 
 ### Troubleshooting
 
-| Problem | Fix |
-|---------|-----|
-| `husky: command not found` | Run `npm install --legacy-peer-deps` |
-| Hook not running | Run `npm run setup:hooks` to re-initialise |
-| `tsc` fails on unrelated files | Check `tsconfig.json` `include`/`exclude` paths |
+| Problem                          | Fix                                                                         |
+| -------------------------------- | --------------------------------------------------------------------------- |
+| `husky: command not found`       | Run `npm install --legacy-peer-deps`                                        |
+| Hook not running                 | Run `npm run setup:hooks` to re-initialise                                  |
+| `tsc` fails on unrelated files   | Check `tsconfig.json` `include`/`exclude` paths                             |
 | `lint-staged` changes not staged | Husky auto-stages Prettier/ESLint fixes — review the diff before committing |
 
 ---
@@ -373,13 +385,13 @@ Never skip hooks on a commit intended for PR review.
 
 ### Naming
 
-| Entity | Convention | Example |
-|--------|------------|---------|
-| Components | PascalCase | `UserProfile.tsx` |
-| Functions / variables | camelCase | `getUserData()` |
-| Constants | UPPER_SNAKE_CASE | `MAX_RETRY_COUNT` |
-| Files (non-component) | camelCase | `authService.ts` |
-| Directories | camelCase | `src/hooks/` |
+| Entity                | Convention       | Example           |
+| --------------------- | ---------------- | ----------------- |
+| Components            | PascalCase       | `UserProfile.tsx` |
+| Functions / variables | camelCase        | `getUserData()`   |
+| Constants             | UPPER_SNAKE_CASE | `MAX_RETRY_COUNT` |
+| Files (non-component) | camelCase        | `authService.ts`  |
+| Directories           | camelCase        | `src/hooks/`      |
 
 ### General
 
@@ -398,8 +410,8 @@ linked issues when the PR merges.
 
 ```markdown
 Closes #42
-Fixes #42     # same effect
-Refs #42      # references without closing
+Fixes #42 # same effect
+Refs #42 # references without closing
 ```
 
 Multiple issues:
