@@ -1,109 +1,289 @@
 import React, { useState } from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, SafeAreaView } from 'react-native';
+import {
+  View,
+  Text,
+  FlatList,
+  TouchableOpacity,
+  StyleSheet,
+  SafeAreaView,
+  Modal,
+  TextInput,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+} from 'react-native';
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
+import { updateProfile } from '../../store/slices/userSlice';
 import Card from '../../components/common/Card';
 import { colors } from '../../constants/designTokens';
+
+const AVATAR_EMOJIS = ['🧘', '🏃', '💪', '🌿', '🎯', '⭐', '🔥', '🏆', '🌸', '🦋', '💫', '🎗'];
+const AVATAR_COLORS = [
+  colors.royal,
+  colors.cyan,
+  colors.gold,
+  '#8B5CF6',
+  '#EF4444',
+  '#10B981',
+  '#F59E0B',
+  '#EC4899',
+];
 
 const MOCK_POSTS = [
   {
     postId: 'p1',
-    userId: 'u1',
-    userName: 'Burak Yılmaz',
-    avatar: 'B',
-    text: "Sabah 06:30'da 10K koşuyu bitirdim! Haftaya yarışmaya hazırım 💪🏃",
-    stats: { distance: '10.2 km', duration: '48:32', avgHeartRate: 142 },
+    author: 'Burak Yılmaz',
+    emoji: '🏃',
+    bg: colors.royal,
+    text: "Sabah 06:30'da 10K koşuyu bitirdim! Haftaya yarışmaya hazırım 💪",
+    sharedStats: { wellness: 88, steps: 14200, sleep: 7.5 },
     likes: 47,
-    comments: 12,
     liked: false,
+    comments: [
+      {
+        id: 'c1',
+        author: 'Elif Kaya',
+        emoji: '🌸',
+        bg: colors.gold,
+        text: 'Harika Burak! 🌅',
+        time: '1 saat önce',
+      },
+    ],
     time: '2 saat önce',
   },
   {
     postId: 'p2',
-    userId: 'u2',
-    userName: 'Elif Kaya',
-    avatar: 'E',
-    text: "Dr. Ayşe'nin anksiyete talk'ı muhteşemdi. Günlük farkındalık egzersizlerini hayatıma katmaya başladım 🧘‍♀️",
-    stats: null,
+    author: 'Elif Kaya',
+    emoji: '🌸',
+    bg: colors.gold,
+    text: "Dr. Ayşe'nin anksiyete talk'ı muhteşemdi. Farkındalık egzersizleri hayatıma girdi 🧘‍♀️",
+    sharedStats: null,
     likes: 32,
-    comments: 8,
     liked: true,
+    comments: [],
     time: '4 saat önce',
   },
   {
     postId: 'p3',
-    userId: 'u3',
-    userName: 'Mert Arslan',
-    avatar: 'M',
-    text: '30 günlük beslenme meydan okuması tamamlandı! -4 kg ve çok daha enerjik hissediyorum 🎯',
-    stats: null,
+    author: 'Mert Arslan',
+    emoji: '🏆',
+    bg: '#F59E0B',
+    text: '30 günlük beslenme meydan okuması tamamlandı! -4 kg 🎯',
+    sharedStats: { wellness: 92, steps: 10100, sleep: 8.2 },
     likes: 89,
-    comments: 24,
     liked: false,
+    comments: [],
     time: '1 gün önce',
+  },
+  {
+    postId: 'p4',
+    author: 'Zeynep Öz',
+    emoji: '🌿',
+    bg: '#10B981',
+    text: "Uyku takibini başlattım — 3 haftada 6.2s'den 7.6 saate çıktım 🌙",
+    sharedStats: { wellness: 78, steps: 7800, sleep: 7.6 },
+    likes: 61,
+    liked: false,
+    comments: [
+      {
+        id: 'c4',
+        author: 'Burak Yılmaz',
+        emoji: '🏃',
+        bg: colors.royal,
+        text: 'Harika ilerleme! 🙌',
+        time: '20 saat önce',
+      },
+    ],
+    time: '2 gün önce',
   },
 ];
 
-const MOCK_EVENT = {
-  title: 'Belgrad Ormanı Şafak Yürüyüşü',
-  date: '25 Mayıs, Cumartesi 06:30',
-  location: 'Belgrad Ormanı, İstanbul',
-  rsvpCount: 24,
-};
+function Avatar({ emoji, bg, size = 40 }) {
+  return (
+    <View
+      style={[
+        styles.avatar,
+        { width: size, height: size, borderRadius: size / 2, backgroundColor: bg },
+      ]}
+    >
+      <Text style={{ fontSize: size * 0.44 }}>{emoji}</Text>
+    </View>
+  );
+}
 
-function PostCard({ post, onLike }) {
+function StatsRow({ stats }) {
+  return (
+    <View style={styles.statsRow}>
+      {[
+        { icon: '⭐', label: 'Wellness', value: stats.wellness },
+        { icon: '👟', label: 'Adım', value: `${(stats.steps / 1000).toFixed(1)}k` },
+        { icon: '😴', label: 'Uyku', value: `${stats.sleep}s` },
+      ].map((s, i) => (
+        <React.Fragment key={s.label}>
+          {i > 0 && <View style={styles.statsDivider} />}
+          <View style={styles.statItem}>
+            <Text style={styles.statIcon}>{s.icon}</Text>
+            <Text style={styles.statValue}>{s.value}</Text>
+            <Text style={styles.statLabel}>{s.label}</Text>
+          </View>
+        </React.Fragment>
+      ))}
+    </View>
+  );
+}
+
+function PostCard({ post, onLike, myProfile }) {
+  const [expanded, setExpanded] = useState(false);
+  const [commentText, setCommentText] = useState('');
+  const [comments, setComments] = useState(post.comments);
+
+  const submitComment = () => {
+    if (!commentText.trim()) return;
+    setComments((prev) => [
+      ...prev,
+      {
+        id: Date.now().toString(),
+        author: myProfile.nickname,
+        emoji: myProfile.emoji,
+        bg: myProfile.bg,
+        text: commentText.trim(),
+        time: 'şimdi',
+      },
+    ]);
+    setCommentText('');
+  };
+
   return (
     <Card style={styles.postCard}>
       <View style={styles.postHeader}>
-        <View style={styles.avatarCircle}>
-          <Text style={styles.avatarText}>{post.avatar}</Text>
-        </View>
+        <Avatar emoji={post.emoji} bg={post.bg} size={40} />
         <View style={styles.postMeta}>
-          <Text style={styles.postAuthor}>{post.userName}</Text>
+          <Text style={styles.postAuthor}>{post.author}</Text>
           <Text style={styles.postTime}>{post.time}</Text>
         </View>
       </View>
 
       <Text style={styles.postText}>{post.text}</Text>
 
-      {post.stats && (
-        <View style={styles.statsRow}>
-          <View style={styles.statItem}>
-            <Text style={styles.statValue}>{post.stats.distance}</Text>
-            <Text style={styles.statLabel}>Mesafe</Text>
-          </View>
-          <View style={styles.statDivider} />
-          <View style={styles.statItem}>
-            <Text style={styles.statValue}>{post.stats.duration}</Text>
-            <Text style={styles.statLabel}>Süre</Text>
-          </View>
-          <View style={styles.statDivider} />
-          <View style={styles.statItem}>
-            <Text style={styles.statValue}>{post.stats.avgHeartRate}</Text>
-            <Text style={styles.statLabel}>Ort. BPM</Text>
-          </View>
-        </View>
-      )}
+      {post.sharedStats && <StatsRow stats={post.sharedStats} />}
 
       <View style={styles.postActions}>
         <TouchableOpacity style={styles.actionBtn} onPress={onLike}>
           <Text style={styles.actionIcon}>{post.liked ? '❤️' : '🤍'}</Text>
-          <Text style={styles.actionCount}>{post.likes}</Text>
+          <Text style={[styles.actionCount, post.liked && { color: colors.gold }]}>
+            {post.likes}
+          </Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.actionBtn}>
+        <TouchableOpacity style={styles.actionBtn} onPress={() => setExpanded((e) => !e)}>
           <Text style={styles.actionIcon}>💬</Text>
-          <Text style={styles.actionCount}>{post.comments}</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.actionBtn}>
-          <Text style={styles.actionIcon}>📤</Text>
+          <Text style={[styles.actionCount, expanded && { color: colors.cyan }]}>
+            {comments.length} {expanded ? '▲' : '▼'}
+          </Text>
         </TouchableOpacity>
       </View>
+
+      {expanded && (
+        <View style={styles.commentsSection}>
+          {comments.map((c) => (
+            <View key={c.id} style={styles.commentRow}>
+              <Avatar emoji={c.emoji} bg={c.bg} size={28} />
+              <View style={styles.commentBubble}>
+                <Text style={styles.commentAuthor}>{c.author}</Text>
+                <Text style={styles.commentText}>{c.text}</Text>
+                <Text style={styles.commentTime}>{c.time}</Text>
+              </View>
+            </View>
+          ))}
+          <View style={styles.commentInput}>
+            <Avatar emoji={myProfile.emoji} bg={myProfile.bg} size={28} />
+            <TextInput
+              style={styles.commentField}
+              placeholder="Yorum yaz..."
+              placeholderTextColor="rgba(255,255,255,0.3)"
+              value={commentText}
+              onChangeText={setCommentText}
+              onSubmitEditing={submitComment}
+              returnKeyType="send"
+            />
+            <TouchableOpacity onPress={submitComment} style={styles.commentSend}>
+              <Text style={styles.commentSendText}>→</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      )}
     </Card>
   );
 }
 
 export default function CommunityScreen() {
+  const dispatch = useAppDispatch();
+  const { user } = useAppSelector((state) => state.auth);
+  const { profile: reduxProfile } = useAppSelector((state) => state.user);
+  const { dailyMetrics, wellnessScore } = useAppSelector((state) => state.metrics);
+
+  const initProfile = {
+    nickname: reduxProfile?.nickname || user?.displayName || 'Demo Kullanıcı',
+    bio: reduxProfile?.bio || 'Wellness enthusiast from Istanbul 🌿',
+    emoji: reduxProfile?.avatarEmoji || '🧘',
+    bg: reduxProfile?.avatarBg || colors.royal,
+  };
+
+  const [myProfile, setMyProfile] = useState(initProfile);
   const [posts, setPosts] = useState(MOCK_POSTS);
 
-  const handleLike = (postId) => {
+  // Profile edit modal
+  const [profileVisible, setProfileVisible] = useState(false);
+  const [draft, setDraft] = useState(initProfile);
+
+  // Post create modal
+  const [postVisible, setPostVisible] = useState(false);
+  const [postText, setPostText] = useState('');
+  const [shareStats, setShareStats] = useState(false);
+
+  const openProfileEdit = () => {
+    setDraft({ ...myProfile });
+    setProfileVisible(true);
+  };
+  const saveProfile = () => {
+    setMyProfile(draft);
+    setProfileVisible(false);
+    dispatch(
+      updateProfile({
+        nickname: draft.nickname,
+        bio: draft.bio,
+        avatarEmoji: draft.emoji,
+        avatarBg: draft.bg,
+      })
+    );
+  };
+
+  const submitPost = () => {
+    if (!postText.trim()) return;
+    const dm = dailyMetrics;
+    setPosts((prev) => [
+      {
+        postId: Date.now().toString(),
+        author: myProfile.nickname,
+        emoji: myProfile.emoji,
+        bg: myProfile.bg,
+        text: postText.trim(),
+        sharedStats:
+          shareStats && dm
+            ? { wellness: wellnessScore, steps: dm.steps, sleep: dm.sleep.hours }
+            : null,
+        likes: 0,
+        liked: false,
+        comments: [],
+        time: 'şimdi',
+      },
+      ...prev,
+    ]);
+    setPostText('');
+    setShareStats(false);
+    setPostVisible(false);
+  };
+
+  const toggleLike = (postId) =>
     setPosts((prev) =>
       prev.map((p) =>
         p.postId === postId
@@ -111,61 +291,54 @@ export default function CommunityScreen() {
           : p
       )
     );
-  };
 
   const ListHeader = () => (
     <>
+      {/* My profile banner */}
+      <TouchableOpacity style={styles.profileBanner} onPress={openProfileEdit} activeOpacity={0.85}>
+        <View
+          style={[
+            styles.profileAvatarLg,
+            { backgroundColor: myProfile.bg, shadowColor: myProfile.bg },
+          ]}
+        >
+          <Text style={styles.profileAvatarEmoji}>{myProfile.emoji}</Text>
+        </View>
+        <View style={styles.profileInfo}>
+          <Text style={styles.profileName}>{myProfile.nickname}</Text>
+          <Text style={styles.profileBio} numberOfLines={2}>
+            {myProfile.bio}
+          </Text>
+          <View style={styles.profileStats}>
+            {[
+              { label: 'Wellness', value: wellnessScore || '—', color: colors.cyan },
+              { label: 'Seri', value: '47g', color: colors.gold },
+              { label: 'Talk', value: '12', color: colors.cyan },
+            ].map((s) => (
+              <View key={s.label} style={styles.profileStat}>
+                <Text style={[styles.profileStatVal, { color: s.color }]}>{s.value}</Text>
+                <Text style={styles.profileStatLabel}>{s.label}</Text>
+              </View>
+            ))}
+          </View>
+        </View>
+        <Text style={styles.editChevron}>✎</Text>
+      </TouchableOpacity>
+
+      {/* Header row */}
       <View style={styles.header}>
         <View>
           <Text style={styles.title}>Topluluk</Text>
           <Text style={styles.subtitle}>
-            akışı <Text style={styles.subtitleAccent}>·</Text>
+            akışı <Text style={{ color: colors.gold }}>·</Text> 1,847 üye
           </Text>
         </View>
-        <TouchableOpacity style={styles.createBtn}>
+        <TouchableOpacity style={styles.createBtn} onPress={() => setPostVisible(true)}>
           <Text style={styles.createBtnText}>+ Paylaş</Text>
         </TouchableOpacity>
       </View>
 
-      {/* Story-like avatars */}
-      <View style={styles.avatarRow}>
-        <View style={styles.addStory}>
-          <Text style={styles.addStoryIcon}>+</Text>
-          <Text style={styles.addStoryLabel}>Sen</Text>
-        </View>
-        {[
-          { initial: 'B', name: 'Burak', color: colors.gold },
-          { initial: 'S', name: 'Selin', color: colors.cyan },
-          { initial: 'C', name: 'Can', color: colors.royal },
-          { initial: 'A', name: 'Aslı', color: colors.gold },
-          { initial: 'M', name: 'Mert', color: colors.cyan },
-        ].map((person, i) => (
-          <View key={i} style={[styles.avatarCircleStory, { backgroundColor: person.color }]}>
-            <Text style={styles.avatarInitial}>{person.initial}</Text>
-            <Text style={styles.avatarName}>{person.name}</Text>
-          </View>
-        ))}
-      </View>
-
-      {/* Event Banner */}
-      <Card style={styles.eventBanner} variant="elevated">
-        <View style={styles.eventBannerRow}>
-          <Text style={styles.eventEmoji}>🌅</Text>
-          <View style={styles.eventInfo}>
-            <Text style={styles.eventTitle}>{MOCK_EVENT.title}</Text>
-            <Text style={styles.eventDate}>{MOCK_EVENT.date}</Text>
-            <Text style={styles.eventLocation}>📍 {MOCK_EVENT.location}</Text>
-          </View>
-        </View>
-        <View style={styles.eventFooter}>
-          <Text style={styles.rsvpCount}>👥 {MOCK_EVENT.rsvpCount} kişi katılıyor</Text>
-          <TouchableOpacity style={styles.rsvpBtn}>
-            <Text style={styles.rsvpBtnText}>Katıl</Text>
-          </TouchableOpacity>
-        </View>
-      </Card>
-
-      {/* Weekly Challenge */}
+      {/* Weekly challenge */}
       <Card style={styles.challengeCard}>
         <View style={styles.challengeHeader}>
           <Text style={styles.challengeTitle}>🏆 Haftalık Meydan Okuma</Text>
@@ -175,7 +348,7 @@ export default function CommunityScreen() {
         <View style={styles.challengeBar}>
           <View style={[styles.challengeFill, { width: '57%' }]} />
         </View>
-        <Text style={styles.challengeProgress}>4/7 gün tamamlandı</Text>
+        <Text style={styles.challengeProgress}>4/7 gün · 234 katılımcı</Text>
       </Card>
 
       <Text style={styles.feedTitle}>Son Paylaşımlar</Text>
@@ -187,101 +360,239 @@ export default function CommunityScreen() {
       <FlatList
         data={posts}
         keyExtractor={(item) => item.postId}
-        contentContainerStyle={{ paddingBottom: 24 }}
+        contentContainerStyle={{ paddingBottom: 32 }}
         showsVerticalScrollIndicator={false}
         ListHeaderComponent={<ListHeader />}
-        renderItem={({ item }) => <PostCard post={item} onLike={() => handleLike(item.postId)} />}
+        renderItem={({ item }) => (
+          <PostCard post={item} myProfile={myProfile} onLike={() => toggleLike(item.postId)} />
+        )}
       />
+
+      {/* ── Profile Edit Modal ── */}
+      <Modal visible={profileVisible} animationType="slide" transparent>
+        <View style={styles.modalOverlay}>
+          <KeyboardAvoidingView
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            style={styles.modalSheet}
+          >
+            <View style={styles.modalHandle} />
+            <ScrollView showsVerticalScrollIndicator={false}>
+              <Text style={styles.modalTitle}>Profili Düzenle</Text>
+
+              {/* Preview */}
+              <View style={styles.previewRow}>
+                <View style={[styles.previewAvatar, { backgroundColor: draft.bg }]}>
+                  <Text style={styles.previewEmoji}>{draft.emoji}</Text>
+                </View>
+                <View>
+                  <Text style={styles.previewName}>{draft.nickname || 'Kullanıcı adın'}</Text>
+                  <Text style={styles.previewHint}>Önizleme</Text>
+                </View>
+              </View>
+
+              {/* Emoji picker */}
+              <Text style={styles.pickerLabel}>Emoji</Text>
+              <View style={styles.emojiGrid}>
+                {AVATAR_EMOJIS.map((em) => (
+                  <TouchableOpacity
+                    key={em}
+                    style={[
+                      styles.emojiBtn,
+                      draft.emoji === em && {
+                        borderColor: colors.cyan,
+                        backgroundColor: 'rgba(20,184,212,0.15)',
+                      },
+                    ]}
+                    onPress={() => setDraft((d) => ({ ...d, emoji: em }))}
+                  >
+                    <Text style={styles.emojiBtnText}>{em}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+
+              {/* Color picker */}
+              <Text style={styles.pickerLabel}>Renk</Text>
+              <View style={styles.colorRow}>
+                {AVATAR_COLORS.map((color) => (
+                  <TouchableOpacity
+                    key={color}
+                    style={[
+                      styles.colorDot,
+                      { backgroundColor: color },
+                      draft.bg === color && styles.colorDotSelected,
+                    ]}
+                    onPress={() => setDraft((d) => ({ ...d, bg: color }))}
+                  />
+                ))}
+              </View>
+
+              {/* Nickname */}
+              <Text style={styles.pickerLabel}>Kullanıcı adı</Text>
+              <TextInput
+                style={styles.textField}
+                value={draft.nickname}
+                onChangeText={(v) => setDraft((d) => ({ ...d, nickname: v }))}
+                placeholder="Kullanıcı adın..."
+                placeholderTextColor="rgba(255,255,255,0.3)"
+              />
+
+              {/* Bio */}
+              <Text style={styles.pickerLabel}>Bio</Text>
+              <TextInput
+                style={[styles.textField, { height: 80 }]}
+                value={draft.bio}
+                onChangeText={(v) => setDraft((d) => ({ ...d, bio: v }))}
+                placeholder="Kendini tanıt..."
+                placeholderTextColor="rgba(255,255,255,0.3)"
+                multiline
+                textAlignVertical="top"
+              />
+
+              <View style={styles.modalActions}>
+                <TouchableOpacity style={styles.saveBtn} onPress={saveProfile}>
+                  <Text style={styles.saveBtnText}>Kaydet</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.cancelBtn} onPress={() => setProfileVisible(false)}>
+                  <Text style={styles.cancelBtnText}>İptal</Text>
+                </TouchableOpacity>
+              </View>
+              <View style={{ height: 24 }} />
+            </ScrollView>
+          </KeyboardAvoidingView>
+        </View>
+      </Modal>
+
+      {/* ── New Post Modal ── */}
+      <Modal visible={postVisible} animationType="slide" transparent>
+        <View style={styles.modalOverlay}>
+          <KeyboardAvoidingView
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            style={styles.modalSheet}
+          >
+            <View style={styles.modalHandle} />
+            <Text style={styles.modalTitle}>Paylaş</Text>
+
+            <View style={styles.composerRow}>
+              <Avatar emoji={myProfile.emoji} bg={myProfile.bg} size={40} />
+              <TextInput
+                style={[styles.textField, { flex: 1, marginBottom: 0 }]}
+                value={postText}
+                onChangeText={setPostText}
+                placeholder="Bir şeyler paylaş..."
+                placeholderTextColor="rgba(255,255,255,0.3)"
+                multiline
+                autoFocus
+              />
+            </View>
+
+            {/* Share stats toggle */}
+            <TouchableOpacity
+              style={[styles.statsToggle, shareStats && styles.statsToggleOn]}
+              onPress={() => setShareStats((s) => !s)}
+            >
+              <View style={[styles.toggleCheck, shareStats && styles.toggleCheckOn]}>
+                {shareStats && <Text style={styles.toggleCheckMark}>✓</Text>}
+              </View>
+              <Text style={[styles.statsToggleText, shareStats && { color: colors.gold }]}>
+                Wellness istatistiklerimi paylaş
+              </Text>
+            </TouchableOpacity>
+
+            {shareStats && dailyMetrics && (
+              <StatsRow
+                stats={{
+                  wellness: wellnessScore,
+                  steps: dailyMetrics.steps,
+                  sleep: dailyMetrics.sleep.hours,
+                }}
+              />
+            )}
+
+            <View style={styles.modalActions}>
+              <TouchableOpacity
+                style={[styles.saveBtn, !postText.trim() && { opacity: 0.4 }]}
+                onPress={submitPost}
+                disabled={!postText.trim()}
+              >
+                <Text style={styles.saveBtnText}>Paylaş</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.cancelBtn}
+                onPress={() => {
+                  setPostVisible(false);
+                  setPostText('');
+                  setShareStats(false);
+                }}
+              >
+                <Text style={styles.cancelBtnText}>İptal</Text>
+              </TouchableOpacity>
+            </View>
+            <View style={{ height: 24 }} />
+          </KeyboardAvoidingView>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.bgPrimary },
+
+  // Profile banner
+  profileBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    margin: 16,
+    padding: 16,
+    borderRadius: 16,
+    backgroundColor: 'rgba(255,255,255,0.04)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.08)',
+    gap: 14,
+  },
+  profileAvatarLg: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: colors.gold,
+    shadowOpacity: 0.4,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 0 },
+  },
+  profileAvatarEmoji: { fontSize: 26 },
+  profileInfo: { flex: 1, gap: 4 },
+  profileName: { fontSize: 15, fontWeight: '700', color: colors.textPrimary },
+  profileBio: { fontSize: 11, color: colors.textSecondary, lineHeight: 16 },
+  profileStats: { flexDirection: 'row', gap: 16, marginTop: 6 },
+  profileStat: { alignItems: 'center' },
+  profileStatVal: { fontSize: 14, fontWeight: '700' },
+  profileStatLabel: { fontSize: 9, color: colors.textTertiary, fontWeight: '600' },
+  editChevron: { fontSize: 16, color: colors.textTertiary },
+
+  // Header
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingTop: 16,
+    paddingHorizontal: 16,
     paddingBottom: 12,
   },
-  title: { fontSize: 24, fontWeight: '700', color: colors.textPrimary },
-  subtitle: { fontSize: 11, fontWeight: '300', color: 'rgba(255,255,255,0.4)', marginTop: 2 },
-  subtitleAccent: { color: colors.gold },
+  title: { fontSize: 22, fontWeight: '700', color: colors.textPrimary },
+  subtitle: { fontSize: 11, color: 'rgba(255,255,255,0.4)', marginTop: 2 },
   createBtn: {
     paddingHorizontal: 14,
-    paddingVertical: 6,
+    paddingVertical: 7,
     backgroundColor: colors.cyan,
     borderRadius: 999,
   },
   createBtnText: { color: colors.navy, fontSize: 13, fontWeight: '600' },
-  avatarRow: {
-    flexDirection: 'row',
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    gap: 12,
-    marginBottom: 8,
-  },
-  addStory: {
-    alignItems: 'center',
-    gap: 4,
-  },
-  addStoryIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    borderWidth: 2,
-    borderColor: colors.gold,
-    borderStyle: 'dashed',
-    textAlign: 'center',
-    textAlignVertical: 'center',
-    fontSize: 20,
-    fontWeight: '600',
-    color: colors.gold,
-  },
-  addStoryLabel: {
-    fontSize: 10,
-    color: 'rgba(255,255,255,0.5)',
-    fontWeight: '500',
-  },
-  avatarCircleStory: {
-    alignItems: 'center',
-    gap: 4,
-  },
-  avatarInitial: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    textAlign: 'center',
-    textAlignVertical: 'center',
-    fontSize: 14,
-    fontWeight: '600',
-    color: colors.navy,
-  },
-  avatarName: {
-    fontSize: 10,
-    color: 'rgba(255,255,255,0.5)',
-    fontWeight: '500',
-  },
-  eventBanner: { marginHorizontal: 20, marginBottom: 12, gap: 12 },
-  eventBannerRow: { flexDirection: 'row', gap: 12 },
-  eventEmoji: { fontSize: 40 },
-  eventInfo: { flex: 1, gap: 2 },
-  eventTitle: { fontSize: 15, fontWeight: '700', color: colors.textPrimary },
-  eventDate: { fontSize: 13, color: colors.gold },
-  eventLocation: { fontSize: 12, color: colors.textTertiary },
-  eventFooter: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  rsvpCount: { fontSize: 13, color: colors.textSecondary },
-  rsvpBtn: {
-    paddingHorizontal: 16,
-    paddingVertical: 6,
-    backgroundColor: colors.gold,
-    borderRadius: 999,
-  },
-  rsvpBtnText: { color: colors.navy, fontSize: 13, fontWeight: '600' },
+
+  // Challenge
   challengeCard: {
-    marginHorizontal: 20,
+    marginHorizontal: 16,
     marginBottom: 12,
     gap: 8,
     borderLeftWidth: 4,
@@ -289,59 +600,218 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(201, 150, 26, 0.06)',
   },
   challengeHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  challengeTitle: { fontSize: 14, fontWeight: '700', color: colors.textPrimary },
-  challengeDays: { fontSize: 12, color: colors.gold },
-  challengeDesc: { fontSize: 13, color: colors.textSecondary },
+  challengeTitle: { fontSize: 13, fontWeight: '700', color: colors.textPrimary },
+  challengeDays: { fontSize: 11, color: colors.gold },
+  challengeDesc: { fontSize: 12, color: colors.textSecondary },
   challengeBar: {
-    height: 6,
+    height: 5,
     backgroundColor: 'rgba(255,255,255,0.1)',
     borderRadius: 3,
     overflow: 'hidden',
   },
   challengeFill: { height: '100%', backgroundColor: colors.gold, borderRadius: 3 },
-  challengeProgress: { fontSize: 11, color: colors.textTertiary },
+  challengeProgress: { fontSize: 10, color: colors.textTertiary },
   feedTitle: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: '700',
     color: colors.textPrimary,
-    paddingHorizontal: 20,
+    paddingHorizontal: 16,
     marginBottom: 8,
-    marginTop: 4,
   },
-  postCard: {
-    marginHorizontal: 20,
-    marginBottom: 12,
-    gap: 12,
-    borderLeftWidth: 4,
-    borderLeftColor: colors.cyan,
-    backgroundColor: 'rgba(20, 184, 212, 0.06)',
-  },
-  postHeader: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  avatarCircle: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: colors.royal,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  avatarText: { fontSize: 16, fontWeight: '700', color: colors.white },
-  postMeta: { gap: 2 },
-  postAuthor: { fontSize: 14, fontWeight: '600', color: colors.textPrimary },
-  postTime: { fontSize: 11, color: colors.textTertiary },
-  postText: { fontSize: 14, color: colors.textPrimary, lineHeight: 20 },
+
+  // Avatar
+  avatar: { alignItems: 'center', justifyContent: 'center' },
+
+  // Stats row (shared stats card in post)
   statsRow: {
     flexDirection: 'row',
     backgroundColor: 'rgba(255,255,255,0.05)',
     borderRadius: 10,
-    padding: 12,
+    marginTop: 10,
+    overflow: 'hidden',
   },
-  statItem: { flex: 1, alignItems: 'center' },
-  statValue: { fontSize: 15, fontWeight: '700', color: colors.textPrimary },
-  statLabel: { fontSize: 10, color: colors.textTertiary, marginTop: 2 },
-  statDivider: { width: 1, backgroundColor: colors.border },
-  postActions: { flexDirection: 'row', gap: 20 },
+  statItem: { flex: 1, alignItems: 'center', paddingVertical: 10 },
+  statIcon: { fontSize: 14 },
+  statValue: { fontSize: 14, fontWeight: '600', color: colors.textPrimary, marginTop: 3 },
+  statLabel: {
+    fontSize: 9,
+    color: colors.textTertiary,
+    fontWeight: '600',
+    textTransform: 'uppercase',
+  },
+  statsDivider: { width: 1, backgroundColor: 'rgba(255,255,255,0.08)' },
+
+  // Post card
+  postCard: {
+    marginHorizontal: 16,
+    marginBottom: 12,
+    gap: 10,
+    borderLeftWidth: 3,
+    borderLeftColor: colors.cyan,
+    backgroundColor: 'rgba(20, 184, 212, 0.06)',
+  },
+  postHeader: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  postMeta: { gap: 2 },
+  postAuthor: { fontSize: 14, fontWeight: '600', color: colors.textPrimary },
+  postTime: { fontSize: 10, color: colors.textTertiary },
+  postText: { fontSize: 13, color: colors.textPrimary, lineHeight: 19 },
+  postActions: {
+    flexDirection: 'row',
+    gap: 20,
+    paddingTop: 6,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255,255,255,0.07)',
+  },
   actionBtn: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  actionIcon: { fontSize: 18 },
+  actionIcon: { fontSize: 16 },
   actionCount: { fontSize: 13, color: colors.textSecondary },
+
+  // Comments
+  commentsSection: {
+    gap: 8,
+    paddingTop: 10,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255,255,255,0.07)',
+  },
+  commentRow: { flexDirection: 'row', gap: 8 },
+  commentBubble: {
+    flex: 1,
+    backgroundColor: 'rgba(255,255,255,0.04)',
+    borderRadius: 10,
+    padding: 10,
+  },
+  commentAuthor: { fontSize: 11, fontWeight: '600', color: colors.textPrimary, marginBottom: 2 },
+  commentText: { fontSize: 12, color: 'rgba(255,255,255,0.8)', lineHeight: 17, marginBottom: 3 },
+  commentTime: { fontSize: 9, color: colors.textTertiary },
+  commentInput: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 4 },
+  commentField: {
+    flex: 1,
+    backgroundColor: 'rgba(255,255,255,0.06)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.12)',
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    color: colors.textPrimary,
+    fontSize: 12,
+  },
+  commentSend: {
+    backgroundColor: colors.cyan,
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+  },
+  commentSendText: { color: colors.navy, fontWeight: '700', fontSize: 14 },
+
+  // Modal
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'flex-end' },
+  modalSheet: {
+    backgroundColor: colors.bgSecondary,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    padding: 20,
+    maxHeight: '90%',
+  },
+  modalHandle: {
+    width: 40,
+    height: 4,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    borderRadius: 2,
+    alignSelf: 'center',
+    marginBottom: 20,
+  },
+  modalTitle: { fontSize: 17, fontWeight: '700', color: colors.textPrimary, marginBottom: 20 },
+
+  // Profile modal
+  previewRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    padding: 12,
+    backgroundColor: 'rgba(255,255,255,0.04)',
+    borderRadius: 12,
+    marginBottom: 20,
+  },
+  previewAvatar: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: colors.gold,
+  },
+  previewEmoji: { fontSize: 22 },
+  previewName: { fontSize: 14, fontWeight: '600', color: colors.textPrimary },
+  previewHint: { fontSize: 10, color: colors.textTertiary, marginTop: 2 },
+  pickerLabel: { fontSize: 11, color: colors.textTertiary, fontWeight: '600', marginBottom: 10 },
+  emojiGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 18 },
+  emojiBtn: {
+    width: 44,
+    height: 44,
+    borderRadius: 10,
+    borderWidth: 2,
+    borderColor: 'rgba(255,255,255,0.1)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(255,255,255,0.05)',
+  },
+  emojiBtnText: { fontSize: 20 },
+  colorRow: { flexDirection: 'row', gap: 10, marginBottom: 20, flexWrap: 'wrap' },
+  colorDot: { width: 30, height: 30, borderRadius: 15, borderWidth: 3, borderColor: 'transparent' },
+  colorDotSelected: { borderColor: colors.white },
+  textField: {
+    backgroundColor: 'rgba(255,255,255,0.06)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.12)',
+    borderRadius: 10,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    color: colors.textPrimary,
+    fontSize: 14,
+    marginBottom: 16,
+  },
+
+  // Post modal
+  composerRow: { flexDirection: 'row', gap: 10, alignItems: 'flex-start', marginBottom: 14 },
+  statsToggle: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    padding: 12,
+    borderRadius: 10,
+    backgroundColor: 'rgba(255,255,255,0.04)',
+    marginBottom: 14,
+  },
+  statsToggleOn: { backgroundColor: 'rgba(201,150,26,0.1)' },
+  toggleCheck: {
+    width: 20,
+    height: 20,
+    borderRadius: 6,
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  toggleCheckOn: { backgroundColor: colors.gold },
+  toggleCheckMark: { fontSize: 12, color: colors.navy, fontWeight: '800' },
+  statsToggleText: { fontSize: 13, color: colors.textSecondary, fontWeight: '500' },
+
+  // Modal actions
+  modalActions: { flexDirection: 'row', gap: 10, marginTop: 8 },
+  saveBtn: {
+    flex: 1,
+    backgroundColor: colors.cyan,
+    borderRadius: 12,
+    paddingVertical: 13,
+    alignItems: 'center',
+  },
+  saveBtnText: { color: colors.navy, fontWeight: '700', fontSize: 14 },
+  cancelBtn: {
+    flex: 1,
+    backgroundColor: 'rgba(255,255,255,0.07)',
+    borderRadius: 12,
+    paddingVertical: 13,
+    alignItems: 'center',
+  },
+  cancelBtnText: { color: colors.textSecondary, fontWeight: '600', fontSize: 14 },
 });
