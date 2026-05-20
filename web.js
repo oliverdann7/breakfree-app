@@ -7,10 +7,11 @@ import { store, persistor } from './src/store';
 import { useAppSelector } from './src/store/hooks';
 import BreakFreeLanding from './src/components/BreakFreeLanding';
 import WebLoginModal from './src/components/WebLoginModal';
+import WebSignupModal from './src/components/WebSignupModal';
 import WebDashboard from './src/components/WebDashboard';
 
 function WebAppContent() {
-  const [showLogin, setShowLogin] = React.useState(false);
+  const [view, setView] = React.useState('landing'); // 'landing', 'login', 'signup'
   const { isAuthenticated } = useAppSelector((state) => state.auth);
 
   if (isAuthenticated) {
@@ -19,8 +20,13 @@ function WebAppContent() {
 
   return (
     <>
-      <BreakFreeLanding onStart={() => setShowLogin(true)} />
-      {showLogin && <WebLoginModal onBack={() => setShowLogin(false)} />}
+      <BreakFreeLanding onStart={() => setView('login')} />
+      {view === 'login' && (
+        <WebLoginModal onBack={() => setView('landing')} onSignup={() => setView('signup')} />
+      )}
+      {view === 'signup' && (
+        <WebSignupModal onBack={() => setView('landing')} onLogin={() => setView('login')} />
+      )}
     </>
   );
 }

@@ -126,7 +126,7 @@ function LogoSymbol() {
   );
 }
 
-export default function WebLoginModal({ onBack }) {
+export default function WebLoginModal({ onBack, onSignup }) {
   const dispatch = useAppDispatch();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -434,7 +434,7 @@ export default function WebLoginModal({ onBack }) {
           }}
         >
           Hesabın yok mu?{' '}
-          <button type="button" className="bfl-link">
+          <button type="button" className="bfl-link" onClick={onSignup}>
             Kaydol
           </button>
         </p>
