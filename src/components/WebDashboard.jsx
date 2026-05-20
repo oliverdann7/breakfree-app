@@ -3,6 +3,7 @@ import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { logout } from '../store/slices/authSlice';
 import { fetchMetrics } from '../store/slices/metricsSlice';
 import { updateProfileFirestore } from '../store/slices/userSlice';
+import { fetchTalks } from '../store/slices/talksSlice';
 
 const C = {
   navyDeep: '#061829',
@@ -624,50 +625,7 @@ function HomeTab({ user, metrics, weeklyData, wellnessScore, loading }) {
   );
 }
 
-function TalksTab() {
-  const talks = [
-    {
-      cat: 'Zihin',
-      title: 'Anksiyeteyi anlamak',
-      dur: '28dk',
-      host: 'Dr. Ayşe Demir',
-      color: C.cyan,
-      listeners: 347,
-    },
-    {
-      cat: 'Hareket',
-      title: 'Koşunun bilimi',
-      dur: '35dk',
-      host: 'Mehmet Çelik',
-      color: C.gold,
-      listeners: 218,
-    },
-    {
-      cat: 'Uyku',
-      title: 'Derin uykuya yolculuk',
-      dur: '22dk',
-      host: 'Dr. Levent Arslan',
-      color: C.royal,
-      listeners: 189,
-    },
-    {
-      cat: 'Beslenme',
-      title: 'Sezgisel beslenme',
-      dur: '42dk',
-      host: 'Selin Kaya',
-      color: C.cyan,
-      listeners: 412,
-    },
-    {
-      cat: 'Motivasyon',
-      title: 'Küçük adımların gücü',
-      dur: '31dk',
-      host: 'Coach Burak',
-      color: C.gold,
-      listeners: 563,
-    },
-  ];
-
+function TalksTab({ talks }) {
   return (
     <div>
       <h2
@@ -680,67 +638,76 @@ function TalksTab() {
         Türkiye&apos;nin en güçlü zihinleri
       </p>
 
-      {/* Live card */}
-      <div className="wd-card-gold" style={{ marginBottom: 28 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-          <span
-            style={{
-              background: C.gold,
-              color: C.navy,
-              fontSize: 9,
-              fontWeight: 700,
-              padding: '3px 8px',
-              borderRadius: 999,
-            }}
-          >
-            ● CANLI
-          </span>
-          <span style={{ fontSize: 11, color: C.textTertiary }}>347 dinleyici şu an bağlı</span>
-        </div>
-        <p
-          style={{
-            fontSize: 20,
-            fontWeight: 300,
-            color: C.textPrimary,
-            margin: '0 0 6px',
-            lineHeight: 1.4,
-          }}
-        >
-          Yorgunluğun ardındaki{' '}
-          <span style={{ color: C.gold, fontStyle: 'italic' }}>gerçek hikaye</span>
-        </p>
-        <p style={{ fontSize: 11, color: C.textTertiary, margin: '0 0 16px' }}>
-          Dr. Ayşe Demir · Coach Burak · 47:12
-        </p>
-        <button
-          style={{
-            width: '100%',
-            background: C.gold,
-            color: C.navy,
-            border: 'none',
-            borderRadius: 999,
-            padding: '12px 0',
-            fontSize: 14,
-            fontWeight: 700,
-            cursor: 'pointer',
-            fontFamily: 'inherit',
-          }}
-        >
-          🎧 Şimdi Dinle
-        </button>
-      </div>
+      {/* Live card (logic simplified for demo) */}
+      {talks
+        .filter((t) => t.status === 'live')
+        .map((t) => (
+          <div key={t.talkId} className="wd-card-gold" style={{ marginBottom: 28 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+              <span
+                style={{
+                  background: C.gold,
+                  color: C.navy,
+                  fontSize: 9,
+                  fontWeight: 700,
+                  padding: '3px 8px',
+                  borderRadius: 999,
+                }}
+              >
+                ● CANLI
+              </span>
+              <span style={{ fontSize: 11, color: C.textTertiary }}>
+                {t.listeners} dinleyici şu an bağlı
+              </span>
+            </div>
+            <p
+              style={{
+                fontSize: 20,
+                fontWeight: 300,
+                color: C.textPrimary,
+                margin: '0 0 6px',
+                lineHeight: 1.4,
+              }}
+            >
+              {t.title}
+            </p>
+            <p style={{ fontSize: 11, color: C.textTertiary, margin: '0 0 16px' }}>
+              {t.host.name} · {t.duration}dk
+            </p>
+            <button
+              style={{
+                width: '100%',
+                background: C.gold,
+                color: C.navy,
+                border: 'none',
+                borderRadius: 999,
+                padding: '12px 0',
+                fontSize: 14,
+                fontWeight: 700,
+                cursor: 'pointer',
+                fontFamily: 'inherit',
+              }}
+            >
+              🎧 Şimdi Dinle
+            </button>
+          </div>
+        ))}
 
       <p style={{ fontSize: 18, fontWeight: 700, color: C.textPrimary, margin: '0 0 14px' }}>
         Senin için
       </p>
       {talks.map((t, i) => (
-        <div key={i} className="wd-talk-item" style={{ borderLeftColor: t.color }}>
+        <div
+          key={t.talkId || i}
+          className="wd-talk-item"
+          style={{ borderLeftColor: t.category === 'Zihin' ? C.cyan : C.gold }}
+        >
           <div
             style={{
               width: 48,
               height: 48,
               borderRadius: 10,
-              background: `${t.color}33`,
+              background: `${t.category === 'Zihin' ? C.cyan : C.gold}33`,
               flexShrink: 0,
               display: 'flex',
               alignItems: 'center',
@@ -748,13 +715,13 @@ function TalksTab() {
             }}
           >
             <span style={{ fontSize: 22 }}>
-              {t.cat === 'Zihin'
+              {t.category === 'Zihin'
                 ? '🧠'
-                : t.cat === 'Hareket'
+                : t.category === 'Hareket'
                   ? '🏃'
-                  : t.cat === 'Uyku'
+                  : t.category === 'Uyku'
                     ? '🌙'
-                    : t.cat === 'Beslenme'
+                    : t.category === 'Beslenme'
                       ? '🥗'
                       : '🎯'}
             </span>
@@ -763,20 +730,20 @@ function TalksTab() {
             <p
               style={{
                 fontSize: 9,
-                color: t.color,
+                color: t.category === 'Zihin' ? C.cyan : C.gold,
                 fontWeight: 700,
                 textTransform: 'uppercase',
                 letterSpacing: 0.4,
                 margin: '0 0 3px',
               }}
             >
-              {t.cat}
+              {t.category}
             </p>
             <p style={{ fontSize: 14, fontWeight: 500, color: C.textPrimary, margin: '0 0 2px' }}>
               {t.title}
             </p>
             <p style={{ fontSize: 10, color: C.textTertiary, margin: 0 }}>
-              {t.host} · {t.dur}
+              {t.host.name} · {t.duration}dk
             </p>
           </div>
           <div style={{ textAlign: 'right' }}>
@@ -1319,7 +1286,7 @@ function CommPostCard({
   );
 }
 
-function CommunityTab({ user, metrics, weeklyData, wellnessScore, loading }) {
+function CommunityTab({ user, metrics, wellnessScore }) {
   const dispatch = useAppDispatch();
   const userProfile = useAppSelector((state) => state.user.profile);
   const dm = metrics?.dailyMetrics;
@@ -2140,12 +2107,12 @@ export default function WebDashboard() {
   const { dailyMetrics, weeklyData, wellnessScore, loading } = useAppSelector(
     (state) => state.metrics
   );
+  const { allTalks } = useAppSelector((state) => state.talks);
   const [activeTab, setActiveTab] = useState('home');
 
   useEffect(() => {
-    if (user?.uid) {
-      dispatch(fetchMetrics(user.uid));
-    }
+    dispatch(fetchMetrics(user.uid));
+    dispatch(fetchTalks());
   }, [dispatch, user]);
 
   const handleLogout = () => {
@@ -2161,11 +2128,13 @@ export default function WebDashboard() {
       case 'home':
         return <HomeTab user={user} {...metricsProps} />;
       case 'talks':
-        return <TalksTab />;
+        return <TalksTab talks={allTalks} />;
       case 'health':
         return <HealthTab {...metricsProps} />;
       case 'community':
-        return <CommunityTab user={user} {...metricsProps} />;
+        return (
+          <CommunityTab user={user} metrics={{ dailyMetrics }} wellnessScore={wellnessScore} />
+        );
       case 'profile':
         return <ProfileTab user={user} onLogout={handleLogout} weeklyData={weeklyData} />;
       default:
