@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { logout } from '../store/slices/authSlice';
 import { fetchMetrics } from '../store/slices/metricsSlice';
-import { updateProfile } from '../store/slices/userSlice';
+import { updateProfileFirestore } from '../store/slices/userSlice';
 
 const C = {
   navyDeep: '#061829',
@@ -1351,7 +1351,8 @@ function CommunityTab({ user, metrics, weeklyData, wellnessScore, loading }) {
     setProfile(draft);
     setEditMode(false);
     dispatch(
-      updateProfile({
+      updateProfileFirestore({
+        uid: user.uid,
         nickname: draft.nickname,
         bio: draft.bio,
         avatarEmoji: draft.emoji,
