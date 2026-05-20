@@ -1,6 +1,6 @@
-// app/store/slices/authSlice.js
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import * as authService from '../../services/authService';
+import { setHasCompletedOnboarding } from './userSlice';
 
 export const signup = createAsyncThunk(
   'auth/signup',
@@ -71,7 +71,27 @@ export const refreshToken = createAsyncThunk(
   }
 );
 
+export const restoreSession = createAsyncThunk(
+  'auth/restoreSession',
+  async (_, { dispatch, rejectWithValue }) => {
+    try {
+      const user = await authService.getCurrentUser();
+      if (user) {
+        if (user.goals?.length > 0 || user.bio || user.displayName) {
+          dispatch(setHasCompletedOnboarding(true));
+        }
+        const token = await authService.refreshToken().catch(() => null);
+        return { user, token };
+      }
+      return null;
+    } catch {
+      return null;
+    }
+  }
+);
+
 const initialState = {
+  isInitializing: true,
   isLoading: false,
   isAuthenticated: false,
   user: null,
@@ -173,6 +193,24 @@ const authSlice = createSlice({
     builder.addCase(refreshToken.fulfilled, (state, action) => {
       state.token = action.payload;
     });
+
+    // Restore Session
+    builder
+      .addCase(restoreSession.fulfilled, (state, action) => {
+        state.isInitializing = false;
+        if (action.payload) {
+          state.isAuthenticated = true;
+          state.user = action.payload.user;
+          state.token = action.payload.token;
+        } else {
+          state.isAuthenticated = false;
+          state.user = null;
+          state.token = null;
+        }
+      })
+      .addCase(restoreSession.rejected, (state) => {
+        state.isInitializing = false;
+      });
   },
 });
 

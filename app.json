@@ -6,6 +6,7 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
+    "privacy": "public",
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
@@ -14,14 +15,22 @@
     "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "com.breakfree.app"
+      "bundleIdentifier": "com.breakfree.app",
+      "buildNumber": "1",
+      "infoPlist": {
+        "NSCameraUsageDescription": "Profil fotoğrafı çekmek için kameraya erişim gerekiyor.",
+        "NSPhotoLibraryUsageDescription": "Profil fotoğrafı seçmek için fotoğraf kütüphanesine erişim gerekiyor.",
+        "NSMicrophoneUsageDescription": "Video görüşmeleri için mikrofona erişim gerekiyor."
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#0A2540"
       },
-      "package": "com.breakfree.app"
+      "package": "com.breakfree.app",
+      "versionCode": 1,
+      "permissions": ["CAMERA", "READ_EXTERNAL_STORAGE", "WRITE_EXTERNAL_STORAGE", "RECORD_AUDIO"]
     },
     "web": {
       "favicon": "./assets/favicon.png",
