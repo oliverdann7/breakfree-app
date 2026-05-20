@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAppDispatch } from '../store/hooks';
+import { login } from '../store/slices/authSlice';
 
 const C = {
   navyDeep: '#061829',
@@ -164,19 +165,16 @@ export default function WebLoginModal({ onBack }) {
     e.preventDefault();
     if (!validate()) return;
     setLoading(true);
+    setErrors((p) => ({ ...p, submit: undefined }));
 
-    // Simulate network delay, then mock-login (Firebase not wired yet)
-    await new Promise((r) => setTimeout(r, 900));
-
-    dispatch({
-      type: 'auth/login/fulfilled',
-      payload: {
-        user: { uid: 'demo-uid', email, displayName: 'Demo Kullanıcı' },
-        token: 'mock-token-demo',
-      },
-    });
-
-    setLoading(false);
+    try {
+      await dispatch(login({ email, password })).unwrap();
+      // On success, state updates automatically, and WebAppContent handles transition
+    } catch (error) {
+      setErrors((p) => ({ ...p, submit: error || 'Giriş başarısız oldu' }));
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleSocial = (provider) => {
