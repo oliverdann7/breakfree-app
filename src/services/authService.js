@@ -43,6 +43,30 @@ export const signup = async (email, password, displayName) => {
   }
 };
 
+export const login = async (email, password) => {
+  try {
+    checkFirebaseAvailable();
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    const user = userCredential.user;
+
+    const userDoc = await getDoc(doc(db, 'users', user.uid));
+    const userData = userDoc.data();
+
+    const token = await user.getIdToken();
+    return {
+      user: {
+        uid: user.uid,
+        email: user.email,
+        displayName: userData?.displayName || 'User',
+        ...userData,
+      },
+      token,
+    };
+  } catch (error) {
+    throw new Error(error.message);
+  }
+};
+
 export const loginWithGoogle = async () => {
   try {
     checkFirebaseAvailable();
