@@ -1,25 +1,83 @@
-import React from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet, SafeAreaView } from 'react-native';
+import React, { useEffect } from 'react';
+import {
+  View,
+  Text,
+  ScrollView,
+  TouchableOpacity,
+  StyleSheet,
+  SafeAreaView,
+  ActivityIndicator,
+} from 'react-native';
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
+import { fetchMentorData } from '../../store/slices/mentorSlice';
 import Card from '../../components/common/Card';
 import { colors } from '../../constants/designTokens';
 
+function formatSessionDate(ts) {
+  if (!ts) return null;
+  const d = new Date(ts);
+  const days = ['Paz', 'Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt'];
+  return {
+    day: days[d.getDay()],
+    date: d.getDate(),
+    time: `${d.getHours()}:${String(d.getMinutes()).padStart(2, '0')}`,
+  };
+}
+
+function timeAgo(ts) {
+  if (!ts) return '';
+  const h = Math.floor((Date.now() - ts) / 3600000);
+  if (h < 1) return 'Az önce';
+  if (h < 24) return `${h}sa önce`;
+  return `${Math.floor(h / 24)}g önce`;
+}
+
 export default function MentorScreen() {
+  const dispatch = useAppDispatch();
+  const { user } = useAppSelector((state) => state.auth);
+  const { mentor, weeklyFocus, weeklyGoals, nextSession, lastMessage, loading } = useAppSelector(
+    (state) => state.mentor
+  );
+
+  useEffect(() => {
+    if (user?.uid) dispatch(fetchMentorData(user.uid));
+  }, [user?.uid]);
+
+  const sessionDate = formatSessionDate(nextSession?.scheduledAt);
+  const completedGoals = weeklyGoals.filter((g) => g.done).length;
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
-        {/* Header with Mentor */}
+        {/* Header */}
         <View style={styles.headerGradient}>
           <View style={styles.headerOverlay} />
           <View style={styles.mentorSection}>
-            <View style={styles.mentorAvatar}>
-              <Text style={styles.avatarText}>A</Text>
-              <View style={styles.onlineBadge} />
-            </View>
-            <View style={styles.mentorInfo}>
-              <Text style={styles.mentorLabel}>Mentörün</Text>
-              <Text style={styles.mentorName}>Dr. Ayşe Demir</Text>
-              <Text style={styles.mentorRole}>Wellness · 8 yıl deneyim</Text>
-            </View>
+            {loading && !mentor ? (
+              <ActivityIndicator color={colors.cyan} style={{ marginBottom: 20 }} />
+            ) : mentor ? (
+              <>
+                <View style={styles.mentorAvatar}>
+                  <Text style={styles.avatarText}>
+                    {mentor.avatarInitial || mentor.name?.[0] || 'M'}
+                  </Text>
+                  <View style={styles.onlineBadge} />
+                </View>
+                <View style={styles.mentorInfo}>
+                  <Text style={styles.mentorLabel}>Mentörün</Text>
+                  <Text style={styles.mentorName}>{mentor.name}</Text>
+                  <Text style={styles.mentorRole}>
+                    {mentor.role} · {mentor.yearsExperience} yıl deneyim
+                  </Text>
+                </View>
+              </>
+            ) : (
+              <View style={styles.mentorInfo}>
+                <Text style={styles.mentorLabel}>Mentör</Text>
+                <Text style={styles.mentorName}>Henüz atanmadı</Text>
+                <Text style={styles.mentorRole}>Yakında bir mentör atanacak</Text>
+              </View>
+            )}
           </View>
         </View>
 
@@ -29,79 +87,96 @@ export default function MentorScreen() {
             { label: 'Sohbet', icon: '💬' },
             { label: 'Görüşme', icon: '📹' },
             { label: 'Planla', icon: '📅' },
-          ].map((action, i) => (
-            <TouchableOpacity key={i} style={styles.actionBtn}>
+          ].map((action) => (
+            <TouchableOpacity key={action.label} style={styles.actionBtn}>
               <Text style={styles.actionIcon}>{action.icon}</Text>
               <Text style={styles.actionLabel}>{action.label}</Text>
             </TouchableOpacity>
           ))}
         </View>
 
-        {/* This Week's Focus */}
+        {/* Weekly Focus */}
         <Card style={styles.focusCard}>
           <View style={styles.focusHeader}>
             <Text style={styles.focusIcon}>🎯</Text>
             <Text style={styles.focusTitle}>Bu hafta odak</Text>
           </View>
-          <Text style={styles.focusGoal}>
-            Akşam rutini ve <Text style={styles.focusHighlight}>uyku kalitesi</Text>
-          </Text>
-
-          <View style={styles.goalsList}>
-            {[
-              { label: "22:00'da ekranları kapat", done: true },
-              { label: '10dk akşam meditasyonu', done: true },
-              { label: 'Günlük journal — 3 minnet', done: false },
-              { label: 'Hafif yoga · 15dk', done: false },
-            ].map((goal, i) => (
-              <View key={i} style={styles.goalItem}>
-                <Text style={styles.goalCheckbox}>{goal.done ? '✓' : '○'}</Text>
-                <Text style={[styles.goalText, goal.done && styles.goalTextDone]}>
-                  {goal.label}
+          {weeklyFocus ? (
+            <Text style={styles.focusGoal}>{weeklyFocus}</Text>
+          ) : (
+            <Text style={styles.emptyText}>Mentörün henüz bir odak belirlemedi.</Text>
+          )}
+          {weeklyGoals.length > 0 && (
+            <>
+              <View style={styles.goalsList}>
+                {weeklyGoals.map((goal, i) => (
+                  <View key={i} style={styles.goalItem}>
+                    <Text style={styles.goalCheckbox}>{goal.done ? '✓' : '○'}</Text>
+                    <Text style={[styles.goalText, goal.done && styles.goalTextDone]}>
+                      {goal.label}
+                    </Text>
+                  </View>
+                ))}
+              </View>
+              <View style={styles.progressContainer}>
+                <View style={styles.progressTrack}>
+                  <View
+                    style={[
+                      styles.progressFill,
+                      { width: `${Math.round((completedGoals / weeklyGoals.length) * 100)}%` },
+                    ]}
+                  />
+                </View>
+                <Text style={styles.progressText}>
+                  {completedGoals}/{weeklyGoals.length}
                 </Text>
               </View>
-            ))}
-          </View>
-
-          <View style={styles.progressContainer}>
-            <View style={styles.progressTrack}>
-              <View style={styles.progressFill} />
-            </View>
-            <Text style={styles.progressText}>2/4</Text>
-          </View>
+            </>
+          )}
         </Card>
 
         {/* Latest Message */}
         <Card style={styles.messageCard}>
           <View style={styles.messageHeader}>
             <Text style={styles.messageLabel}>Son mesaj</Text>
-            <Text style={styles.messageTime}>2sa önce</Text>
+            {lastMessage && (
+              <Text style={styles.messageTime}>{timeAgo(lastMessage.createdAt)}</Text>
+            )}
           </View>
-          <View style={styles.messageBubble}>
-            <View style={styles.senderAvatar}>
-              <Text style={styles.senderInitial}>A</Text>
+          {lastMessage ? (
+            <View style={styles.messageBubble}>
+              <View style={styles.senderAvatar}>
+                <Text style={styles.senderInitial}>
+                  {mentor?.avatarInitial || mentor?.name?.[0] || 'M'}
+                </Text>
+              </View>
+              <View style={styles.messageContent}>
+                <Text style={styles.messageText}>{lastMessage.text}</Text>
+              </View>
             </View>
-            <View style={styles.messageContent}>
-              <Text style={styles.messageText}>
-                Elif, bu haftaki ilerlemen harika 🌟 Pazartesi seansımızda uyku verilerine birlikte
-                bakalım.
-              </Text>
-            </View>
-          </View>
+          ) : (
+            <Text style={styles.emptyText}>Henüz mesaj yok.</Text>
+          )}
         </Card>
 
         {/* Next Session */}
-        <TouchableOpacity style={styles.sessionCard}>
-          <View style={styles.dateBox}>
-            <Text style={styles.dayLabel}>Pzt</Text>
-            <Text style={styles.dayNumber}>17</Text>
-          </View>
-          <View style={styles.sessionInfo}>
-            <Text style={styles.sessionTitle}>Görüntülü görüşme</Text>
-            <Text style={styles.sessionTime}>19:00 · 30dk</Text>
-          </View>
-          <Text style={styles.chevron}>›</Text>
-        </TouchableOpacity>
+        {nextSession && sessionDate && (
+          <TouchableOpacity style={styles.sessionCard}>
+            <View style={styles.dateBox}>
+              <Text style={styles.dayLabel}>{sessionDate.day}</Text>
+              <Text style={styles.dayNumber}>{sessionDate.date}</Text>
+            </View>
+            <View style={styles.sessionInfo}>
+              <Text style={styles.sessionTitle}>
+                {nextSession.sessionType || 'Görüntülü görüşme'}
+              </Text>
+              <Text style={styles.sessionTime}>
+                {sessionDate.time} · {nextSession.durationMinutes || 30}dk
+              </Text>
+            </View>
+            <Text style={styles.chevron}>›</Text>
+          </TouchableOpacity>
+        )}
 
         <View style={{ height: 24 }} />
       </ScrollView>
@@ -112,11 +187,7 @@ export default function MentorScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.bgPrimary },
   scrollContent: { paddingBottom: 20 },
-  headerGradient: {
-    height: 160,
-    backgroundColor: colors.royal,
-    overflow: 'hidden',
-  },
+  headerGradient: { height: 160, backgroundColor: colors.royal, overflow: 'hidden' },
   headerOverlay: {
     position: 'absolute',
     bottom: 0,
@@ -205,7 +276,6 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
   },
   focusGoal: { fontSize: 14, fontWeight: '500', color: colors.textPrimary, lineHeight: 19 },
-  focusHighlight: { color: colors.gold, fontStyle: 'italic' },
   goalsList: { gap: 8 },
   goalItem: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   goalCheckbox: { fontSize: 14, color: colors.gold, fontWeight: '600', width: 14 },
@@ -219,14 +289,9 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.1)',
     overflow: 'hidden',
   },
-  progressFill: { width: '50%', height: '100%', backgroundColor: colors.gold, borderRadius: 2 },
+  progressFill: { height: '100%', backgroundColor: colors.gold, borderRadius: 2 },
   progressText: { fontSize: 10, color: 'rgba(255,255,255,0.5)', fontWeight: '500' },
-  messageCard: {
-    marginHorizontal: 20,
-    marginBottom: 12,
-    padding: 12,
-    gap: 8,
-  },
+  messageCard: { marginHorizontal: 20, marginBottom: 12, padding: 12, gap: 8 },
   messageHeader: { flexDirection: 'row', justifyContent: 'space-between' },
   messageLabel: {
     fontSize: 10,
@@ -254,6 +319,7 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   messageText: { fontSize: 12, color: 'rgba(255,255,255,0.85)', lineHeight: 17 },
+  emptyText: { fontSize: 13, color: 'rgba(255,255,255,0.35)', fontStyle: 'italic' },
   sessionCard: {
     marginHorizontal: 20,
     flexDirection: 'row',

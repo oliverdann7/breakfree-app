@@ -74,9 +74,9 @@ export default function ProfileScreen({ navigation }) {
           {/* Stats */}
           <View style={styles.statsRow}>
             {[
-              { label: 'Talk', value: '12' },
-              { label: 'Gün', value: '47' },
-              { label: 'Puan', value: '890' },
+              { label: 'Talk', value: displayData.talksWatched ?? '—' },
+              { label: 'Gün', value: displayData.streakDays ?? '—' },
+              { label: 'Puan', value: displayData.points ?? '—' },
             ].map((s) => (
               <View key={s.label} style={styles.statItem}>
                 <Text style={styles.statValue}>{s.value}</Text>

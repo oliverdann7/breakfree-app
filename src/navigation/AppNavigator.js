@@ -10,22 +10,35 @@ import CommunityScreen from '../screens/Community/CommunityScreen';
 import MentorScreen from '../screens/Mentor/MentorScreen';
 import ProfileScreen from '../screens/Profile/ProfileScreen';
 import EditProfileScreen from '../screens/Profile/EditProfileScreen';
+import VideoFeedScreen from '../screens/Videos/VideoFeedScreen';
+import VideoPlayerScreen from '../screens/Videos/VideoPlayerScreen';
 import { colors } from '../constants/designTokens';
 
 const Tab = createBottomTabNavigator();
 const TalksStack = createStackNavigator();
 const ProfileStack = createStackNavigator();
+const VideoStack = createStackNavigator();
 
 function TabIcon({ label, focused }) {
   const icons = {
     'Ana Sayfa': '⬡',
     Palestralar: '🎙',
+    Videolar: '🎬',
     Sağlık: '💚',
     Topluluk: '👥',
     Mentör: '🤝',
     Profil: '👤',
   };
   return <Text style={{ fontSize: 20, opacity: focused ? 1 : 0.45 }}>{icons[label] || '●'}</Text>;
+}
+
+function VideoStackNavigator() {
+  return (
+    <VideoStack.Navigator screenOptions={{ headerShown: false }}>
+      <VideoStack.Screen name="VideoFeed" component={VideoFeedScreen} />
+      <VideoStack.Screen name="VideoPlayer" component={VideoPlayerScreen} />
+    </VideoStack.Navigator>
+  );
 }
 
 function TalksStackNavigator() {
@@ -60,6 +73,7 @@ export default function AppNavigator() {
     >
       <Tab.Screen name="Ana Sayfa" component={DashboardScreen} />
       <Tab.Screen name="Palestralar" component={TalksStackNavigator} />
+      <Tab.Screen name="Videolar" component={VideoStackNavigator} />
       <Tab.Screen name="Sağlık" component={HealthMetricsScreen} />
       <Tab.Screen name="Topluluk" component={CommunityScreen} />
       <Tab.Screen name="Mentör" component={MentorScreen} />

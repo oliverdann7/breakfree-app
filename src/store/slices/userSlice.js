@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { doc, getDoc, updateDoc, collection, getCountFromServer } from 'firebase/firestore';
 import { db } from '../../services/firebase';
 
 export const fetchUserProfile = createAsyncThunk(
@@ -9,7 +9,16 @@ export const fetchUserProfile = createAsyncThunk(
       if (!db) throw new Error('Firebase not configured');
       const snap = await getDoc(doc(db, 'users', uid));
       if (!snap.exists()) throw new Error('Profile not found');
-      return snap.data();
+      const data = snap.data();
+      if (data.talksWatched === undefined) {
+        try {
+          const countSnap = await getCountFromServer(collection(db, 'users', uid, 'watched_talks'));
+          data.talksWatched = countSnap.data().count;
+        } catch {
+          data.talksWatched = 0;
+        }
+      }
+      return data;
     } catch (error) {
       return rejectWithValue(error.message);
     }
@@ -86,5 +95,6 @@ const userSlice = createSlice({
   },
 });
 
-export const { updatePreferences, updateProfile, clearUser } = userSlice.actions;
+export const { updatePreferences, updateProfile, setHasCompletedOnboarding, clearUser } =
+  userSlice.actions;
 export default userSlice.reducer;
