@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAppDispatch } from '../store/hooks';
-import { login } from '../store/slices/authSlice';
+import { login, loginWithGoogle, loginWithApple } from '../store/slices/authSlice';
 
 const C = {
   navyDeep: '#061829',
@@ -177,19 +177,17 @@ export default function WebLoginModal({ onBack, onSignup }) {
     }
   };
 
-  const handleSocial = (provider) => {
-    // Mock social login
-    dispatch({
-      type: 'auth/login/fulfilled',
-      payload: {
-        user: {
-          uid: `${provider}-uid`,
-          email: `demo@${provider}.com`,
-          displayName: 'Demo Kullanıcı',
-        },
-        token: `mock-${provider}-token`,
-      },
-    });
+  const handleSocial = async (provider) => {
+    setLoading(true);
+    setErrors((p) => ({ ...p, submit: undefined }));
+    try {
+      if (provider === 'google') await dispatch(loginWithGoogle()).unwrap();
+      else if (provider === 'apple') await dispatch(loginWithApple()).unwrap();
+    } catch (error) {
+      setErrors((p) => ({ ...p, submit: error || 'Sosyal giriş başarısız' }));
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

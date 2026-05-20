@@ -3,6 +3,9 @@ import {
   signInWithEmailAndPassword,
   signOut,
   onAuthStateChanged,
+  signInWithPopup,
+  GoogleAuthProvider,
+  OAuthProvider,
 } from 'firebase/auth';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
 import { auth, db } from './firebase';
@@ -40,22 +43,73 @@ export const signup = async (email, password, displayName) => {
   }
 };
 
-export const login = async (email, password) => {
+export const loginWithGoogle = async () => {
   try {
     checkFirebaseAvailable();
-    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    const provider = new GoogleAuthProvider();
+    const userCredential = await signInWithPopup(auth, provider);
     const user = userCredential.user;
 
-    const userDoc = await getDoc(doc(db, 'users', user.uid));
-    const userData = userDoc.data();
+    // Check if user exists in Firestore
+    const userDocRef = doc(db, 'users', user.uid);
+    const userDoc = await getDoc(userDocRef);
+
+    if (!userDoc.exists()) {
+      // Create user document if it doesn't exist
+      await setDoc(userDocRef, {
+        uid: user.uid,
+        email: user.email,
+        displayName: user.displayName,
+        avatar: user.photoURL,
+        bio: '',
+        goals: [],
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+        preferences: { language: 'tr', units: 'metric', notifications: true },
+      });
+    }
 
     const token = await user.getIdToken();
     return {
       user: {
         uid: user.uid,
         email: user.email,
-        displayName: userData?.displayName || 'User',
-        ...userData,
+        displayName: user.displayName || 'User',
+      },
+      token,
+    };
+  } catch (error) {
+    throw new Error(error.message);
+  }
+};
+
+export const loginWithApple = async () => {
+  try {
+    checkFirebaseAvailable();
+    const provider = new OAuthProvider('apple.com');
+    const userCredential = await signInWithPopup(auth, provider);
+    const user = userCredential.user;
+
+    const userDocRef = doc(db, 'users', user.uid);
+    const userDoc = await getDoc(userDocRef);
+
+    if (!userDoc.exists()) {
+      await setDoc(userDocRef, {
+        uid: user.uid,
+        email: user.email,
+        displayName: user.displayName || 'Apple User',
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+        preferences: { language: 'tr', units: 'metric', notifications: true },
+      });
+    }
+
+    const token = await user.getIdToken();
+    return {
+      user: {
+        uid: user.uid,
+        email: user.email,
+        displayName: user.displayName || 'Apple User',
       },
       token,
     };
