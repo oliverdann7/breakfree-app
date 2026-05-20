@@ -2142,8 +2142,10 @@ export default function WebDashboard() {
   const [activeTab, setActiveTab] = useState('home');
 
   useEffect(() => {
-    dispatch(fetchMetrics());
-  }, [dispatch]);
+    if (user?.uid) {
+      dispatch(fetchMetrics(user.uid));
+    }
+  }, [dispatch, user]);
 
   const handleLogout = () => {
     if (window.confirm('Hesabından çıkmak istediğine emin misin?')) {
