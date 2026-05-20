@@ -34,6 +34,7 @@ const userSlice = createSlice({
   initialState: {
     uid: null,
     profile: null,
+    hasCompletedOnboarding: false,
     preferences: { language: 'tr', units: 'metric', notifications: true },
     loading: false,
     error: null,
@@ -45,9 +46,13 @@ const userSlice = createSlice({
     updateProfile: (state, action) => {
       state.profile = { ...state.profile, ...action.payload };
     },
+    setHasCompletedOnboarding: (state, action) => {
+      state.hasCompletedOnboarding = action.payload;
+    },
     clearUser: (state) => {
       state.uid = null;
       state.profile = null;
+      state.hasCompletedOnboarding = false;
     },
   },
   extraReducers: (builder) => {

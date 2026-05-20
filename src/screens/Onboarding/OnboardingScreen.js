@@ -1,9 +1,14 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView, Dimensions } from 'react-native';
+import { useDispatch } from 'react-redux';
 import { colors } from '../../constants/designTokens';
+import { setHasCompletedOnboarding } from '../../store/slices/userSlice';
+
+const { width } = Dimensions.get('window');
 
 export default function OnboardingScreen({ navigation }) {
-  const [currentPage] = useState(0);
+  const [currentPage, setCurrentPage] = useState(0);
+  const dispatch = useDispatch();
 
   const pages = [
     {
@@ -41,12 +46,22 @@ export default function OnboardingScreen({ navigation }) {
     },
   ];
 
-  const handleStart = () => {
-    navigation?.navigate('Auth', { screen: 'Login' }) || console.log('Navigate to Login');
+  const handleNext = () => {
+    if (currentPage < pages.length - 1) {
+      setCurrentPage(currentPage + 1);
+    } else {
+      finishOnboarding();
+    }
+  };
+
+  const finishOnboarding = () => {
+    dispatch(setHasCompletedOnboarding(true));
+    navigation?.navigate('Auth', { screen: 'Register' });
   };
 
   const handleSignUp = () => {
-    navigation?.navigate('Auth', { screen: 'Register' }) || console.log('Navigate to Register');
+    dispatch(setHasCompletedOnboarding(true));
+    navigation?.navigate('Auth', { screen: 'Register' });
   };
 
   const page = pages[currentPage];
@@ -101,8 +116,10 @@ export default function OnboardingScreen({ navigation }) {
 
         {/* Buttons */}
         <View style={styles.buttonSection}>
-          <TouchableOpacity style={styles.primaryBtn} onPress={handleStart}>
-            <Text style={styles.primaryBtnText}>Başla</Text>
+          <TouchableOpacity style={styles.primaryBtn} onPress={handleNext}>
+            <Text style={styles.primaryBtnText}>
+              {currentPage < pages.length - 1 ? 'Devam et' : 'Başla'}
+            </Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.secondaryBtn} onPress={handleSignUp}>
             <Text style={styles.secondaryBtnText}>Hesabım var</Text>
