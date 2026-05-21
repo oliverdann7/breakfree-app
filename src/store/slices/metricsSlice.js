@@ -32,12 +32,34 @@ export const fetchMetrics = createAsyncThunk('metrics/fetch', async (uid, { reje
 
 export const logMetric = createAsyncThunk(
   'metrics/log',
-  async ({ uid, data }, { rejectWithValue }) => {
+  async ({ uid, data }, { rejectWithValue, getState }) => {
     try {
       if (!db) throw new Error('Firebase not configured');
       const date = new Date().toISOString().split('T')[0];
       const entry = { ...data, date, updatedAt: Date.now() };
       await setDoc(doc(db, 'users', uid, 'metrics', date), entry, { merge: true });
+
+      // Publish public health snapshot so the community leaderboard stays current
+      const state = getState();
+      const profile = state.user?.profile;
+      const existing = state.metrics?.dailyMetrics || {};
+      await setDoc(
+        doc(db, 'user_status', uid),
+        {
+          uid,
+          displayName: profile?.nickname || profile?.displayName || 'Kullanıcı',
+          avatarEmoji: profile?.avatarEmoji || '🧘',
+          avatarBg: profile?.avatarBg || '#0072B0',
+          wellnessScore: entry.wellnessScore ?? existing.wellnessScore ?? 0,
+          steps: entry.steps ?? existing.steps ?? 0,
+          sleep: entry.sleep?.hours ?? existing.sleep?.hours ?? 0,
+          heartRate: entry.heartRate ?? existing.heartRate ?? 0,
+          calories: entry.calories ?? existing.calories ?? 0,
+          updatedAt: Date.now(),
+        },
+        { merge: true }
+      );
+
       return entry;
     } catch (error) {
       return rejectWithValue(error.message);
