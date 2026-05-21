@@ -10,6 +10,18 @@ import WebLoginModal from './src/components/WebLoginModal';
 import WebSignupModal from './src/components/WebSignupModal';
 import WebDashboard from './src/components/WebDashboard';
 
+function GlobalStyles() {
+  return (
+    <style>{`
+      body { overflow: auto !important; -webkit-overflow-scrolling: touch; }
+      html { scroll-behavior: smooth; }
+      @media (max-width: 768px) {
+        .bf-nav-links { display: none !important; }
+      }
+    `}</style>
+  );
+}
+
 function WebAppContent() {
   const [view, setView] = React.useState('landing'); // 'landing', 'login', 'signup'
   const { isAuthenticated } = useAppSelector((state) => state.auth);
@@ -35,6 +47,7 @@ function WebApp() {
   return (
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
+        <GlobalStyles />
         <WebAppContent />
       </PersistGate>
     </Provider>

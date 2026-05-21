@@ -22,10 +22,20 @@ function AppRouter() {
   return <BreakFreeLanding onStart={() => setShowLogin(true)} />;
 }
 
+function GlobalStyles() {
+  return (
+    <style>{`
+      body { overflow: auto !important; -webkit-overflow-scrolling: touch; }
+      html { scroll-behavior: smooth; }
+    `}</style>
+  );
+}
+
 export default function WebApp() {
   return (
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
+        <GlobalStyles />
         <AppRouter />
       </PersistGate>
     </Provider>
