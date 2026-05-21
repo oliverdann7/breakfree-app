@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -15,13 +15,17 @@ import {
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { updateProfile, updateProfileFirestore } from '../../store/slices/userSlice';
 import {
-  fetchPosts,
+  subscribeToPosts,
+  unsubscribeFromPosts,
   createPost,
   toggleLike,
   fetchComments,
   addComment,
 } from '../../store/slices/communitySlice';
+import { fetchActiveChallenges, joinChallenge } from '../../store/slices/challengesSlice';
 import Card from '../../components/common/Card';
+import HealthStatusCard from '../../components/features/HealthStatusCard';
+import LeaderboardCard from '../../components/features/LeaderboardCard';
 import { colors } from '../../constants/designTokens';
 
 const AVATAR_EMOJIS = ['🧘', '🏃', '💪', '🌿', '🎯', '⭐', '🔥', '🏆', '🌸', '🦋', '💫', '🎗'];
@@ -34,6 +38,12 @@ const AVATAR_COLORS = [
   '#10B981',
   '#F59E0B',
   '#EC4899',
+];
+
+const FILTER_TABS = [
+  { key: 'all', label: 'Tümü' },
+  { key: 'health_checkin', label: '💚 Sağlık' },
+  { key: 'text', label: '📝 Gönderi' },
 ];
 
 function Avatar({ emoji, bg, size = 40 }) {
@@ -86,19 +96,44 @@ function PostCard({ post, onLike, onAddComment, onFetchComments, comments = [], 
     setCommentText('');
   };
 
+  const timeStr = post.createdAt
+    ? new Date(post.createdAt).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })
+    : '';
+
   return (
     <Card style={styles.postCard}>
-      <View style={styles.postHeader}>
-        <Avatar emoji={post.emoji} bg={post.bg} size={40} />
-        <View style={styles.postMeta}>
-          <Text style={styles.postAuthor}>{post.author}</Text>
-          <Text style={styles.postTime}>{post.time}</Text>
-        </View>
-      </View>
-
-      <Text style={styles.postText}>{post.text}</Text>
-
-      {post.sharedStats && <StatsRow stats={post.sharedStats} />}
+      {post.type === 'health_checkin' && post.sharedStats ? (
+        <HealthStatusCard
+          name={post.author || post.authorName}
+          emoji={post.emoji || post.authorEmoji}
+          bg={post.bg || post.authorBg}
+          wellnessScore={post.sharedStats.wellness || 0}
+          steps={post.sharedStats.steps}
+          sleep={post.sharedStats.sleep}
+          heartRate={post.sharedStats.heartRate}
+          calories={post.sharedStats.calories}
+          streak={post.sharedStats.streak}
+          message={post.text}
+          time={timeStr}
+          compact
+        />
+      ) : (
+        <>
+          <View style={styles.postHeader}>
+            <Avatar
+              emoji={post.emoji || post.authorEmoji}
+              bg={post.bg || post.authorBg}
+              size={40}
+            />
+            <View style={styles.postMeta}>
+              <Text style={styles.postAuthor}>{post.author || post.authorName}</Text>
+              <Text style={styles.postTime}>{timeStr}</Text>
+            </View>
+          </View>
+          <Text style={styles.postText}>{post.text}</Text>
+          {post.sharedStats && <StatsRow stats={post.sharedStats} />}
+        </>
+      )}
 
       <View style={styles.postActions}>
         <TouchableOpacity style={styles.actionBtn} onPress={onLike}>
@@ -155,12 +190,13 @@ function PostCard({ post, onLike, onAddComment, onFetchComments, comments = [], 
   );
 }
 
-export default function CommunityScreen() {
+export default function CommunityScreen({ route }) {
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state.auth);
   const { profile: reduxProfile } = useAppSelector((state) => state.user);
   const { dailyMetrics, wellnessScore } = useAppSelector((state) => state.metrics);
   const { posts, commentsByPost } = useAppSelector((state) => state.community);
+  const { challenges, userParticipation } = useAppSelector((state) => state.challenges);
 
   const initProfile = {
     nickname:
@@ -171,24 +207,47 @@ export default function CommunityScreen() {
   };
 
   const [myProfile, setMyProfile] = useState(initProfile);
+  const [activeFilter, setActiveFilter] = useState('all');
 
   useEffect(() => {
-    dispatch(fetchPosts(user?.uid));
+    const unsub = dispatch(subscribeToPosts(user?.uid));
+    dispatch(fetchActiveChallenges(user?.uid));
+    return () => {
+      unsubscribeFromPosts();
+    };
   }, [user?.uid]);
+
+  // Open check-in modal if navigated here with openCheckIn param
+  useEffect(() => {
+    if (route?.params?.openCheckIn) {
+      setCheckInVisible(true);
+    }
+  }, [route?.params?.openCheckIn]);
 
   // Profile edit modal
   const [profileVisible, setProfileVisible] = useState(false);
   const [draft, setDraft] = useState(initProfile);
 
-  // Post create modal
+  // Text post modal
   const [postVisible, setPostVisible] = useState(false);
   const [postText, setPostText] = useState('');
   const [shareStats, setShareStats] = useState(false);
+
+  // Health check-in modal
+  const [checkInVisible, setCheckInVisible] = useState(false);
+  const [checkInMessage, setCheckInMessage] = useState('');
+
+  // FAB menu
+  const [fabOpen, setFabOpen] = useState(false);
+
+  const filteredPosts =
+    activeFilter === 'all' ? posts : posts.filter((p) => (p.type || 'text') === activeFilter);
 
   const openProfileEdit = () => {
     setDraft({ ...myProfile });
     setProfileVisible(true);
   };
+
   const saveProfile = () => {
     setMyProfile(draft);
     setProfileVisible(false);
@@ -200,9 +259,7 @@ export default function CommunityScreen() {
       avatarBg: draft.bg,
     };
     dispatch(updateProfile(profileData));
-    if (user?.uid) {
-      dispatch(updateProfileFirestore({ uid: user.uid, ...profileData }));
-    }
+    if (user?.uid) dispatch(updateProfileFirestore({ uid: user.uid, ...profileData }));
   };
 
   const submitPost = () => {
@@ -215,6 +272,7 @@ export default function CommunityScreen() {
         authorEmoji: myProfile.emoji,
         authorBg: myProfile.bg,
         text: postText.trim(),
+        type: 'text',
         sharedStats:
           shareStats && dm
             ? { wellness: wellnessScore, steps: dm.steps, sleep: dm.sleep?.hours }
@@ -224,6 +282,29 @@ export default function CommunityScreen() {
     setPostText('');
     setShareStats(false);
     setPostVisible(false);
+  };
+
+  const submitCheckIn = () => {
+    const dm = dailyMetrics;
+    dispatch(
+      createPost({
+        uid: user?.uid,
+        authorName: myProfile.nickname,
+        authorEmoji: myProfile.emoji,
+        authorBg: myProfile.bg,
+        text: checkInMessage.trim(),
+        type: 'health_checkin',
+        sharedStats: {
+          wellness: wellnessScore || 0,
+          steps: dm?.steps || 0,
+          sleep: dm?.sleep?.hours || 0,
+          heartRate: dm?.heartRate || 0,
+          calories: dm?.calories || 0,
+        },
+      })
+    );
+    setCheckInMessage('');
+    setCheckInVisible(false);
   };
 
   const handleToggleLike = (postId, currentlyLiked) => {
@@ -245,9 +326,8 @@ export default function CommunityScreen() {
     );
   };
 
-  const handleFetchComments = (postId) => {
-    dispatch(fetchComments(postId));
-  };
+  const activeChallenge = challenges[0] || null;
+  const dm = dailyMetrics;
 
   const ListHeader = () => (
     <>
@@ -269,8 +349,13 @@ export default function CommunityScreen() {
           <View style={styles.profileStats}>
             {[
               { label: 'Wellness', value: wellnessScore || '—', color: colors.cyan },
-              { label: 'Seri', value: '47g', color: colors.gold },
-              { label: 'Talk', value: '12', color: colors.cyan },
+              { label: 'Gönderi', value: posts.length, color: colors.gold },
+              {
+                label: 'Check-in',
+                value: posts.filter((p) => p.authorUid === user?.uid && p.type === 'health_checkin')
+                  .length,
+                color: colors.success,
+              },
             ].map((s) => (
               <View key={s.label} style={styles.profileStat}>
                 <Text style={[styles.profileStatVal, { color: s.color }]}>{s.value}</Text>
@@ -282,43 +367,81 @@ export default function CommunityScreen() {
         <Text style={styles.editChevron}>✎</Text>
       </TouchableOpacity>
 
+      {/* Leaderboard */}
+      <LeaderboardCard />
+
+      {/* Active challenge */}
+      {activeChallenge ? (
+        <Card style={styles.challengeCard}>
+          <View style={styles.challengeHeader}>
+            <Text style={styles.challengeTitle}>
+              {activeChallenge.icon || '🏆'} {activeChallenge.title}
+            </Text>
+            <Text style={styles.challengeDays}>
+              {Math.max(0, Math.ceil((activeChallenge.endDate - Date.now()) / 86400000))} gün kaldı
+            </Text>
+          </View>
+          <Text style={styles.challengeDesc}>{activeChallenge.description}</Text>
+          <View style={styles.challengeFooter}>
+            <Text style={styles.challengeProgress}>
+              {activeChallenge.participantCount || 0} katılımcı
+            </Text>
+            {!userParticipation[activeChallenge.id] && user?.uid && (
+              <TouchableOpacity
+                style={styles.joinBtn}
+                onPress={() =>
+                  dispatch(joinChallenge({ challengeId: activeChallenge.id, uid: user.uid }))
+                }
+              >
+                <Text style={styles.joinBtnText}>Katıl</Text>
+              </TouchableOpacity>
+            )}
+            {userParticipation[activeChallenge.id] && (
+              <Text style={styles.joinedBadge}>✓ Katıldın</Text>
+            )}
+          </View>
+        </Card>
+      ) : null}
+
       {/* Header row */}
       <View style={styles.header}>
         <View>
           <Text style={styles.title}>Topluluk</Text>
           <Text style={styles.subtitle}>
-            akışı <Text style={{ color: colors.gold }}>·</Text>{' '}
-            {posts.length > 0 ? `${posts.length} gönderi` : 'yükleniyor...'}
+            {filteredPosts.length > 0 ? `${filteredPosts.length} gönderi` : 'yükleniyor...'}
           </Text>
         </View>
-        <TouchableOpacity style={styles.createBtn} onPress={() => setPostVisible(true)}>
-          <Text style={styles.createBtnText}>+ Paylaş</Text>
-        </TouchableOpacity>
       </View>
 
-      {/* Weekly challenge */}
-      <Card style={styles.challengeCard}>
-        <View style={styles.challengeHeader}>
-          <Text style={styles.challengeTitle}>🏆 Haftalık Meydan Okuma</Text>
-          <Text style={styles.challengeDays}>3 gün kaldı</Text>
-        </View>
-        <Text style={styles.challengeDesc}>7 gün boyunca günde 8.000 adım at</Text>
-        <View style={styles.challengeBar}>
-          <View style={[styles.challengeFill, { width: '57%' }]} />
-        </View>
-        <Text style={styles.challengeProgress}>4/7 gün · 234 katılımcı</Text>
-      </Card>
-
-      <Text style={styles.feedTitle}>Son Paylaşımlar</Text>
+      {/* Filter tabs */}
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.filterTabsRow}
+      >
+        {FILTER_TABS.map((tab) => (
+          <TouchableOpacity
+            key={tab.key}
+            style={[styles.filterTab, activeFilter === tab.key && styles.filterTabActive]}
+            onPress={() => setActiveFilter(tab.key)}
+          >
+            <Text
+              style={[styles.filterTabText, activeFilter === tab.key && styles.filterTabTextActive]}
+            >
+              {tab.label}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
     </>
   );
 
   return (
     <SafeAreaView style={styles.container}>
       <FlatList
-        data={posts}
+        data={filteredPosts}
         keyExtractor={(item) => item.postId}
-        contentContainerStyle={{ paddingBottom: 32 }}
+        contentContainerStyle={{ paddingBottom: 100 }}
         showsVerticalScrollIndicator={false}
         ListHeaderComponent={<ListHeader />}
         renderItem={({ item }) => (
@@ -327,11 +450,53 @@ export default function CommunityScreen() {
             myProfile={myProfile}
             onLike={() => handleToggleLike(item.postId, item.liked)}
             onAddComment={handleAddComment}
-            onFetchComments={handleFetchComments}
+            onFetchComments={(id) => dispatch(fetchComments(id))}
             comments={commentsByPost[item.postId] || []}
           />
         )}
       />
+
+      {/* FAB */}
+      {fabOpen && (
+        <TouchableOpacity
+          style={StyleSheet.absoluteFill}
+          activeOpacity={1}
+          onPress={() => setFabOpen(false)}
+        />
+      )}
+      <View style={styles.fabContainer}>
+        {fabOpen && (
+          <View style={styles.fabMenu}>
+            <TouchableOpacity
+              style={styles.fabMenuItem}
+              onPress={() => {
+                setFabOpen(false);
+                setCheckInVisible(true);
+              }}
+            >
+              <Text style={styles.fabMenuIcon}>💚</Text>
+              <Text style={styles.fabMenuText}>Sağlık Check-in</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.fabMenuItem}
+              onPress={() => {
+                setFabOpen(false);
+                setPostVisible(true);
+              }}
+            >
+              <Text style={styles.fabMenuIcon}>📝</Text>
+              <Text style={styles.fabMenuText}>Metin Paylaş</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+        <TouchableOpacity
+          style={[styles.fab, fabOpen && styles.fabOpen]}
+          onPress={() => setFabOpen((v) => !v)}
+          activeOpacity={0.85}
+        >
+          <Text style={styles.fabIcon}>{fabOpen ? '✕' : '+'}</Text>
+        </TouchableOpacity>
+      </View>
 
       {/* ── Profile Edit Modal ── */}
       <Modal visible={profileVisible} animationType="slide" transparent>
@@ -343,8 +508,6 @@ export default function CommunityScreen() {
             <View style={styles.modalHandle} />
             <ScrollView showsVerticalScrollIndicator={false}>
               <Text style={styles.modalTitle}>Profili Düzenle</Text>
-
-              {/* Preview */}
               <View style={styles.previewRow}>
                 <View style={[styles.previewAvatar, { backgroundColor: draft.bg }]}>
                   <Text style={styles.previewEmoji}>{draft.emoji}</Text>
@@ -354,8 +517,6 @@ export default function CommunityScreen() {
                   <Text style={styles.previewHint}>Önizleme</Text>
                 </View>
               </View>
-
-              {/* Emoji picker */}
               <Text style={styles.pickerLabel}>Emoji</Text>
               <View style={styles.emojiGrid}>
                 {AVATAR_EMOJIS.map((em) => (
@@ -374,8 +535,6 @@ export default function CommunityScreen() {
                   </TouchableOpacity>
                 ))}
               </View>
-
-              {/* Color picker */}
               <Text style={styles.pickerLabel}>Renk</Text>
               <View style={styles.colorRow}>
                 {AVATAR_COLORS.map((color) => (
@@ -390,8 +549,6 @@ export default function CommunityScreen() {
                   />
                 ))}
               </View>
-
-              {/* Nickname */}
               <Text style={styles.pickerLabel}>Kullanıcı adı</Text>
               <TextInput
                 style={styles.textField}
@@ -400,8 +557,6 @@ export default function CommunityScreen() {
                 placeholder="Kullanıcı adın..."
                 placeholderTextColor="rgba(255,255,255,0.3)"
               />
-
-              {/* Bio */}
               <Text style={styles.pickerLabel}>Bio</Text>
               <TextInput
                 style={[styles.textField, { height: 80 }]}
@@ -412,7 +567,6 @@ export default function CommunityScreen() {
                 multiline
                 textAlignVertical="top"
               />
-
               <View style={styles.modalActions}>
                 <TouchableOpacity style={styles.saveBtn} onPress={saveProfile}>
                   <Text style={styles.saveBtnText}>Kaydet</Text>
@@ -427,7 +581,7 @@ export default function CommunityScreen() {
         </View>
       </Modal>
 
-      {/* ── New Post Modal ── */}
+      {/* ── New Text Post Modal ── */}
       <Modal visible={postVisible} animationType="slide" transparent>
         <View style={styles.modalOverlay}>
           <KeyboardAvoidingView
@@ -435,8 +589,7 @@ export default function CommunityScreen() {
             style={styles.modalSheet}
           >
             <View style={styles.modalHandle} />
-            <Text style={styles.modalTitle}>Paylaş</Text>
-
+            <Text style={styles.modalTitle}>📝 Gönderi Paylaş</Text>
             <View style={styles.composerRow}>
               <Avatar emoji={myProfile.emoji} bg={myProfile.bg} size={40} />
               <TextInput
@@ -449,8 +602,6 @@ export default function CommunityScreen() {
                 autoFocus
               />
             </View>
-
-            {/* Share stats toggle */}
             <TouchableOpacity
               style={[styles.statsToggle, shareStats && styles.statsToggleOn]}
               onPress={() => setShareStats((s) => !s)}
@@ -459,20 +610,14 @@ export default function CommunityScreen() {
                 {shareStats && <Text style={styles.toggleCheckMark}>✓</Text>}
               </View>
               <Text style={[styles.statsToggleText, shareStats && { color: colors.gold }]}>
-                Wellness istatistiklerimi paylaş
+                Wellness istatistiklerimi ekle
               </Text>
             </TouchableOpacity>
-
-            {shareStats && dailyMetrics && (
+            {shareStats && dm && (
               <StatsRow
-                stats={{
-                  wellness: wellnessScore,
-                  steps: dailyMetrics.steps,
-                  sleep: dailyMetrics.sleep.hours,
-                }}
+                stats={{ wellness: wellnessScore, steps: dm.steps, sleep: dm.sleep?.hours }}
               />
             )}
-
             <View style={styles.modalActions}>
               <TouchableOpacity
                 style={[styles.saveBtn, !postText.trim() && { opacity: 0.4 }]}
@@ -487,6 +632,66 @@ export default function CommunityScreen() {
                   setPostVisible(false);
                   setPostText('');
                   setShareStats(false);
+                }}
+              >
+                <Text style={styles.cancelBtnText}>İptal</Text>
+              </TouchableOpacity>
+            </View>
+            <View style={{ height: 24 }} />
+          </KeyboardAvoidingView>
+        </View>
+      </Modal>
+
+      {/* ── Health Check-In Modal ── */}
+      <Modal visible={checkInVisible} animationType="slide" transparent>
+        <View style={styles.modalOverlay}>
+          <KeyboardAvoidingView
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            style={styles.modalSheet}
+          >
+            <View style={styles.modalHandle} />
+            <Text style={styles.modalTitle}>💚 Sağlık Check-in</Text>
+
+            {/* Preview card */}
+            <HealthStatusCard
+              name={myProfile.nickname}
+              emoji={myProfile.emoji}
+              bg={myProfile.bg}
+              wellnessScore={wellnessScore || 0}
+              steps={dm?.steps}
+              sleep={dm?.sleep?.hours}
+              heartRate={dm?.heartRate}
+              calories={dm?.calories}
+              message={checkInMessage || undefined}
+              compact
+            />
+
+            <Text style={[styles.pickerLabel, { marginTop: 16 }]}>Mesaj (isteğe bağlı)</Text>
+            <TextInput
+              style={[styles.textField, { height: 72 }]}
+              value={checkInMessage}
+              onChangeText={setCheckInMessage}
+              placeholder="Bugün nasılsın?"
+              placeholderTextColor="rgba(255,255,255,0.3)"
+              multiline
+              textAlignVertical="top"
+            />
+
+            {(!dm || wellnessScore === 0) && (
+              <Text style={styles.noMetricsHint}>
+                💡 Sağlık sekmesinden metrik girerek daha zengin bir check-in paylaşabilirsin.
+              </Text>
+            )}
+
+            <View style={styles.modalActions}>
+              <TouchableOpacity style={styles.saveBtn} onPress={submitCheckIn}>
+                <Text style={styles.saveBtnText}>Paylaş</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.cancelBtn}
+                onPress={() => {
+                  setCheckInVisible(false);
+                  setCheckInMessage('');
                 }}
               >
                 <Text style={styles.cancelBtnText}>İptal</Text>
@@ -537,57 +742,62 @@ const styles = StyleSheet.create({
   profileStatLabel: { fontSize: 9, color: colors.textTertiary, fontWeight: '600' },
   editChevron: { fontSize: 16, color: colors.textTertiary },
 
-  // Header
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingBottom: 12,
-  },
-  title: { fontSize: 22, fontWeight: '700', color: colors.textPrimary },
-  subtitle: { fontSize: 11, color: 'rgba(255,255,255,0.4)', marginTop: 2 },
-  createBtn: {
-    paddingHorizontal: 14,
-    paddingVertical: 7,
-    backgroundColor: colors.cyan,
-    borderRadius: 999,
-  },
-  createBtnText: { color: colors.navy, fontSize: 13, fontWeight: '600' },
-
   // Challenge
   challengeCard: {
     marginHorizontal: 16,
     marginBottom: 12,
     gap: 8,
+    borderWidth: 0,
     borderLeftWidth: 4,
     borderLeftColor: colors.gold,
     backgroundColor: 'rgba(201, 150, 26, 0.06)',
   },
-  challengeHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  challengeHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
   challengeTitle: { fontSize: 13, fontWeight: '700', color: colors.textPrimary },
   challengeDays: { fontSize: 11, color: colors.gold },
   challengeDesc: { fontSize: 12, color: colors.textSecondary },
-  challengeBar: {
-    height: 5,
-    backgroundColor: 'rgba(255,255,255,0.1)',
-    borderRadius: 3,
-    overflow: 'hidden',
-  },
-  challengeFill: { height: '100%', backgroundColor: colors.gold, borderRadius: 3 },
+  challengeFooter: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   challengeProgress: { fontSize: 10, color: colors.textTertiary },
-  feedTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: colors.textPrimary,
-    paddingHorizontal: 16,
-    marginBottom: 8,
+  joinBtn: {
+    paddingHorizontal: 14,
+    paddingVertical: 5,
+    backgroundColor: colors.gold,
+    borderRadius: 999,
   },
+  joinBtnText: { fontSize: 11, fontWeight: '700', color: colors.navy },
+  joinedBadge: { fontSize: 11, color: colors.success, fontWeight: '600' },
+
+  // Header + filter
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingBottom: 8,
+  },
+  title: { fontSize: 22, fontWeight: '700', color: colors.textPrimary },
+  subtitle: { fontSize: 11, color: 'rgba(255,255,255,0.4)', marginTop: 2 },
+  filterTabsRow: { paddingHorizontal: 16, gap: 8, paddingBottom: 12 },
+  filterTab: {
+    paddingHorizontal: 14,
+    paddingVertical: 6,
+    borderRadius: 999,
+    backgroundColor: 'rgba(255,255,255,0.06)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.1)',
+  },
+  filterTabActive: { backgroundColor: colors.cyan, borderColor: colors.cyan },
+  filterTabText: { fontSize: 12, color: colors.textSecondary, fontWeight: '500' },
+  filterTabTextActive: { color: colors.navy, fontWeight: '700' },
 
   // Avatar
   avatar: { alignItems: 'center', justifyContent: 'center' },
 
-  // Stats row (shared stats card in post)
+  // Stats row
   statsRow: {
     flexDirection: 'row',
     backgroundColor: 'rgba(255,255,255,0.05)',
@@ -668,6 +878,49 @@ const styles = StyleSheet.create({
   },
   commentSendText: { color: colors.navy, fontWeight: '700', fontSize: 14 },
 
+  // FAB
+  fabContainer: {
+    position: 'absolute',
+    bottom: 24,
+    right: 20,
+    alignItems: 'flex-end',
+    gap: 10,
+  },
+  fabMenu: { gap: 8, alignItems: 'flex-end' },
+  fabMenuItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    backgroundColor: colors.bgSecondary,
+    borderRadius: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderWidth: 1,
+    borderColor: colors.border,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
+  },
+  fabMenuIcon: { fontSize: 18 },
+  fabMenuText: { fontSize: 13, fontWeight: '600', color: colors.textPrimary },
+  fab: {
+    width: 52,
+    height: 52,
+    borderRadius: 26,
+    backgroundColor: colors.cyan,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: colors.cyan,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.5,
+    shadowRadius: 12,
+    elevation: 8,
+  },
+  fabOpen: { backgroundColor: colors.gold },
+  fabIcon: { fontSize: 24, color: colors.navy, fontWeight: '700' },
+
   // Modal
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'flex-end' },
   modalSheet: {
@@ -687,7 +940,6 @@ const styles = StyleSheet.create({
   },
   modalTitle: { fontSize: 17, fontWeight: '700', color: colors.textPrimary, marginBottom: 20 },
 
-  // Profile modal
   previewRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -736,8 +988,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginBottom: 16,
   },
-
-  // Post modal
   composerRow: { flexDirection: 'row', gap: 10, alignItems: 'flex-start', marginBottom: 14 },
   statsToggle: {
     flexDirection: 'row',
@@ -760,8 +1010,15 @@ const styles = StyleSheet.create({
   toggleCheckOn: { backgroundColor: colors.gold },
   toggleCheckMark: { fontSize: 12, color: colors.navy, fontWeight: '800' },
   statsToggleText: { fontSize: 13, color: colors.textSecondary, fontWeight: '500' },
-
-  // Modal actions
+  noMetricsHint: {
+    fontSize: 12,
+    color: colors.textTertiary,
+    backgroundColor: 'rgba(255,255,255,0.04)',
+    borderRadius: 10,
+    padding: 12,
+    marginBottom: 12,
+    lineHeight: 18,
+  },
   modalActions: { flexDirection: 'row', gap: 10, marginTop: 8 },
   saveBtn: {
     flex: 1,

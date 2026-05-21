@@ -13,6 +13,7 @@ import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { logout } from '../../store/slices/authSlice';
 import { updatePreferences } from '../../store/slices/userSlice';
 import Card from '../../components/common/Card';
+import HealthStatusCard from '../../components/features/HealthStatusCard';
 import { colors } from '../../constants/designTokens';
 
 function SettingRow({ icon, label, value, onPress, rightElement, isDestructive }) {
@@ -34,6 +35,7 @@ export default function ProfileScreen({ navigation }) {
   const { i18n } = useTranslation();
   const { user } = useAppSelector((state) => state.auth);
   const { preferences, profile } = useAppSelector((state) => state.user);
+  const { wellnessScore, dailyMetrics } = useAppSelector((state) => state.metrics);
 
   // Prefer persisted profile over auth user (edit profile updates profile slice)
   const displayData = profile || user || {};
@@ -92,6 +94,31 @@ export default function ProfileScreen({ navigation }) {
             <Text style={styles.editBtnText}>Profili Düzenle</Text>
           </TouchableOpacity>
         </View>
+
+        {/* Public health status */}
+        {(wellnessScore > 0 || dailyMetrics) && (
+          <View style={styles.healthStatusSection}>
+            <Text style={styles.settingsSectionTitle}>Sağlık Durumum</Text>
+            <View style={{ marginHorizontal: 20, marginBottom: 8 }}>
+              <HealthStatusCard
+                name={displayData.displayName || 'Kullanıcı'}
+                emoji={profile?.avatarEmoji || '🧘'}
+                bg={profile?.avatarBg || colors.royal}
+                wellnessScore={wellnessScore || 0}
+                steps={dailyMetrics?.steps}
+                sleep={dailyMetrics?.sleep?.hours}
+                heartRate={dailyMetrics?.heartRate}
+                calories={dailyMetrics?.calories}
+              />
+            </View>
+            <TouchableOpacity
+              style={styles.shareHealthBtn}
+              onPress={() => navigation.navigate('Topluluk', { openCheckIn: true })}
+            >
+              <Text style={styles.shareHealthBtnText}>💚 Sağlık Durumumu Paylaş</Text>
+            </TouchableOpacity>
+          </View>
+        )}
 
         {/* Goals */}
         <Card style={styles.goalsCard}>
@@ -259,4 +286,16 @@ const styles = StyleSheet.create({
     color: colors.textTertiary,
     marginTop: 8,
   },
+  healthStatusSection: { marginBottom: 8 },
+  shareHealthBtn: {
+    marginHorizontal: 20,
+    marginBottom: 16,
+    backgroundColor: 'rgba(16, 185, 129, 0.12)',
+    borderRadius: 12,
+    paddingVertical: 12,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(16, 185, 129, 0.25)',
+  },
+  shareHealthBtnText: { fontSize: 14, fontWeight: '600', color: colors.success },
 });
