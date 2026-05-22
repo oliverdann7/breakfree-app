@@ -13,7 +13,7 @@ import {
 } from 'react-native';
 import { Svg, Path } from 'react-native-svg';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
-import { login, clearError } from '../../store/slices/authSlice';
+import { login, loginWithGoogle, loginWithApple, clearError } from '../../store/slices/authSlice';
 import BreakFreeLogo from '../../components/branding/BreakFreeLogo';
 import { colors } from '../../constants/designTokens';
 
@@ -77,38 +77,22 @@ export default function LoginScreen({ navigation }) {
     const result = await dispatch(login({ email, password }));
     if (login.rejected.match(result)) {
       const errorMsg = result.payload;
-      if (errorMsg?.includes('Firebase not configured')) {
-        const buttons = [{ text: 'İptal' }];
-        if (__DEV__) {
-          buttons.push({ text: 'Test (Mock)', onPress: () => forceMockLogin() });
-        }
-        Alert.alert(
-          'Firebase Yapılandırılmadı',
-          'Lütfen .env.local dosyasını yapılandırın.',
-          buttons
-        );
-      } else {
-        Alert.alert('Giriş Başarısız', errorMsg || 'E-posta veya şifre yanlış.');
-      }
+      Alert.alert('Giriş Başarısız', errorMsg || 'E-posta veya şifre yanlış.');
     }
   };
 
-  const forceMockLogin = () => {
-    dispatch({
-      type: 'auth/login/fulfilled',
-      payload: {
-        user: { uid: 'mock-uid', email, displayName: 'Demo Kullanıcı' },
-        token: 'mock-token-123',
-      },
-    });
+  const handleGoogleLogin = async () => {
+    const result = await dispatch(loginWithGoogle());
+    if (loginWithGoogle.rejected.match(result)) {
+      Alert.alert('Google Giriş Başarısız', result.payload || 'Bir hata oluştu.');
+    }
   };
 
-  const handleGoogleLogin = () => {
-    Alert.alert('Google', 'Google ile giriş çok yakında!');
-  };
-
-  const handleAppleLogin = () => {
-    Alert.alert('Apple', 'Apple ile giriş çok yakında!');
+  const handleAppleLogin = async () => {
+    const result = await dispatch(loginWithApple());
+    if (loginWithApple.rejected.match(result)) {
+      Alert.alert('Apple Giriş Başarısız', result.payload || 'Bir hata oluştu.');
+    }
   };
 
   return (

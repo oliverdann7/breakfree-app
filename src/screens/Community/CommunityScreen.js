@@ -13,7 +13,11 @@ import {
   ScrollView,
 } from 'react-native';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
-import { updateProfile, updateProfileFirestore } from '../../store/slices/userSlice';
+import {
+  updateProfile,
+  updateProfileFirestore,
+  fetchUserStats,
+} from '../../store/slices/userSlice';
 import {
   fetchPosts,
   createPost,
@@ -161,6 +165,7 @@ export default function CommunityScreen() {
   const { profile: reduxProfile } = useAppSelector((state) => state.user);
   const { dailyMetrics, wellnessScore } = useAppSelector((state) => state.metrics);
   const { posts, commentsByPost } = useAppSelector((state) => state.community);
+  const { stats } = useAppSelector((state) => state.user);
 
   const initProfile = {
     nickname:
@@ -174,6 +179,7 @@ export default function CommunityScreen() {
 
   useEffect(() => {
     dispatch(fetchPosts(user?.uid));
+    if (user?.uid) dispatch(fetchUserStats(user.uid));
   }, [user?.uid]);
 
   // Profile edit modal
@@ -269,8 +275,8 @@ export default function CommunityScreen() {
           <View style={styles.profileStats}>
             {[
               { label: 'Wellness', value: wellnessScore || '—', color: colors.cyan },
-              { label: 'Seri', value: '47g', color: colors.gold },
-              { label: 'Talk', value: '12', color: colors.cyan },
+              { label: 'Seri', value: `${stats?.streak || 0}g`, color: colors.gold },
+              { label: 'Talk', value: String(stats?.totalTalks || 0), color: colors.cyan },
             ].map((s) => (
               <View key={s.label} style={styles.profileStat}>
                 <Text style={[styles.profileStatVal, { color: s.color }]}>{s.value}</Text>

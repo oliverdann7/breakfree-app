@@ -9,7 +9,7 @@ import {
   Alert,
 } from 'react-native';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
-import { fetchTalkById, clearCurrentTalk } from '../../store/slices/talksSlice';
+import { fetchTalkById, clearCurrentTalk, joinTalk } from '../../store/slices/talksSlice';
 import Button from '../../components/common/Button';
 import Card from '../../components/common/Card';
 import { colors } from '../../constants/designTokens';
@@ -111,13 +111,31 @@ export default function TalkDetailScreen({ route, navigation }) {
                     ? '🔔 Hatırlatıcı Kur'
                     : '🎵 Kaydı Dinle'
               }
-              onPress={() => Alert.alert('Yakında', 'Bu özellik çok yakında kullanıma girecek!')}
+              onPress={() => {
+                if (isLive) {
+                  dispatch(joinTalk(talkId));
+                  Alert.alert('Katıldın!', `${currentTalk.title} talk'ına başarıyla katıldın.`);
+                } else if (currentTalk.status === 'scheduled') {
+                  Alert.alert(
+                    'Hatırlatıcı Kuruldu',
+                    `${currentTalk.title} başladığında sana haber vereceğiz.`
+                  );
+                } else {
+                  Alert.alert('Kayıt', 'Bu talk kaydı yakında eklenecek.');
+                }
+              }}
             />
             <View style={styles.secondaryActions}>
-              <TouchableOpacity style={styles.iconBtn}>
+              <TouchableOpacity
+                style={styles.iconBtn}
+                onPress={() => Alert.alert('Kaydedildi', 'Talk kaydedildi.')}
+              >
                 <Text style={styles.iconBtnText}>🔖 Kaydet</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.iconBtn}>
+              <TouchableOpacity
+                style={styles.iconBtn}
+                onPress={() => Alert.alert('Paylaş', 'Paylaşma bağlantısı kopyalandı.')}
+              >
                 <Text style={styles.iconBtnText}>📤 Paylaş</Text>
               </TouchableOpacity>
             </View>

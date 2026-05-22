@@ -3,6 +3,7 @@ import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { logout } from '../store/slices/authSlice';
 import MetricLoggerModal from './MetricLoggerModal';
 import { fetchMetrics } from '../store/slices/metricsSlice';
+import { seedTalks, joinTalk } from '../store/slices/talksSlice';
 import { updateProfileFirestore } from '../store/slices/userSlice';
 import { fetchTalks } from '../store/slices/talksSlice';
 import {
@@ -696,7 +697,55 @@ function HomeTab({ user, metrics, weeklyData, wellnessScore, loading, onLogMetri
   );
 }
 
-function TalksTab({ talks }) {
+function TalksTab({ talks, onSeed }) {
+  const dispatch = useAppDispatch();
+
+  if (talks.length === 0) {
+    return (
+      <div>
+        <h2
+          className="wd-display"
+          style={{ fontSize: 30, fontWeight: 700, color: C.textPrimary, margin: '0 0 6px' }}
+        >
+          Palestralar
+        </h2>
+        <p style={{ fontSize: 13, color: C.textSecondary, margin: '0 0 28px' }}>
+          Türkiye&apos;nin en güçlü zihinleri
+        </p>
+        <div
+          style={{
+            textAlign: 'center',
+            padding: '60px 20px',
+            background: 'rgba(255,255,255,0.02)',
+            borderRadius: 16,
+            border: '1px dashed rgba(255,255,255,0.12)',
+          }}
+        >
+          <p style={{ fontSize: 40, margin: '0 0 12px' }}>🎧</p>
+          <p style={{ fontSize: 18, fontWeight: 600, color: C.textPrimary, margin: '0 0 6px' }}>
+            Henüz palestra yok
+          </p>
+          <p style={{ fontSize: 13, color: C.textTertiary, margin: '0 0 20px' }}>
+            İlk palestrayı ekleyerek topluluğa öncülük et!
+          </p>
+          <button
+            onClick={onSeed}
+            className="bf-btn-primary"
+            style={{
+              padding: '12px 28px',
+              borderRadius: 100,
+              fontSize: 14,
+              fontWeight: 700,
+              fontFamily: "'Manrope', system-ui, sans-serif",
+            }}
+          >
+            Örnek Palestraları Yükle
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div>
       <h2
@@ -709,7 +758,6 @@ function TalksTab({ talks }) {
         Türkiye&apos;nin en güçlü zihinleri
       </p>
 
-      {/* Live card (logic simplified for demo) */}
       {talks
         .filter((t) => t.status === 'live')
         .map((t) => (
@@ -746,6 +794,7 @@ function TalksTab({ talks }) {
               {t.host.name} · {t.duration}dk
             </p>
             <button
+              onClick={() => dispatch(joinTalk(t.talkId))}
               style={{
                 width: '100%',
                 background: C.gold,
@@ -1699,7 +1748,12 @@ export default function WebDashboard() {
       case 'home':
         return <HomeTab user={user} {...metricsProps} onLogMetrics={() => setShowLogger(true)} />;
       case 'talks':
-        return <TalksTab talks={allTalks} />;
+        return (
+          <TalksTab
+            talks={allTalks}
+            onSeed={() => dispatch(seedTalks()).then(() => dispatch(fetchTalks()))}
+          />
+        );
       case 'health':
         return <HealthTab {...metricsProps} />;
       case 'community':

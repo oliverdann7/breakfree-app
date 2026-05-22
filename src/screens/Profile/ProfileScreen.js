@@ -9,9 +9,10 @@ import {
   Alert,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { logout } from '../../store/slices/authSlice';
-import { updatePreferences } from '../../store/slices/userSlice';
+import { updatePreferences, fetchUserStats } from '../../store/slices/userSlice';
 import Card from '../../components/common/Card';
 import { colors } from '../../constants/designTokens';
 
@@ -33,7 +34,11 @@ export default function ProfileScreen({ navigation }) {
   const dispatch = useAppDispatch();
   const { i18n } = useTranslation();
   const { user } = useAppSelector((state) => state.auth);
-  const { preferences, profile } = useAppSelector((state) => state.user);
+  const { preferences, profile, stats } = useAppSelector((state) => state.user);
+
+  useEffect(() => {
+    if (user?.uid) dispatch(fetchUserStats(user.uid));
+  }, [user?.uid]);
 
   // Prefer persisted profile over auth user (edit profile updates profile slice)
   const displayData = profile || user || {};
@@ -74,9 +79,9 @@ export default function ProfileScreen({ navigation }) {
           {/* Stats */}
           <View style={styles.statsRow}>
             {[
-              { label: 'Talk', value: '12' },
-              { label: 'Gün', value: '47' },
-              { label: 'Puan', value: '890' },
+              { label: 'Talk', value: String(stats?.totalTalks || 0) },
+              { label: 'Gün', value: String(stats?.streak || 0) },
+              { label: 'Puan', value: String(stats?.points || 0) },
             ].map((s) => (
               <View key={s.label} style={styles.statItem}>
                 <Text style={styles.statValue}>{s.value}</Text>

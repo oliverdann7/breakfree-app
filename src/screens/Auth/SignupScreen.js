@@ -7,6 +7,7 @@ import {
   StyleSheet,
   KeyboardAvoidingView,
   Platform,
+  Alert,
 } from 'react-native';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { signup, clearError } from '../../store/slices/authSlice';
@@ -46,15 +47,7 @@ export default function SignupScreen({ navigation }) {
     if (signup.fulfilled.match(result)) {
       navigation.navigate('Onboarding');
     } else {
-      // Mock fallback
-      dispatch({
-        type: 'auth/signup/fulfilled',
-        payload: {
-          user: { uid: 'mock-uid', email, displayName },
-          token: 'mock-token-123',
-        },
-      });
-      navigation.navigate('Onboarding');
+      Alert.alert('Kayıt Başarısız', result.payload || 'Bir hata oluştu.');
     }
   };
 
