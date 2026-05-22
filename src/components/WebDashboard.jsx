@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { logout } from '../store/slices/authSlice';
+import MetricLoggerModal from './MetricLoggerModal';
 import { fetchMetrics } from '../store/slices/metricsSlice';
 import { updateProfileFirestore } from '../store/slices/userSlice';
 import { fetchTalks } from '../store/slices/talksSlice';
@@ -317,7 +318,7 @@ function WeeklyChart({ data, metric, color, label, format }) {
   );
 }
 
-function HomeTab({ user, metrics, weeklyData, wellnessScore, loading }) {
+function HomeTab({ user, metrics, weeklyData, wellnessScore, loading, onLogMetrics }) {
   const dm = metrics?.dailyMetrics;
 
   const metricCards = [
@@ -398,6 +399,43 @@ function HomeTab({ user, metrics, weeklyData, wellnessScore, loading }) {
         </h2>
       </div>
 
+      {!dm && !loading && (
+        <div
+          style={{
+            background: 'rgba(201,150,26,0.06)',
+            border: '1px solid rgba(201,150,26,0.2)',
+            borderRadius: 16,
+            padding: '16px 20px',
+            marginBottom: 20,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}
+        >
+          <div>
+            <p style={{ fontSize: 14, fontWeight: 600, color: C.textPrimary, margin: '0 0 4px' }}>
+              📋 Bugünün verilerini gir
+            </p>
+            <p style={{ fontSize: 12, color: C.textTertiary, margin: 0 }}>
+              Uyku, nabız ve aktivite verilerini kaydederek wellness skorunu takip et.
+            </p>
+          </div>
+          <button
+            onClick={onLogMetrics}
+            className="bf-btn-primary"
+            style={{
+              padding: '10px 20px',
+              borderRadius: 100,
+              fontSize: 13,
+              whiteSpace: 'nowrap',
+              fontFamily: "'Manrope', system-ui, sans-serif",
+            }}
+          >
+            Veri Gir
+          </button>
+        </div>
+      )}
+
       <div className="wd-home-grid">
         {/* Left column */}
         <div>
@@ -435,11 +473,37 @@ function HomeTab({ user, metrics, weeklyData, wellnessScore, loading }) {
               </div>
             </div>
             <div>
-              <p
-                style={{ fontSize: 10, color: C.textTertiary, fontWeight: 500, margin: '0 0 4px' }}
+              <div
+                style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
               >
-                Wellness skorun
-              </p>
+                <p
+                  style={{
+                    fontSize: 10,
+                    color: C.textTertiary,
+                    fontWeight: 500,
+                    margin: '0 0 4px',
+                  }}
+                >
+                  Wellness skorun
+                </p>
+                {dm && (
+                  <button
+                    onClick={onLogMetrics}
+                    style={{
+                      background: 'rgba(255,255,255,0.06)',
+                      border: 'none',
+                      color: C.textTertiary,
+                      fontSize: 10,
+                      padding: '4px 10px',
+                      borderRadius: 6,
+                      cursor: 'pointer',
+                      fontFamily: "'Manrope', system-ui, sans-serif",
+                    }}
+                  >
+                    Düzenle
+                  </button>
+                )}
+              </div>
               <p style={{ fontSize: 17, color: C.textPrimary, fontWeight: 300, margin: '0 0 6px' }}>
                 Bugün{' '}
                 <span style={{ color: C.gold, fontWeight: 700 }}>
@@ -1614,6 +1678,7 @@ export default function WebDashboard() {
   const { allTalks } = useAppSelector((state) => state.talks);
   const { posts, commentsByPost } = useAppSelector((state) => state.community);
   const [activeTab, setActiveTab] = useState('home');
+  const [showLogger, setShowLogger] = useState(false);
 
   useEffect(() => {
     dispatch(fetchMetrics(user.uid));
@@ -1632,7 +1697,7 @@ export default function WebDashboard() {
   const renderContent = () => {
     switch (activeTab) {
       case 'home':
-        return <HomeTab user={user} {...metricsProps} />;
+        return <HomeTab user={user} {...metricsProps} onLogMetrics={() => setShowLogger(true)} />;
       case 'talks':
         return <TalksTab talks={allTalks} />;
       case 'health':
@@ -1872,6 +1937,8 @@ export default function WebDashboard() {
           ))}
         </div>
       </div>
+
+      {showLogger && <MetricLoggerModal uid={user.uid} onClose={() => setShowLogger(false)} />}
     </div>
   );
 }
