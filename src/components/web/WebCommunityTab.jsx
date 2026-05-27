@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { useAppDispatch, useAppSelector } from '../store/hooks';
-import { updateProfileFirestore } from '../store/slices/userSlice';
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
+import { updateProfileFirestore } from '../../store/slices/userSlice';
 import { C } from './WebStyles';
 
 const AVATAR_EMOJIS = ['🧘', '🏃', '💪', '🌿', '🎯', '⭐', '🔥', '🏆', '🌸', '🦋', '💫', '🎗'];

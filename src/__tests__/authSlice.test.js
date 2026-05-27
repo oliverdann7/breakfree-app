@@ -1,6 +1,7 @@
 import authReducer, { clearError } from '../store/slices/authSlice';
 
 const initialState = {
+  isInitializing: true,
   isLoading: false,
   isAuthenticated: false,
   user: null,

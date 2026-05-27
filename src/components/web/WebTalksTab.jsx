@@ -1,6 +1,6 @@
 import React from 'react';
-import { useAppDispatch } from '../store/hooks';
-import { joinTalk } from '../store/slices/talksSlice';
+import { useAppDispatch } from '../../store/hooks';
+import { joinTalk } from '../../store/slices/talksSlice';
 import { C } from './WebStyles';
 
 function TalksTab({ talks, onSeed }) {
