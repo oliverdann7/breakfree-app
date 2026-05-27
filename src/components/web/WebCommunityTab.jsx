@@ -302,10 +302,13 @@ function CommunityTab({
   user,
   posts,
   commentsByPost,
+  challenges,
+  userParticipation,
   onFetchComments,
   onAddComment,
   onToggleLike,
   onCreatePost,
+  onJoinChallenge,
 }) {
   const dispatch = useAppDispatch();
   const userProfile = useAppSelector((state) => state.user.profile);
@@ -420,7 +423,94 @@ function CommunityTab({
 
         {/* Right: Feed */}
         <div>
-          {/* ... (Existing feed UI, but replace COMM_POSTS_INIT usage with `posts` prop) */}
+          {/* Challenges */}
+          {challenges &&
+            challenges.length > 0 &&
+            challenges.slice(0, 3).map((challenge) => {
+              const participation = userParticipation?.[challenge.id];
+              const daysLeft = Math.ceil((challenge.endDate - Date.now()) / 86400000);
+              const hasJoined = !!participation;
+              const progress = challenge.targetMetric
+                ? Math.min(
+                    100,
+                    ((participation?.currentProgress || 0) / challenge.targetValue) * 100
+                  )
+                : 0;
+
+              return (
+                <div
+                  key={challenge.id}
+                  className="comm-challenge-card"
+                  style={{
+                    padding: 16,
+                    marginBottom: 16,
+                    borderRadius: 12,
+                    backgroundColor: 'rgba(201,150,26,0.06)',
+                    border: '1px solid rgba(255,255,255,0.08)',
+                    borderLeft: `4px solid ${C.gold}`,
+                  }}
+                >
+                  <div
+                    style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}
+                  >
+                    <strong style={{ color: C.textPrimary, fontSize: 13 }}>
+                      🏆 {challenge.title}
+                    </strong>
+                    <span style={{ color: C.gold, fontSize: 11 }}>
+                      {daysLeft > 0 ? `${daysLeft} gün kaldı` : 'Son gün'}
+                    </span>
+                  </div>
+                  <p style={{ color: C.textSecondary, fontSize: 12, margin: '0 0 8px' }}>
+                    {challenge.description}
+                  </p>
+                  {hasJoined ? (
+                    <>
+                      <div
+                        style={{
+                          height: 5,
+                          background: 'rgba(255,255,255,0.1)',
+                          borderRadius: 3,
+                          overflow: 'hidden',
+                          marginBottom: 4,
+                        }}
+                      >
+                        <div
+                          style={{
+                            height: '100%',
+                            width: `${progress}%`,
+                            background: C.gold,
+                            borderRadius: 3,
+                          }}
+                        />
+                      </div>
+                      <p style={{ color: C.textTertiary, fontSize: 10, margin: 0 }}>
+                        {participation.currentProgress || 0}/{challenge.targetValue}{' '}
+                        {challenge.targetMetric} · {challenge.participantCount || 0} katılımcı
+                      </p>
+                    </>
+                  ) : (
+                    <button
+                      onClick={() => onJoinChallenge?.(challenge.id)}
+                      style={{
+                        background: C.cyan,
+                        color: C.navy,
+                        border: 'none',
+                        borderRadius: 999,
+                        padding: '6px 16px',
+                        fontSize: 12,
+                        fontWeight: 700,
+                        cursor: 'pointer',
+                        fontFamily: 'inherit',
+                      }}
+                    >
+                      Katıl →
+                    </button>
+                  )}
+                </div>
+              );
+            })}
+
+          {/* Posts */}
           {posts.map((post) => (
             <CommPostCard
               key={post.postId}

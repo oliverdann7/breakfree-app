@@ -36,6 +36,7 @@ import {
   addComment,
   realtimePostsUpdate,
 } from '../../store/slices/communitySlice';
+import { fetchActiveChallenges, joinChallenge } from '../../store/slices/challengesSlice';
 import Card from '../../components/common/Card';
 import { colors } from '../../constants/designTokens';
 
@@ -177,6 +178,11 @@ export default function CommunityScreen() {
   const { dailyMetrics, wellnessScore } = useAppSelector((state) => state.metrics);
   const { posts, commentsByPost } = useAppSelector((state) => state.community);
   const { stats } = useAppSelector((state) => state.user);
+  const {
+    challenges,
+    userParticipation,
+    loading: challengesLoading,
+  } = useAppSelector((state) => state.challenges);
 
   const initProfile = {
     nickname:
@@ -192,6 +198,7 @@ export default function CommunityScreen() {
 
   useEffect(() => {
     if (user?.uid) dispatch(fetchUserStats(user.uid));
+    if (user?.uid) dispatch(fetchActiveChallenges(user.uid));
 
     if (!db) {
       dispatch(fetchPosts(user?.uid));
@@ -340,17 +347,57 @@ export default function CommunityScreen() {
       </View>
 
       {/* Weekly challenge */}
-      <Card style={styles.challengeCard}>
-        <View style={styles.challengeHeader}>
-          <Text style={styles.challengeTitle}>🏆 Haftalık Meydan Okuma</Text>
-          <Text style={styles.challengeDays}>3 gün kaldı</Text>
-        </View>
-        <Text style={styles.challengeDesc}>7 gün boyunca günde 8.000 adım at</Text>
-        <View style={styles.challengeBar}>
-          <View style={[styles.challengeFill, { width: '57%' }]} />
-        </View>
-        <Text style={styles.challengeProgress}>4/7 gün · 234 katılımcı</Text>
-      </Card>
+      {challenges.length > 0 ? (
+        challenges.slice(0, 3).map((challenge) => {
+          const participation = userParticipation[challenge.id];
+          const daysLeft = Math.ceil((challenge.endDate - Date.now()) / 86400000);
+          const hasJoined = !!participation;
+          const progress = challenge.targetMetric
+            ? Math.min(100, ((participation?.currentProgress || 0) / challenge.targetValue) * 100)
+            : 0;
+
+          return (
+            <Card key={challenge.id} style={styles.challengeCard}>
+              <View style={styles.challengeHeader}>
+                <Text style={styles.challengeTitle}>🏆 {challenge.title || 'Meydan Okuma'}</Text>
+                <Text style={styles.challengeDays}>
+                  {daysLeft > 0 ? `${daysLeft} gün kaldı` : 'Son gün'}
+                </Text>
+              </View>
+              <Text style={styles.challengeDesc}>
+                {challenge.description || 'Hedefini tamamla!'}
+              </Text>
+              {hasJoined ? (
+                <>
+                  <View style={styles.challengeBar}>
+                    <View style={[styles.challengeFill, { width: `${progress}%` }]} />
+                  </View>
+                  <Text style={styles.challengeProgress}>
+                    {participation.currentProgress || 0}/{challenge.targetValue}{' '}
+                    {challenge.targetMetric} · {challenge.participantCount || 0} katılımcı
+                  </Text>
+                </>
+              ) : (
+                <TouchableOpacity
+                  style={styles.joinBtn}
+                  onPress={() =>
+                    dispatch(joinChallenge({ challengeId: challenge.id, uid: user?.uid }))
+                  }
+                >
+                  <Text style={styles.joinBtnText}>Katıl →</Text>
+                </TouchableOpacity>
+              )}
+            </Card>
+          );
+        })
+      ) : challengesLoading ? null : (
+        <Card style={styles.challengeCard}>
+          <View style={styles.challengeHeader}>
+            <Text style={styles.challengeTitle}>🏆 Aktif Meydan Okuma</Text>
+          </View>
+          <Text style={styles.challengeDesc}>Şu anda aktif bir meydan okuma bulunmuyor.</Text>
+        </Card>
+      )}
 
       <Text style={styles.feedTitle}>Son Paylaşımlar</Text>
     </>
@@ -619,6 +666,15 @@ const styles = StyleSheet.create({
   },
   challengeFill: { height: '100%', backgroundColor: colors.gold, borderRadius: 3 },
   challengeProgress: { fontSize: 10, color: colors.textTertiary },
+  joinBtn: {
+    alignSelf: 'flex-start',
+    marginTop: 4,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    backgroundColor: colors.cyan,
+    borderRadius: 999,
+  },
+  joinBtnText: { color: colors.navy, fontSize: 12, fontWeight: '700' },
   feedTitle: {
     fontSize: 18,
     fontWeight: '700',
