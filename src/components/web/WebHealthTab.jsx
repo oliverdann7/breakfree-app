@@ -9,30 +9,30 @@ function HealthTab({ metrics, weeklyData, wellnessScore, loading }) {
   const breakdown = [
     {
       label: 'Uyku kalitesi',
-      value: dm ? Math.round((dm.sleep.hours / 9) * 100) : 0,
+      value: dm?.sleep?.hours ? Math.round((dm.sleep.hours / 9) * 100) : 0,
       color: C.cyan,
-      sub: dm ? `${dm.sleep.quality} · ${dm.sleep.hours}s uyku` : '—',
+      sub: dm?.sleep ? `${dm.sleep.quality || '—'} · ${dm.sleep.hours}s uyku` : '—',
       icon: '😴',
     },
     {
       label: 'Hareket',
-      value: dm ? Math.min(100, Math.round(dm.steps / 100)) : 0,
+      value: dm?.steps ? Math.min(100, Math.round(dm.steps / 100)) : 0,
       color: C.gold,
-      sub: dm ? `${(dm.steps / 1000).toFixed(1)}k adım` : '—',
+      sub: dm?.steps ? `${(dm.steps / 1000).toFixed(1)}k adım` : '—',
       icon: '👟',
     },
     {
       label: 'Zihin & stres',
-      value: dm ? Math.round(68 + (dm.heartRate < 70 ? 10 : 0)) : 0,
+      value: dm?.heartRate ? Math.round(68 + (dm.heartRate < 70 ? 10 : 0)) : 0,
       color: C.royal,
       sub: '3 meditasyon',
       icon: '🧘',
     },
     {
       label: 'Kalori dengesi',
-      value: dm ? Math.round((dm.calories / 2200) * 100) : 0,
+      value: dm?.calories ? Math.round((dm.calories / 2200) * 100) : 0,
       color: C.gold,
-      sub: dm ? `${dm.calories.toLocaleString()} kcal aktif` : '—',
+      sub: dm?.calories ? `${dm.calories.toLocaleString()} kcal aktif` : '—',
       icon: '🔥',
     },
   ];
@@ -107,7 +107,7 @@ function HealthTab({ metrics, weeklyData, wellnessScore, loading }) {
             <div
               style={{
                 height: '100%',
-                width: `${dm ? Math.min(100, (dm.heartRate / 100) * 100) : 0}%`,
+                width: `${dm?.heartRate ? Math.min(100, (dm.heartRate / 100) * 100) : 0}%`,
                 background: C.gold,
                 borderRadius: 3,
               }}
@@ -214,7 +214,7 @@ function HealthTab({ metrics, weeklyData, wellnessScore, loading }) {
           <span style={{ fontSize: 13, fontWeight: 600, color: C.textPrimary }}>AI İçgörü</span>
         </div>
         <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.7)', lineHeight: 1.6, margin: 0 }}>
-          {dm && dm.sleep.hours >= 7 ? (
+          {dm?.sleep?.hours >= 7 ? (
             <>
               Uyku kalitenin{' '}
               <span style={{ color: C.gold, fontWeight: 600 }}>hedefin üzerinde</span>. Akşam
