@@ -3,6 +3,7 @@ import { View, Text, ScrollView, TouchableOpacity, StyleSheet, SafeAreaView } fr
 import { collection, query, orderBy, onSnapshot } from 'firebase/firestore';
 import { db } from '../../services/firebase';
 import Card from '../../components/common/Card';
+import TalkCard from '../../components/features/TalkCard';
 import { colors } from '../../constants/designTokens';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import {
@@ -11,17 +12,6 @@ import {
   joinTalk,
   realtimeTalksUpdate,
 } from '../../store/slices/talksSlice';
-
-const categoryEmoji = (cat) =>
-  cat === 'Zihin'
-    ? '🧘'
-    : cat === 'Sağlık'
-      ? '💚'
-      : cat === 'Hareket'
-        ? '🏃'
-        : cat === 'Beslenme'
-          ? '🥗'
-          : '🎧';
 
 export default function TalksListScreen({ navigation }) {
   const dispatch = useAppDispatch();
@@ -153,22 +143,11 @@ export default function TalksListScreen({ navigation }) {
               <Text style={styles.sectionTitle}>Yaklaşanlar</Text>
             </View>
             {upcoming.map((talk) => (
-              <TouchableOpacity
+              <TalkCard
                 key={talk.talkId}
-                style={[styles.talkItem, { borderLeftColor: colors.cyan }]}
+                talk={talk}
                 onPress={() => navigation.navigate('TalkDetail', { talkId: talk.talkId })}
-              >
-                <View style={[styles.talkThumb, { backgroundColor: colors.cyan }]}>
-                  <Text style={{ fontSize: 20 }}>{categoryEmoji(talk.category)}</Text>
-                </View>
-                <View style={styles.talkContent}>
-                  <Text style={styles.talkCategory}>{talk.category}</Text>
-                  <Text style={styles.talkTitle}>{talk.title}</Text>
-                  <Text style={styles.talkMeta}>
-                    {talk.host.name} · {talk.duration}dk
-                  </Text>
-                </View>
-              </TouchableOpacity>
+              />
             ))}
           </View>
         </View>
@@ -181,22 +160,11 @@ export default function TalksListScreen({ navigation }) {
                 <Text style={styles.sectionTitle}>Geçmiş Palestralar</Text>
               </View>
               {ended.map((talk) => (
-                <TouchableOpacity
+                <TalkCard
                   key={talk.talkId}
-                  style={[styles.talkItem, { borderLeftColor: colors.textTertiary }]}
+                  talk={talk}
                   onPress={() => navigation.navigate('TalkDetail', { talkId: talk.talkId })}
-                >
-                  <View style={[styles.talkThumb, { backgroundColor: 'rgba(255,255,255,0.06)' }]}>
-                    <Text style={{ fontSize: 20 }}>{categoryEmoji(talk.category)}</Text>
-                  </View>
-                  <View style={styles.talkContent}>
-                    <Text style={styles.talkCategory}>{talk.category}</Text>
-                    <Text style={styles.talkTitle}>{talk.title}</Text>
-                    <Text style={styles.talkMeta}>
-                      {talk.host.name} · {talk.listeners} dinleyici
-                    </Text>
-                  </View>
-                </TouchableOpacity>
+                />
               ))}
             </View>
           </View>

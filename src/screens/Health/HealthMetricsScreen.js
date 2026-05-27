@@ -15,6 +15,7 @@ import {
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { fetchMetrics, logMetric } from '../../store/slices/metricsSlice';
 import Card from '../../components/common/Card';
+import MetricCard from '../../components/features/MetricCard';
 import { colors } from '../../constants/designTokens';
 
 export default function HealthMetricsScreen() {
@@ -176,38 +177,14 @@ export default function HealthMetricsScreen() {
         <View style={styles.breakdownWrapper}>
           <View style={styles.breakdown}>
             {breakdown.map((metric, i) => (
-              <Card
+              <MetricCard
                 key={i}
-                style={[
-                  styles.metricCard,
-                  {
-                    borderLeftWidth: 3,
-                    borderLeftColor: metric.color,
-                    backgroundColor:
-                      metric.color === colors.cyan
-                        ? 'rgba(20, 184, 212, 0.06)'
-                        : metric.color === colors.royal
-                          ? 'rgba(0, 114, 176, 0.06)'
-                          : 'rgba(201, 150, 26, 0.06)',
-                  },
-                ]}
-              >
-                <View style={styles.metricHeader}>
-                  <Text style={styles.metricLabel}>{metric.label}</Text>
-                  <Text style={styles.metricValue}>{metric.value ?? '—'}</Text>
-                </View>
-                <View style={styles.metricBarTrack}>
-                  {metric.value != null && (
-                    <View
-                      style={[
-                        styles.metricBarFill,
-                        { width: `${metric.value}%`, backgroundColor: metric.color },
-                      ]}
-                    />
-                  )}
-                </View>
-                <Text style={styles.metricSub}>{metric.sub}</Text>
-              </Card>
+                emoji={i === 0 ? '😴' : i === 1 ? '👟' : i === 2 ? '❤️' : '🔥'}
+                label={metric.label}
+                value={metric.value ?? '—'}
+                unit={i === 0 ? 'puan' : i === 1 ? 'puan' : i === 2 ? 'puan' : 'puan'}
+                color={metric.color}
+              />
             ))}
           </View>
         </View>

@@ -38,6 +38,8 @@ import {
 } from '../../store/slices/communitySlice';
 import { fetchActiveChallenges, joinChallenge } from '../../store/slices/challengesSlice';
 import Card from '../../components/common/Card';
+import LeaderboardCard from '../../components/features/LeaderboardCard';
+import HealthStatusCard from '../../components/features/HealthStatusCard';
 import { colors } from '../../constants/designTokens';
 
 const AVATAR_EMOJIS = ['🧘', '🏃', '💪', '🌿', '🎯', '⭐', '🔥', '🏆', '🌸', '🦋', '💫', '🎗'];
@@ -397,6 +399,25 @@ export default function CommunityScreen() {
           </View>
           <Text style={styles.challengeDesc}>Şu anda aktif bir meydan okuma bulunmuyor.</Text>
         </Card>
+      )}
+
+      {/* Leaderboard */}
+      <LeaderboardCard />
+
+      {/* My health status */}
+      {dailyMetrics && (
+        <HealthStatusCard
+          name={myProfile.nickname}
+          emoji={myProfile.emoji}
+          bg={myProfile.bg}
+          wellnessScore={wellnessScore}
+          steps={dailyMetrics.steps}
+          sleep={dailyMetrics.sleep?.hours}
+          heartRate={dailyMetrics.heartRate}
+          calories={dailyMetrics.calories}
+          streak={stats?.streak}
+          compact
+        />
       )}
 
       <Text style={styles.feedTitle}>Son Paylaşımlar</Text>
