@@ -71,24 +71,21 @@ export const refreshToken = createAsyncThunk(
   }
 );
 
-export const restoreSession = createAsyncThunk(
-  'auth/restoreSession',
-  async (_, { dispatch, rejectWithValue }) => {
-    try {
-      const user = await authService.getCurrentUser();
-      if (user) {
-        if (user.goals?.length > 0 || user.bio || user.displayName) {
-          dispatch(setHasCompletedOnboarding(true));
-        }
-        const token = await authService.refreshToken().catch(() => null);
-        return { user, token };
+export const restoreSession = createAsyncThunk('auth/restoreSession', async (_, { dispatch }) => {
+  try {
+    const user = await authService.getCurrentUser();
+    if (user) {
+      if (user.goals?.length > 0 || user.bio || user.displayName) {
+        dispatch(setHasCompletedOnboarding(true));
       }
-      return null;
-    } catch {
-      return null;
+      const token = await authService.refreshToken().catch(() => null);
+      return { user, token };
     }
+    return null;
+  } catch {
+    return null;
   }
-);
+});
 
 const initialState = {
   isInitializing: true,
