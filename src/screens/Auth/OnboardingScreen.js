@@ -1,7 +1,11 @@
 import React, { useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
-import { updateProfile, updateProfileFirestore } from '../../store/slices/userSlice';
+import {
+  updateProfile,
+  updateProfileFirestore,
+  setHasCompletedOnboarding,
+} from '../../store/slices/userSlice';
 import Button from '../../components/common/Button';
 import Input from '../../components/common/Input';
 import BreakFreeLogo from '../../components/branding/BreakFreeLogo';
@@ -38,7 +42,7 @@ export default function OnboardingScreen({ _navigation }) {
     if (uid) {
       dispatch(updateProfileFirestore({ uid, ...profileData }));
     }
-    // RootNavigator handles redirect via isAuthenticated
+    dispatch(setHasCompletedOnboarding(true));
   };
 
   const steps = [
