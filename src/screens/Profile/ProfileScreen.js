@@ -9,11 +9,11 @@ import {
   Alert,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { logout } from '../../store/slices/authSlice';
-import { updatePreferences } from '../../store/slices/userSlice';
+import { updatePreferences, fetchUserStats } from '../../store/slices/userSlice';
 import Card from '../../components/common/Card';
-import HealthStatusCard from '../../components/features/HealthStatusCard';
 import { colors } from '../../constants/designTokens';
 
 function SettingRow({ icon, label, value, onPress, rightElement, isDestructive }) {
@@ -34,8 +34,11 @@ export default function ProfileScreen({ navigation }) {
   const dispatch = useAppDispatch();
   const { i18n } = useTranslation();
   const { user } = useAppSelector((state) => state.auth);
-  const { preferences, profile } = useAppSelector((state) => state.user);
-  const { wellnessScore, dailyMetrics } = useAppSelector((state) => state.metrics);
+  const { preferences, profile, stats } = useAppSelector((state) => state.user);
+
+  useEffect(() => {
+    if (user?.uid) dispatch(fetchUserStats(user.uid));
+  }, [user?.uid]);
 
   // Prefer persisted profile over auth user (edit profile updates profile slice)
   const displayData = profile || user || {};
@@ -76,9 +79,9 @@ export default function ProfileScreen({ navigation }) {
           {/* Stats */}
           <View style={styles.statsRow}>
             {[
-              { label: 'Talk', value: displayData.talksWatched ?? '—' },
-              { label: 'Gün', value: displayData.streakDays ?? '—' },
-              { label: 'Puan', value: displayData.points ?? '—' },
+              { label: 'Talk', value: String(stats?.totalTalks || 0) },
+              { label: 'Gün', value: String(stats?.streak || 0) },
+              { label: 'Puan', value: String(stats?.points || 0) },
             ].map((s) => (
               <View key={s.label} style={styles.statItem}>
                 <Text style={styles.statValue}>{s.value}</Text>
@@ -94,31 +97,6 @@ export default function ProfileScreen({ navigation }) {
             <Text style={styles.editBtnText}>Profili Düzenle</Text>
           </TouchableOpacity>
         </View>
-
-        {/* Public health status */}
-        {(wellnessScore > 0 || dailyMetrics) && (
-          <View style={styles.healthStatusSection}>
-            <Text style={styles.settingsSectionTitle}>Sağlık Durumum</Text>
-            <View style={{ marginHorizontal: 20, marginBottom: 8 }}>
-              <HealthStatusCard
-                name={displayData.displayName || 'Kullanıcı'}
-                emoji={profile?.avatarEmoji || '🧘'}
-                bg={profile?.avatarBg || colors.royal}
-                wellnessScore={wellnessScore || 0}
-                steps={dailyMetrics?.steps}
-                sleep={dailyMetrics?.sleep?.hours}
-                heartRate={dailyMetrics?.heartRate}
-                calories={dailyMetrics?.calories}
-              />
-            </View>
-            <TouchableOpacity
-              style={styles.shareHealthBtn}
-              onPress={() => navigation.navigate('Topluluk', { openCheckIn: true })}
-            >
-              <Text style={styles.shareHealthBtnText}>💚 Sağlık Durumumu Paylaş</Text>
-            </TouchableOpacity>
-          </View>
-        )}
 
         {/* Goals */}
         <Card style={styles.goalsCard}>
@@ -286,16 +264,4 @@ const styles = StyleSheet.create({
     color: colors.textTertiary,
     marginTop: 8,
   },
-  healthStatusSection: { marginBottom: 8 },
-  shareHealthBtn: {
-    marginHorizontal: 20,
-    marginBottom: 16,
-    backgroundColor: 'rgba(16, 185, 129, 0.12)',
-    borderRadius: 12,
-    paddingVertical: 12,
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(16, 185, 129, 0.25)',
-  },
-  shareHealthBtnText: { fontSize: 14, fontWeight: '600', color: colors.success },
 });

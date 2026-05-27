@@ -2,7 +2,7 @@ import './src/i18n'; // initialise i18next before anything renders
 import React, { useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { Platform, View, ActivityIndicator } from 'react-native';
-import { Provider } from 'react-redux';
+import { Provider, useSelector } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { store, persistor } from './src/store';
@@ -26,22 +26,30 @@ function LoadingScreen() {
   );
 }
 
-function MobileApp() {
+function MobileAppContent() {
+  const { user } = useSelector((s: any) => s.auth);
+
   useEffect(() => {
-    registerForPushNotificationsAsync();
-  }, []);
+    registerForPushNotificationsAsync(user?.uid);
+  }, [user?.uid]);
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <ErrorBoundary>
-        <Provider store={store}>
-          <PersistGate loading={<LoadingScreen />} persistor={persistor}>
-            <StatusBar style="light" />
-            <RootNavigator />
-          </PersistGate>
-        </Provider>
-      </ErrorBoundary>
+      <StatusBar style="light" />
+      <RootNavigator />
     </GestureHandlerRootView>
+  );
+}
+
+function MobileApp() {
+  return (
+    <ErrorBoundary>
+      <Provider store={store}>
+        <PersistGate loading={<LoadingScreen />} persistor={persistor}>
+          <MobileAppContent />
+        </PersistGate>
+      </Provider>
+    </ErrorBoundary>
   );
 }
 

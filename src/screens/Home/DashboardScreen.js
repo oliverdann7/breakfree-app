@@ -10,9 +10,8 @@ import {
 } from 'react-native';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { fetchMetrics } from '../../store/slices/metricsSlice';
-import { fetchUserProfile } from '../../store/slices/userSlice';
+import { fetchUserProfile, fetchDailyPlan, completeTask } from '../../store/slices/userSlice';
 import WellnessRing from '../../components/features/WellnessRing';
-import HealthStatusCard from '../../components/features/HealthStatusCard';
 import Card from '../../components/common/Card';
 import { colors } from '../../constants/designTokens';
 
@@ -24,15 +23,6 @@ function greeting() {
   if (h < 18) return 'İyi günler';
   return 'İyi akşamlar';
 }
-
-const GOAL_TASKS = {
-  sleep: { title: 'Uyku Takibi', icon: '😴', duration: '5dk', accent: false },
-  fitness: { title: '30dk Antrenman', icon: '💪', duration: '30dk', accent: false },
-  mindfulness: { title: 'Meditasyon', icon: '🧘', duration: '10dk', accent: false },
-  nutrition: { title: 'Su İçmeyi Takip Et', icon: '💧', duration: '1dk', accent: false },
-  community: { title: 'Gönderi Paylaş', icon: '🤝', duration: '5dk', accent: false },
-  stress: { title: 'Nefes Egzersizi', icon: '🌿', duration: '5dk', accent: false },
-};
 
 function todayLabel() {
   const d = new Date();
@@ -58,25 +48,17 @@ export default function DashboardScreen() {
   const dispatch = useAppDispatch();
   const { wellnessScore, dailyMetrics } = useAppSelector((state) => state.metrics);
   const { user } = useAppSelector((state) => state.auth);
-  const { profile } = useAppSelector((state) => state.user);
-  const { posts } = useAppSelector((state) => state.community);
+  const { profile, dailyPlan } = useAppSelector((state) => state.user);
 
   useEffect(() => {
     if (user?.uid) {
       dispatch(fetchMetrics(user.uid));
+      dispatch(fetchDailyPlan(user.uid));
       if (!profile) dispatch(fetchUserProfile(user.uid));
     }
   }, [user?.uid]);
 
-  const goals = profile?.goals || user?.goals || [];
-  const todayPlan =
-    goals.length > 0
-      ? goals.map((g) => GOAL_TASKS[g]).filter(Boolean)
-      : [
-          GOAL_TASKS.mindfulness,
-          GOAL_TASKS.fitness,
-          { title: 'Wellness Palestrası', icon: '🎙', duration: '30dk', accent: true },
-        ];
+  const todayPlan = dailyPlan?.tasks || [];
 
   const dm = dailyMetrics;
   const metrics = [
@@ -176,7 +158,15 @@ export default function DashboardScreen() {
             </View>
             <View style={styles.planList}>
               {todayPlan.map((item, i) => (
-                <View key={item.title + i}>
+                <TouchableOpacity
+                  key={item.title + i}
+                  activeOpacity={0.7}
+                  onPress={() => {
+                    if (!item.done) {
+                      dispatch(completeTask({ uid: user.uid, taskIndex: i }));
+                    }
+                  }}
+                >
                   <View style={[styles.planItem, item.accent && styles.planItemAccent]}>
                     <View style={[styles.planIconBox, item.accent && styles.planIconBoxAccent]}>
                       {item.done ? (
@@ -190,7 +180,13 @@ export default function DashboardScreen() {
                         {item.title}
                       </Text>
                       <Text style={styles.planTime}>
-                        {item.time} · {item.duration}
+                        {item.time
+                          ? new Date(item.time).toLocaleTimeString('tr-TR', {
+                              hour: '2-digit',
+                              minute: '2-digit',
+                            })
+                          : ''}{' '}
+                        · {item.duration}
                       </Text>
                     </View>
                     {item.accent && (
@@ -200,48 +196,11 @@ export default function DashboardScreen() {
                     )}
                   </View>
                   {i < todayPlan.length - 1 && <View style={styles.planDivider} />}
-                </View>
+                </TouchableOpacity>
               ))}
             </View>
           </View>
         </View>
-
-        {/* Community pulse widget */}
-        {posts.filter((p) => p.type === 'health_checkin').length > 0 && (
-          <View style={styles.communitySection}>
-            <View style={styles.communitySectionHeader}>
-              <Text style={styles.sectionTitle}>💚 Topluluk Nabzı</Text>
-              <Text style={styles.communitySubtitle}>Son sağlık check-inleri</Text>
-            </View>
-            {posts
-              .filter((p) => p.type === 'health_checkin')
-              .slice(0, 3)
-              .map((p) => (
-                <View key={p.postId} style={styles.communityItem}>
-                  <HealthStatusCard
-                    name={p.authorName || p.author}
-                    emoji={p.authorEmoji || p.emoji}
-                    bg={p.authorBg || p.bg}
-                    wellnessScore={p.sharedStats?.wellness || 0}
-                    steps={p.sharedStats?.steps}
-                    sleep={p.sharedStats?.sleep}
-                    heartRate={p.sharedStats?.heartRate}
-                    calories={p.sharedStats?.calories}
-                    message={p.text || undefined}
-                    time={
-                      p.createdAt
-                        ? new Date(p.createdAt).toLocaleTimeString('tr-TR', {
-                            hour: '2-digit',
-                            minute: '2-digit',
-                          })
-                        : undefined
-                    }
-                    compact
-                  />
-                </View>
-              ))}
-          </View>
-        )}
 
         <View style={{ height: 24 }} />
       </ScrollView>
@@ -458,17 +417,4 @@ const styles = StyleSheet.create({
     height: 1,
     backgroundColor: 'rgba(255,255,255,0.08)',
   },
-  communitySection: {
-    paddingHorizontal: 20,
-    marginTop: 8,
-    gap: 8,
-  },
-  communitySectionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 4,
-  },
-  communitySubtitle: { fontSize: 11, color: colors.textTertiary },
-  communityItem: { marginBottom: 8 },
 });

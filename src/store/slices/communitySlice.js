@@ -12,54 +12,15 @@ import {
   getDoc,
   increment,
   setDoc,
-  onSnapshot,
 } from 'firebase/firestore';
 import { db } from '../../services/firebase';
 
-// Module-level unsubscribe handle for the real-time feed
-let postsUnsubscribe = null;
-
-// ─── Real-time subscriber (plain thunk) ───────────────────────────────────────
-export const subscribeToPosts = (uid) => (dispatch) => {
-  if (!db) return;
-  if (postsUnsubscribe) postsUnsubscribe();
-
-  dispatch(communitySlice.actions.setLoading(true));
-  const q = query(collection(db, 'posts'), orderBy('createdAt', 'desc'), limit(30));
-
-  postsUnsubscribe = onSnapshot(q, (snap) => {
-    const posts = snap.docs.map((d) => ({ postId: d.id, ...d.data(), liked: false }));
-    dispatch(communitySlice.actions.setPosts(posts));
-    dispatch(communitySlice.actions.setLoading(false));
-
-    // Non-blocking per-user like check
-    if (uid) {
-      Promise.all(
-        snap.docs.map(async (d) => {
-          const likeSnap = await getDoc(doc(db, 'liked_posts', `${uid}_${d.id}`));
-          return { postId: d.id, liked: likeSnap.exists() };
-        })
-      ).then((states) => dispatch(communitySlice.actions.setLikedStates(states)));
-    }
-  });
-
-  return postsUnsubscribe;
-};
-
-export const unsubscribeFromPosts = () => {
-  if (postsUnsubscribe) {
-    postsUnsubscribe();
-    postsUnsubscribe = null;
-  }
-};
-
-// ─── Async thunks ─────────────────────────────────────────────────────────────
 export const fetchPosts = createAsyncThunk(
   'community/fetchPosts',
   async (uid, { rejectWithValue }) => {
     try {
       if (!db) return [];
-      const q = query(collection(db, 'posts'), orderBy('createdAt', 'desc'), limit(30));
+      const q = query(collection(db, 'posts'), orderBy('createdAt', 'desc'), limit(20));
       const snap = await getDocs(q);
       const posts = await Promise.all(
         snap.docs.map(async (d) => {
@@ -82,10 +43,7 @@ export const fetchPosts = createAsyncThunk(
 
 export const createPost = createAsyncThunk(
   'community/createPost',
-  async (
-    { uid, authorName, authorEmoji, authorBg, text, sharedStats, type = 'text' },
-    { rejectWithValue }
-  ) => {
+  async ({ uid, authorName, authorEmoji, authorBg, text, sharedStats }, { rejectWithValue }) => {
     try {
       if (!db) throw new Error('Firebase not configured');
       const data = {
@@ -94,7 +52,6 @@ export const createPost = createAsyncThunk(
         authorEmoji,
         authorBg,
         text,
-        type,
         sharedStats: sharedStats || null,
         likes: 0,
         createdAt: Date.now(),
@@ -166,44 +123,22 @@ export const addComment = createAsyncThunk(
   }
 );
 
-export const fetchLeaderboard = createAsyncThunk(
-  'community/fetchLeaderboard',
-  async (_, { rejectWithValue }) => {
-    try {
-      if (!db) return [];
-      const q = query(collection(db, 'user_status'), orderBy('wellnessScore', 'desc'), limit(10));
-      const snap = await getDocs(q);
-      return snap.docs.map((d) => ({ uid: d.id, ...d.data() }));
-    } catch (error) {
-      return rejectWithValue(error.message);
-    }
-  }
-);
-
-// ─── Slice ────────────────────────────────────────────────────────────────────
 const communitySlice = createSlice({
   name: 'community',
   initialState: {
     posts: [],
     commentsByPost: {},
-    leaderboard: [],
-    leaderboardLoading: false,
     loading: false,
     postingComment: false,
     error: null,
   },
   reducers: {
-    setLoading: (state, action) => {
-      state.loading = action.payload;
-    },
-    setPosts: (state, action) => {
+    realtimePostsUpdate: (state, action) => {
       state.posts = action.payload;
     },
-    setLikedStates: (state, action) => {
-      action.payload.forEach(({ postId, liked }) => {
-        const post = state.posts.find((p) => p.postId === postId);
-        if (post) post.liked = liked;
-      });
+    realtimeCommentsUpdate: (state, action) => {
+      const { postId, comments } = action.payload;
+      state.commentsByPost[postId] = comments;
     },
   },
   extraReducers: (builder) => {
@@ -245,18 +180,9 @@ const communitySlice = createSlice({
       })
       .addCase(addComment.rejected, (state) => {
         state.postingComment = false;
-      })
-      .addCase(fetchLeaderboard.pending, (state) => {
-        state.leaderboardLoading = true;
-      })
-      .addCase(fetchLeaderboard.fulfilled, (state, action) => {
-        state.leaderboardLoading = false;
-        state.leaderboard = action.payload;
-      })
-      .addCase(fetchLeaderboard.rejected, (state) => {
-        state.leaderboardLoading = false;
       });
   },
 });
 
+export const { realtimePostsUpdate, realtimeCommentsUpdate } = communitySlice.actions;
 export default communitySlice.reducer;

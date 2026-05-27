@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -6,78 +6,90 @@ import {
   TouchableOpacity,
   StyleSheet,
   SafeAreaView,
-  ActivityIndicator,
+  Modal,
+  TextInput,
+  KeyboardAvoidingView,
+  Platform,
+  Alert,
 } from 'react-native';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
-import { fetchMentorData } from '../../store/slices/mentorSlice';
+import {
+  fetchMentorAssignment,
+  fetchMentorProfile,
+  fetchLatestMessage,
+  sendMessage,
+  toggleGoal,
+  seedMentorProfile,
+} from '../../store/slices/mentorSlice';
 import Card from '../../components/common/Card';
 import { colors } from '../../constants/designTokens';
-
-function formatSessionDate(ts) {
-  if (!ts) return null;
-  const d = new Date(ts);
-  const days = ['Paz', 'Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt'];
-  return {
-    day: days[d.getDay()],
-    date: d.getDate(),
-    time: `${d.getHours()}:${String(d.getMinutes()).padStart(2, '0')}`,
-  };
-}
-
-function timeAgo(ts) {
-  if (!ts) return '';
-  const h = Math.floor((Date.now() - ts) / 3600000);
-  if (h < 1) return 'Az önce';
-  if (h < 24) return `${h}sa önce`;
-  return `${Math.floor(h / 24)}g önce`;
-}
 
 export default function MentorScreen() {
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state.auth);
-  const { mentor, weeklyFocus, weeklyGoals, nextSession, lastMessage, loading } = useAppSelector(
-    (state) => state.mentor
-  );
+  const { assignment, mentorProfile, latestMessage, goals, focusTitle, nextSession } =
+    useAppSelector((state) => state.mentor);
+
+  const [chatVisible, setChatVisible] = useState(false);
+  const [messageText, setMessageText] = useState('');
 
   useEffect(() => {
-    if (user?.uid) dispatch(fetchMentorData(user.uid));
+    if (user?.uid) {
+      dispatch(seedMentorProfile());
+      dispatch(fetchMentorAssignment(user.uid));
+      dispatch(fetchLatestMessage(user.uid));
+    }
   }, [user?.uid]);
 
-  const sessionDate = formatSessionDate(nextSession?.scheduledAt);
-  const completedGoals = weeklyGoals.filter((g) => g.done).length;
+  useEffect(() => {
+    const mentorId = assignment?.mentorId;
+    if (mentorId && !mentorProfile) {
+      dispatch(fetchMentorProfile(mentorId));
+    }
+  }, [assignment?.mentorId, mentorProfile]);
+
+  const profile = mentorProfile || {
+    name: 'Dr. Ayşe Demir',
+    role: 'Wellness · 8 yıl deneyim',
+    avatarEmoji: '🌿',
+    avatarBg: colors.gold,
+  };
+
+  const handleSendMessage = () => {
+    if (!messageText.trim() || !user?.uid) return;
+    dispatch(sendMessage({ uid: user.uid, text: messageText.trim() }));
+    setMessageText('');
+  };
+
+  const handleAction = (label) => {
+    if (label === 'Sohbet') {
+      setChatVisible(true);
+    } else {
+      Alert.alert('Yakında', `"${label}" özelliği çok yakında kullanıma sunulacak.`, [
+        { text: 'Tamam' },
+      ]);
+    }
+  };
+
+  const completedCount = goals.filter((g) => g.done).length;
+  const progressPct = goals.length > 0 ? (completedCount / goals.length) * 100 : 0;
 
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
-        {/* Header */}
+        {/* Header with Mentor */}
         <View style={styles.headerGradient}>
           <View style={styles.headerOverlay} />
           <View style={styles.mentorSection}>
-            {loading && !mentor ? (
-              <ActivityIndicator color={colors.cyan} style={{ marginBottom: 20 }} />
-            ) : mentor ? (
-              <>
-                <View style={styles.mentorAvatar}>
-                  <Text style={styles.avatarText}>
-                    {mentor.avatarInitial || mentor.name?.[0] || 'M'}
-                  </Text>
-                  <View style={styles.onlineBadge} />
-                </View>
-                <View style={styles.mentorInfo}>
-                  <Text style={styles.mentorLabel}>Mentörün</Text>
-                  <Text style={styles.mentorName}>{mentor.name}</Text>
-                  <Text style={styles.mentorRole}>
-                    {mentor.role} · {mentor.yearsExperience} yıl deneyim
-                  </Text>
-                </View>
-              </>
-            ) : (
-              <View style={styles.mentorInfo}>
-                <Text style={styles.mentorLabel}>Mentör</Text>
-                <Text style={styles.mentorName}>Henüz atanmadı</Text>
-                <Text style={styles.mentorRole}>Yakında bir mentör atanacak</Text>
-              </View>
-            )}
+            <View style={[styles.mentorAvatar, { backgroundColor: profile.avatarBg }]}>
+              <Text style={styles.avatarText}>{profile.avatarEmoji}</Text>
+              <View style={styles.onlineBadge} />
+            </View>
+            <View style={styles.mentorInfo}>
+              <Text style={styles.mentorLabel}>Mentörün</Text>
+              <Text style={styles.mentorName}>{profile.name}</Text>
+              <Text style={styles.mentorRole}>{profile.role}</Text>
+            </View>
           </View>
         </View>
 
@@ -87,91 +99,87 @@ export default function MentorScreen() {
             { label: 'Sohbet', icon: '💬' },
             { label: 'Görüşme', icon: '📹' },
             { label: 'Planla', icon: '📅' },
-          ].map((action) => (
-            <TouchableOpacity key={action.label} style={styles.actionBtn}>
+          ].map((action, i) => (
+            <TouchableOpacity
+              key={i}
+              style={styles.actionBtn}
+              onPress={() => handleAction(action.label)}
+            >
               <Text style={styles.actionIcon}>{action.icon}</Text>
               <Text style={styles.actionLabel}>{action.label}</Text>
             </TouchableOpacity>
           ))}
         </View>
 
-        {/* Weekly Focus */}
+        {/* This Week's Focus */}
         <Card style={styles.focusCard}>
           <View style={styles.focusHeader}>
             <Text style={styles.focusIcon}>🎯</Text>
             <Text style={styles.focusTitle}>Bu hafta odak</Text>
           </View>
-          {weeklyFocus ? (
-            <Text style={styles.focusGoal}>{weeklyFocus}</Text>
-          ) : (
-            <Text style={styles.emptyText}>Mentörün henüz bir odak belirlemedi.</Text>
-          )}
-          {weeklyGoals.length > 0 && (
-            <>
-              <View style={styles.goalsList}>
-                {weeklyGoals.map((goal, i) => (
-                  <View key={i} style={styles.goalItem}>
-                    <Text style={styles.goalCheckbox}>{goal.done ? '✓' : '○'}</Text>
-                    <Text style={[styles.goalText, goal.done && styles.goalTextDone]}>
-                      {goal.label}
-                    </Text>
-                  </View>
-                ))}
-              </View>
-              <View style={styles.progressContainer}>
-                <View style={styles.progressTrack}>
-                  <View
-                    style={[
-                      styles.progressFill,
-                      { width: `${Math.round((completedGoals / weeklyGoals.length) * 100)}%` },
-                    ]}
-                  />
-                </View>
-                <Text style={styles.progressText}>
-                  {completedGoals}/{weeklyGoals.length}
-                </Text>
-              </View>
-            </>
-          )}
+          <Text style={styles.focusGoal}>
+            {focusTitle || 'Akşam rutini ve '}
+            {focusTitle?.includes('uyku') ? (
+              ''
+            ) : (
+              <Text style={styles.focusHighlight}>uyku kalitesi</Text>
+            )}
+          </Text>
+
+          <View style={styles.goalsList}>
+            {goals.map((goal, i) => (
+              <TouchableOpacity
+                key={i}
+                style={styles.goalItem}
+                onPress={() => {
+                  if (user?.uid) dispatch(toggleGoal({ uid: user.uid, goalIndex: i }));
+                }}
+              >
+                <Text style={styles.goalCheckbox}>{goal.done ? '✓' : '○'}</Text>
+                <Text style={[styles.goalText, goal.done && styles.goalTextDone]}>{goal.text}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+
+          <View style={styles.progressContainer}>
+            <View style={styles.progressTrack}>
+              <View style={[styles.progressFill, { width: `${progressPct}%` }]} />
+            </View>
+            <Text style={styles.progressText}>
+              {completedCount}/{goals.length}
+            </Text>
+          </View>
         </Card>
 
         {/* Latest Message */}
-        <Card style={styles.messageCard}>
-          <View style={styles.messageHeader}>
-            <Text style={styles.messageLabel}>Son mesaj</Text>
-            {lastMessage && (
-              <Text style={styles.messageTime}>{timeAgo(lastMessage.createdAt)}</Text>
-            )}
-          </View>
-          {lastMessage ? (
+        {latestMessage && (
+          <Card style={styles.messageCard}>
+            <View style={styles.messageHeader}>
+              <Text style={styles.messageLabel}>Son mesaj</Text>
+              <Text style={styles.messageTime}>{latestMessage.timeAgo}</Text>
+            </View>
             <View style={styles.messageBubble}>
-              <View style={styles.senderAvatar}>
-                <Text style={styles.senderInitial}>
-                  {mentor?.avatarInitial || mentor?.name?.[0] || 'M'}
-                </Text>
+              <View style={[styles.senderAvatar, { backgroundColor: profile.avatarBg }]}>
+                <Text style={styles.senderInitial}>{profile.avatarEmoji}</Text>
               </View>
               <View style={styles.messageContent}>
-                <Text style={styles.messageText}>{lastMessage.text}</Text>
+                <Text style={styles.messageText}>{latestMessage.text}</Text>
               </View>
             </View>
-          ) : (
-            <Text style={styles.emptyText}>Henüz mesaj yok.</Text>
-          )}
-        </Card>
+          </Card>
+        )}
 
         {/* Next Session */}
-        {nextSession && sessionDate && (
+        {nextSession && (
           <TouchableOpacity style={styles.sessionCard}>
             <View style={styles.dateBox}>
-              <Text style={styles.dayLabel}>{sessionDate.day}</Text>
-              <Text style={styles.dayNumber}>{sessionDate.date}</Text>
+              <Text style={styles.dayLabel}>{nextSession.day}</Text>
+              <Text style={styles.dayNumber}>{nextSession.date}</Text>
             </View>
             <View style={styles.sessionInfo}>
-              <Text style={styles.sessionTitle}>
-                {nextSession.sessionType || 'Görüntülü görüşme'}
-              </Text>
+              <Text style={styles.sessionTitle}>{nextSession.title}</Text>
               <Text style={styles.sessionTime}>
-                {sessionDate.time} · {nextSession.durationMinutes || 30}dk
+                {nextSession.time} · {nextSession.duration}
               </Text>
             </View>
             <Text style={styles.chevron}>›</Text>
@@ -180,6 +188,55 @@ export default function MentorScreen() {
 
         <View style={{ height: 24 }} />
       </ScrollView>
+
+      {/* Chat Modal */}
+      <Modal visible={chatVisible} animationType="slide" transparent>
+        <View style={styles.modalOverlay}>
+          <KeyboardAvoidingView
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            style={styles.modalSheet}
+          >
+            <View style={styles.modalHandle} />
+            <Text style={styles.modalTitle}>{profile.name} ile Sohbet</Text>
+
+            <ScrollView style={styles.chatArea} showsVerticalScrollIndicator={false}>
+              {latestMessage && (
+                <View style={styles.chatMessage}>
+                  <View style={[styles.senderAvatar, { backgroundColor: profile.avatarBg }]}>
+                    <Text style={styles.senderInitial}>{profile.avatarEmoji}</Text>
+                  </View>
+                  <View style={styles.chatBubble}>
+                    <Text style={styles.chatText}>{latestMessage.text}</Text>
+                    <Text style={styles.chatTime}>{latestMessage.timeAgo}</Text>
+                  </View>
+                </View>
+              )}
+            </ScrollView>
+
+            <View style={styles.chatInputRow}>
+              <TextInput
+                style={styles.chatInput}
+                value={messageText}
+                onChangeText={setMessageText}
+                placeholder="Mesaj yaz..."
+                placeholderTextColor="rgba(255,255,255,0.3)"
+                multiline
+              />
+              <TouchableOpacity
+                style={[styles.sendBtn, !messageText.trim() && { opacity: 0.4 }]}
+                onPress={handleSendMessage}
+                disabled={!messageText.trim()}
+              >
+                <Text style={styles.sendBtnText}>→</Text>
+              </TouchableOpacity>
+            </View>
+
+            <TouchableOpacity style={styles.closeChatBtn} onPress={() => setChatVisible(false)}>
+              <Text style={styles.closeChatText}>Kapat</Text>
+            </TouchableOpacity>
+          </KeyboardAvoidingView>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -187,7 +244,11 @@ export default function MentorScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.bgPrimary },
   scrollContent: { paddingBottom: 20 },
-  headerGradient: { height: 160, backgroundColor: colors.royal, overflow: 'hidden' },
+  headerGradient: {
+    height: 160,
+    backgroundColor: colors.royal,
+    overflow: 'hidden',
+  },
   headerOverlay: {
     position: 'absolute',
     bottom: 0,
@@ -216,7 +277,7 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: colors.bgPrimary,
   },
-  avatarText: { fontSize: 24, fontWeight: '700', color: colors.navy },
+  avatarText: { fontSize: 28 },
   onlineBadge: {
     position: 'absolute',
     bottom: -2,
@@ -276,6 +337,7 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
   },
   focusGoal: { fontSize: 14, fontWeight: '500', color: colors.textPrimary, lineHeight: 19 },
+  focusHighlight: { color: colors.gold, fontStyle: 'italic' },
   goalsList: { gap: 8 },
   goalItem: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   goalCheckbox: { fontSize: 14, color: colors.gold, fontWeight: '600', width: 14 },
@@ -291,7 +353,12 @@ const styles = StyleSheet.create({
   },
   progressFill: { height: '100%', backgroundColor: colors.gold, borderRadius: 2 },
   progressText: { fontSize: 10, color: 'rgba(255,255,255,0.5)', fontWeight: '500' },
-  messageCard: { marginHorizontal: 20, marginBottom: 12, padding: 12, gap: 8 },
+  messageCard: {
+    marginHorizontal: 20,
+    marginBottom: 12,
+    padding: 12,
+    gap: 8,
+  },
   messageHeader: { flexDirection: 'row', justifyContent: 'space-between' },
   messageLabel: {
     fontSize: 10,
@@ -311,7 +378,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     flexShrink: 0,
   },
-  senderInitial: { fontSize: 12, fontWeight: '600', color: colors.navy },
+  senderInitial: { fontSize: 14 },
   messageContent: {
     flex: 1,
     backgroundColor: 'rgba(255,255,255,0.05)',
@@ -319,7 +386,6 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   messageText: { fontSize: 12, color: 'rgba(255,255,255,0.85)', lineHeight: 17 },
-  emptyText: { fontSize: 13, color: 'rgba(255,255,255,0.35)', fontStyle: 'italic' },
   sessionCard: {
     marginHorizontal: 20,
     flexDirection: 'row',
@@ -346,4 +412,65 @@ const styles = StyleSheet.create({
   sessionTitle: { fontSize: 11, fontWeight: '500', color: colors.textPrimary },
   sessionTime: { fontSize: 9, color: 'rgba(255,255,255,0.5)' },
   chevron: { fontSize: 18, color: 'rgba(255,255,255,0.3)' },
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'flex-end' },
+  modalSheet: {
+    backgroundColor: colors.bgSecondary,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    padding: 20,
+    maxHeight: '80%',
+  },
+  modalHandle: {
+    width: 40,
+    height: 4,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    borderRadius: 2,
+    alignSelf: 'center',
+    marginBottom: 20,
+  },
+  modalTitle: { fontSize: 17, fontWeight: '700', color: colors.textPrimary, marginBottom: 20 },
+  chatArea: { maxHeight: 300, marginBottom: 12 },
+  chatMessage: { flexDirection: 'row', gap: 8, marginBottom: 12, alignItems: 'flex-end' },
+  chatBubble: {
+    flex: 1,
+    backgroundColor: 'rgba(255,255,255,0.06)',
+    borderRadius: 12,
+    padding: 10,
+  },
+  chatText: { fontSize: 13, color: colors.textPrimary, lineHeight: 18 },
+  chatTime: { fontSize: 9, color: 'rgba(255,255,255,0.3)', marginTop: 4 },
+  chatInputRow: {
+    flexDirection: 'row',
+    gap: 8,
+    alignItems: 'flex-end',
+  },
+  chatInput: {
+    flex: 1,
+    backgroundColor: 'rgba(255,255,255,0.06)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.12)',
+    borderRadius: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    color: colors.textPrimary,
+    fontSize: 14,
+    maxHeight: 80,
+  },
+  sendBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: colors.cyan,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  sendBtnText: { color: colors.navy, fontWeight: '700', fontSize: 18 },
+  closeChatBtn: {
+    marginTop: 8,
+    paddingVertical: 12,
+    alignItems: 'center',
+    backgroundColor: 'rgba(255,255,255,0.06)',
+    borderRadius: 12,
+  },
+  closeChatText: { color: colors.textSecondary, fontWeight: '600', fontSize: 14 },
 });

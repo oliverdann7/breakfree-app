@@ -1,9 +1,51 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, SafeAreaView } from 'react-native';
+import { collection, query, orderBy, onSnapshot } from 'firebase/firestore';
+import { db } from '../../services/firebase';
 import Card from '../../components/common/Card';
 import { colors } from '../../constants/designTokens';
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
+import {
+  fetchTalks,
+  seedTalks,
+  joinTalk,
+  realtimeTalksUpdate,
+} from '../../store/slices/talksSlice';
 
-export default function TalksListScreen() {
+const categoryEmoji = (cat) =>
+  cat === 'Zihin'
+    ? '🧘'
+    : cat === 'Sağlık'
+      ? '💚'
+      : cat === 'Hareket'
+        ? '🏃'
+        : cat === 'Beslenme'
+          ? '🥗'
+          : '🎧';
+
+export default function TalksListScreen({ navigation }) {
+  const dispatch = useAppDispatch();
+  const { allTalks, loading } = useAppSelector((state) => state.talks);
+  const unsubRef = useRef(null);
+
+  useEffect(() => {
+    if (!db) {
+      dispatch(fetchTalks());
+      return;
+    }
+    const q = query(collection(db, 'talks'), orderBy('scheduledAt', 'desc'));
+    const unsub = onSnapshot(q, (snap) => {
+      const talks = snap.docs.map((d) => ({ talkId: d.id, ...d.data() }));
+      dispatch(realtimeTalksUpdate(talks));
+    });
+    unsubRef.current = unsub;
+    return () => unsub();
+  }, [dispatch]);
+
+  const liveTalk = allTalks.find((t) => t.status === 'live');
+  const upcoming = allTalks.filter((t) => t.status === 'scheduled');
+  const ended = allTalks.filter((t) => t.status === 'ended');
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
@@ -15,32 +57,78 @@ export default function TalksListScreen() {
             </Text>
             <Text style={styles.headerSub}>Türkiye&apos;nin en güçlü zihinleri</Text>
           </View>
-          <Text style={styles.searchIcon}>🔍</Text>
+          {allTalks.length === 0 && !loading && (
+            <TouchableOpacity
+              onPress={() => dispatch(seedTalks()).then(() => dispatch(fetchTalks()))}
+              style={styles.seedBtn}
+            >
+              <Text style={styles.seedBtnText}>Yükle</Text>
+            </TouchableOpacity>
+          )}
         </View>
 
-        {/* Live Now Card */}
-        <Card style={styles.liveCard}>
-          <View style={styles.liveHeader}>
-            <View style={styles.liveBadge}>
-              <View style={styles.liveDot} />
-              <Text style={styles.liveBadgeText}>Canlı</Text>
+        {loading && (
+          <View style={{ padding: 40, alignItems: 'center' }}>
+            <Text style={{ color: colors.textTertiary }}>Yükleniyor...</Text>
+          </View>
+        )}
+
+        {!loading && allTalks.length === 0 && (
+          <View style={{ padding: 60, alignItems: 'center' }}>
+            <Text style={{ fontSize: 40, marginBottom: 12 }}>🎧</Text>
+            <Text
+              style={{
+                fontSize: 16,
+                fontWeight: '600',
+                color: colors.textPrimary,
+                marginBottom: 6,
+              }}
+            >
+              Henüz palestra yok
+            </Text>
+            <Text
+              style={{
+                fontSize: 13,
+                color: colors.textTertiary,
+                marginBottom: 20,
+                textAlign: 'center',
+              }}
+            >
+              İlk palestrayı ekleyerek topluluğa öncülük et!
+            </Text>
+            <TouchableOpacity
+              onPress={() => dispatch(seedTalks()).then(() => dispatch(fetchTalks()))}
+              style={styles.seedActionBtn}
+            >
+              <Text style={styles.seedActionBtnText}>Örnek Palestraları Yükle</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+
+        {liveTalk && (
+          <Card style={styles.liveCard}>
+            <View style={styles.liveHeader}>
+              <View style={styles.liveBadge}>
+                <View style={styles.liveDot} />
+                <Text style={styles.liveBadgeText}>Canlı</Text>
+              </View>
+              <Text style={styles.liveCount}>{liveTalk.listeners} dinleyici</Text>
             </View>
-            <Text style={styles.liveCount}>347 dinleyici</Text>
-          </View>
-          <Text style={styles.liveTitle}>
-            Yorgunluğun ardındaki{'\n'}
-            <Text style={styles.liveAccent}>gerçek hikaye</Text>
-          </Text>
-          <View style={styles.liveHosts}>
-            <View style={styles.hostAvatar1} />
-            <View style={styles.hostAvatar2} />
-            <Text style={styles.hostsText}>Dr. Ayşe Demir · Coach Burak</Text>
-          </View>
-          <TouchableOpacity style={styles.liveButton}>
-            <Text style={styles.liveButtonIcon}>🎧</Text>
-            <Text style={styles.liveButtonText}>Şimdi dinle</Text>
-          </TouchableOpacity>
-        </Card>
+            <Text style={styles.liveTitle}>{liveTalk.title}</Text>
+            <View style={styles.liveHosts}>
+              <Text style={styles.hostsText}>
+                {liveTalk.host.name} · {liveTalk.duration}dk
+              </Text>
+            </View>
+            <TouchableOpacity
+              style={styles.liveButton}
+              onPress={() => dispatch(joinTalk(liveTalk.talkId))}
+            >
+              <Text style={styles.liveButtonIcon}>🎧</Text>
+              <Text style={styles.liveButtonText}>Şimdi dinle</Text>
+            </TouchableOpacity>
+          </Card>
+        )}
 
         {/* Categories */}
         <ScrollView
@@ -58,72 +146,61 @@ export default function TalksListScreen() {
           ))}
         </ScrollView>
 
-        {/* Featured Talk */}
-        <View style={styles.featuredSection}>
-          <Text style={styles.sectionLabel}>Öne çıkan</Text>
-          <Card style={styles.featuredCard}>
-            <View style={styles.featuredThumbnail} />
-            <View style={styles.featuredDuration}>
-              <Text style={styles.featuredDurationText}>42 dk</Text>
-            </View>
-            <View style={styles.playIconContainer}>
-              <Text style={styles.playIcon}>▶</Text>
-            </View>
-            <View style={styles.featuredContent}>
-              <Text style={styles.featuredCategory}>Beslenme · Bölüm 12</Text>
-              <Text style={styles.featuredTitle}>Sezgisel beslenme: kuralları unutmak</Text>
-              <View style={styles.featuredHost}>
-                <View style={styles.hostAvatar3} />
-                <Text style={styles.hostName}>Beslenme uzmanı Selin Kaya</Text>
-              </View>
-            </View>
-          </Card>
-        </View>
-
-        {/* Talks List */}
+        {/* Upcoming Talks */}
         <View style={styles.listSectionWrapper}>
           <View style={styles.listSection}>
             <View style={styles.listHeader}>
-              <Text style={styles.sectionTitle}>Senin için</Text>
-              <Text style={styles.arrow}>→</Text>
+              <Text style={styles.sectionTitle}>Yaklaşanlar</Text>
             </View>
-            {[
-              {
-                cat: 'Zihin',
-                title: 'Anksiyeteyi anlamak',
-                dur: '28dk',
-                host: 'Dr. Ayşe',
-                color1: colors.cyan,
-              },
-              {
-                cat: 'Hareket',
-                title: 'Koşunun bilimi',
-                dur: '35dk',
-                host: 'Mehmet Ç.',
-                color1: colors.gold,
-              },
-              {
-                cat: 'Uyku',
-                title: 'Derin uykuya yolculuk',
-                dur: '22dk',
-                host: 'Dr. Levent',
-                color1: colors.royal,
-              },
-            ].map((talk, i) => (
-              <TouchableOpacity key={i} style={[styles.talkItem, { borderLeftColor: talk.color1 }]}>
-                <View style={[styles.talkThumbnail, { backgroundColor: talk.color1 }]} />
+            {upcoming.map((talk) => (
+              <TouchableOpacity
+                key={talk.talkId}
+                style={[styles.talkItem, { borderLeftColor: colors.cyan }]}
+                onPress={() => navigation.navigate('TalkDetail', { talkId: talk.talkId })}
+              >
+                <View style={[styles.talkThumb, { backgroundColor: colors.cyan }]}>
+                  <Text style={{ fontSize: 20 }}>{categoryEmoji(talk.category)}</Text>
+                </View>
                 <View style={styles.talkContent}>
-                  <Text style={styles.talkCategory}>{talk.cat}</Text>
+                  <Text style={styles.talkCategory}>{talk.category}</Text>
                   <Text style={styles.talkTitle}>{talk.title}</Text>
                   <Text style={styles.talkMeta}>
-                    {talk.host} · {talk.dur}
+                    {talk.host.name} · {talk.duration}dk
                   </Text>
                 </View>
-                <Text style={styles.plusIcon}>+</Text>
               </TouchableOpacity>
             ))}
           </View>
         </View>
+
+        {/* Past Talks */}
+        {ended.length > 0 && (
+          <View style={styles.listSectionWrapper}>
+            <View style={styles.listSection}>
+              <View style={styles.listHeader}>
+                <Text style={styles.sectionTitle}>Geçmiş Palestralar</Text>
+              </View>
+              {ended.map((talk) => (
+                <TouchableOpacity
+                  key={talk.talkId}
+                  style={[styles.talkItem, { borderLeftColor: colors.textTertiary }]}
+                  onPress={() => navigation.navigate('TalkDetail', { talkId: talk.talkId })}
+                >
+                  <View style={[styles.talkThumb, { backgroundColor: 'rgba(255,255,255,0.06)' }]}>
+                    <Text style={{ fontSize: 20 }}>{categoryEmoji(talk.category)}</Text>
+                  </View>
+                  <View style={styles.talkContent}>
+                    <Text style={styles.talkCategory}>{talk.category}</Text>
+                    <Text style={styles.talkTitle}>{talk.title}</Text>
+                    <Text style={styles.talkMeta}>
+                      {talk.host.name} · {talk.listeners} dinleyici
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+        )}
 
         <View style={{ height: 24 }} />
       </ScrollView>

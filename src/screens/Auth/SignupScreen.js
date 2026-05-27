@@ -47,7 +47,7 @@ export default function SignupScreen({ navigation }) {
     if (signup.fulfilled.match(result)) {
       navigation.navigate('Onboarding');
     } else {
-      Alert.alert('Kayıt Başarısız', result.payload || 'Bir hata oluştu. Tekrar deneyin.');
+      Alert.alert('Kayıt Başarısız', result.payload || 'Bir hata oluştu.');
     }
   };
 
