@@ -6,6 +6,8 @@ import communityReducer, {
 const initialState = {
   posts: [],
   commentsByPost: {},
+  leaderboard: [],
+  leaderboardLoading: false,
   loading: false,
   postingComment: false,
   error: null,

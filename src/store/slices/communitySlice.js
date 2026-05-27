@@ -123,11 +123,31 @@ export const addComment = createAsyncThunk(
   }
 );
 
+export const fetchLeaderboard = createAsyncThunk(
+  'community/fetchLeaderboard',
+  async (_, { rejectWithValue }) => {
+    try {
+      if (!db) return [];
+      const usersSnap = await getDocs(collection(db, 'users'));
+      const users = usersSnap.docs
+        .map((d) => ({ uid: d.id, ...d.data() }))
+        .filter((u) => u.wellnessScore != null)
+        .sort((a, b) => (b.wellnessScore || 0) - (a.wellnessScore || 0))
+        .slice(0, 10);
+      return users;
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
 const communitySlice = createSlice({
   name: 'community',
   initialState: {
     posts: [],
     commentsByPost: {},
+    leaderboard: [],
+    leaderboardLoading: false,
     loading: false,
     postingComment: false,
     error: null,
@@ -180,6 +200,16 @@ const communitySlice = createSlice({
       })
       .addCase(addComment.rejected, (state) => {
         state.postingComment = false;
+      })
+      .addCase(fetchLeaderboard.pending, (state) => {
+        state.leaderboardLoading = true;
+      })
+      .addCase(fetchLeaderboard.fulfilled, (state, action) => {
+        state.leaderboardLoading = false;
+        state.leaderboard = action.payload;
+      })
+      .addCase(fetchLeaderboard.rejected, (state) => {
+        state.leaderboardLoading = false;
       });
   },
 });
