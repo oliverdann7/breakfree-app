@@ -12,6 +12,7 @@ import {
   fetchComments,
   addComment,
 } from '../store/slices/communitySlice';
+import { fetchActiveChallenges, joinChallenge } from '../store/slices/challengesSlice';
 import { C, CSS, TABS } from './web/WebStyles';
 import HomeTab from './web/WebHomeTab';
 import TalksTab from './web/WebTalksTab';
@@ -68,6 +69,7 @@ export default function WebDashboard() {
   );
   const { allTalks } = useAppSelector((state) => state.talks);
   const { posts, commentsByPost } = useAppSelector((state) => state.community);
+  const { challenges, userParticipation } = useAppSelector((state) => state.challenges);
   const [activeTab, setActiveTab] = useState('home');
   const [showLogger, setShowLogger] = useState(false);
 
@@ -75,6 +77,7 @@ export default function WebDashboard() {
     dispatch(fetchMetrics(user.uid));
     dispatch(fetchTalks());
     dispatch(fetchPosts(user.uid));
+    dispatch(fetchActiveChallenges(user.uid));
   }, [dispatch, user]);
 
   const handleLogout = () => {
@@ -104,10 +107,15 @@ export default function WebDashboard() {
             user={user}
             posts={posts}
             commentsByPost={commentsByPost}
+            challenges={challenges}
+            userParticipation={userParticipation}
             onFetchComments={(postId) => dispatch(fetchComments(postId))}
             onAddComment={(data) => dispatch(addComment(data))}
             onToggleLike={(data) => dispatch(toggleLike(data))}
             onCreatePost={(data) => dispatch(createPost(data))}
+            onJoinChallenge={(challengeId) =>
+              dispatch(joinChallenge({ challengeId, uid: user?.uid }))
+            }
           />
         );
       case 'profile':
