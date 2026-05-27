@@ -125,6 +125,9 @@ const talksSlice = createSlice({
     clearCurrentTalk: (state) => {
       state.currentTalk = null;
     },
+    realtimeTalksUpdate: (state, action) => {
+      state.allTalks = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder

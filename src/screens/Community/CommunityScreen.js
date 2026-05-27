@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -12,6 +12,16 @@ import {
   Platform,
   ScrollView,
 } from 'react-native';
+import {
+  collection,
+  query,
+  orderBy,
+  limit as firestoreLimit,
+  onSnapshot,
+  doc,
+  getDoc,
+} from 'firebase/firestore';
+import { db } from '../../services/firebase';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import {
   updateProfile,
@@ -24,6 +34,7 @@ import {
   toggleLike,
   fetchComments,
   addComment,
+  realtimePostsUpdate,
 } from '../../store/slices/communitySlice';
 import Card from '../../components/common/Card';
 import { colors } from '../../constants/designTokens';
@@ -177,9 +188,35 @@ export default function CommunityScreen() {
 
   const [myProfile, setMyProfile] = useState(initProfile);
 
+  const unsubPostsRef = useRef(null);
+
   useEffect(() => {
-    dispatch(fetchPosts(user?.uid));
     if (user?.uid) dispatch(fetchUserStats(user.uid));
+
+    if (!db) {
+      dispatch(fetchPosts(user?.uid));
+      return;
+    }
+
+    const q = query(collection(db, 'posts'), orderBy('createdAt', 'desc'), firestoreLimit(20));
+    const unsub = onSnapshot(q, async (snap) => {
+      const uid = user?.uid;
+      const posts = await Promise.all(
+        snap.docs.map(async (d) => {
+          const post = { postId: d.id, ...d.data() };
+          if (uid) {
+            const likeSnap = await getDoc(doc(db, 'liked_posts', `${uid}_${d.id}`));
+            post.liked = likeSnap.exists();
+          } else {
+            post.liked = false;
+          }
+          return post;
+        })
+      );
+      dispatch(realtimePostsUpdate(posts));
+    });
+    unsubPostsRef.current = unsub;
+    return () => unsub();
   }, [user?.uid]);
 
   // Profile edit modal

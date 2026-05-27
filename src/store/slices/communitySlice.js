@@ -132,7 +132,15 @@ const communitySlice = createSlice({
     postingComment: false,
     error: null,
   },
-  reducers: {},
+  reducers: {
+    realtimePostsUpdate: (state, action) => {
+      state.posts = action.payload;
+    },
+    realtimeCommentsUpdate: (state, action) => {
+      const { postId, comments } = action.payload;
+      state.commentsByPost[postId] = comments;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchPosts.pending, (state) => {
@@ -176,4 +184,5 @@ const communitySlice = createSlice({
   },
 });
 
+export const { realtimePostsUpdate, realtimeCommentsUpdate } = communitySlice.actions;
 export default communitySlice.reducer;

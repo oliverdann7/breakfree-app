@@ -191,5 +191,6 @@ const userSlice = createSlice({
   },
 });
 
-export const { updatePreferences, updateProfile, clearUser } = userSlice.actions;
+export const { updatePreferences, updateProfile, setHasCompletedOnboarding, clearUser } =
+  userSlice.actions;
 export default userSlice.reducer;

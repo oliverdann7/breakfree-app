@@ -1,9 +1,16 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, SafeAreaView } from 'react-native';
+import { collection, query, orderBy, onSnapshot } from 'firebase/firestore';
+import { db } from '../../services/firebase';
 import Card from '../../components/common/Card';
 import { colors } from '../../constants/designTokens';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
-import { fetchTalks, seedTalks, joinTalk } from '../../store/slices/talksSlice';
+import {
+  fetchTalks,
+  seedTalks,
+  joinTalk,
+  realtimeTalksUpdate,
+} from '../../store/slices/talksSlice';
 
 const categoryEmoji = (cat) =>
   cat === 'Zihin'
@@ -19,9 +26,20 @@ const categoryEmoji = (cat) =>
 export default function TalksListScreen({ navigation }) {
   const dispatch = useAppDispatch();
   const { allTalks, loading } = useAppSelector((state) => state.talks);
+  const unsubRef = useRef(null);
 
   useEffect(() => {
-    dispatch(fetchTalks());
+    if (!db) {
+      dispatch(fetchTalks());
+      return;
+    }
+    const q = query(collection(db, 'talks'), orderBy('scheduledAt', 'desc'));
+    const unsub = onSnapshot(q, (snap) => {
+      const talks = snap.docs.map((d) => ({ talkId: d.id, ...d.data() }));
+      dispatch(realtimeTalksUpdate(talks));
+    });
+    unsubRef.current = unsub;
+    return () => unsub();
   }, [dispatch]);
 
   const liveTalk = allTalks.find((t) => t.status === 'live');
