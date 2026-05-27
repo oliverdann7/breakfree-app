@@ -1,6 +1,6 @@
 import * as Notifications from 'expo-notifications';
-import { Platform, Alert } from 'react-native';
-import { doc, setDoc, getDoc } from 'firebase/firestore';
+import { Platform } from 'react-native';
+import { doc, setDoc } from 'firebase/firestore';
 import { db } from './firebase';
 
 Notifications.setNotificationHandler({
