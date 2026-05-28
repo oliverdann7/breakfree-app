@@ -82,6 +82,7 @@
     "jest-mock-axios": "^4.6.1",
     "lint-staged": "^15.2.2",
     "prettier": "^3.1.1",
+    "react-test-renderer": "^18.3.1",
     "typescript": "^5.3.3"
   },
   "jest": {
@@ -92,8 +93,11 @@
     "moduleNameMapper": {
       "\\.(css|less|scss|sass)$": "identity-obj-proxy"
     },
+    "transformIgnorePatterns": [
+      "node_modules/(?!(react-native|@react-native|react-native-.*|@react-navigation|@react-native-async-storage|@testing-library|expo-.*|react-native-reanimated|react-native-gesture-handler|react-native-screens|react-native-safe-area-context|react-native-svg)/)"
+    ],
     "transform": {
-      "^.+\\.(js|jsx)$": "babel-jest"
+      "^.+\\.(js|jsx|ts|tsx)$": "babel-jest"
     },
     "collectCoverageFrom": [
       "src/**/*.{js,jsx}",
