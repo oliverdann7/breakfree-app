@@ -419,7 +419,7 @@ function CommunityTab({
 
       <div className="comm-grid">
         {/* Left: My Profile */}
-        <div>{/* ... (Existing profile UI remains mostly same but uses profile state) */}</div>
+        <div></div>
 
         {/* Right: Feed */}
         <div>
