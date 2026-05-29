@@ -1,0 +1,6 @@
+appId: com.breakfree.app
+---
+- launchApp
+- tapOn: 'Profil'
+- tapOn: 'Bildirimler'
+- assertVisible: 'Bildirimler'

@@ -1,0 +1,19 @@
+appId: com.breakfree.app
+---
+- launchApp
+- tapOn: 'Mentör'
+- tapOn:
+    text: 'Tüm mentörler'
+    optional: true
+- assertVisible: 'Mentörler'
+- tapOn: 'Mert Arslan'
+- assertVisible: 'Müsait Zamanlar'
+- tapOn: 'Bugün'
+- tapOn:
+    text: '07:30'
+    optional: true
+- tapOn:
+    text: 'Seans Rezerve Et'
+    matching:
+      contains: true
+- assertVisible: 'Seans rezerve edildi'

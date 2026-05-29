@@ -1,0 +1,14 @@
+appId: com.breakfree.app
+---
+- launchApp
+- tapOn: 'Palestralar'
+- assertVisible:
+    text: '.*talk.*'
+    matching:
+      regex: true
+- tapOn:
+    index: 0
+    optional: true
+- assertVisible:
+    text: 'Katıl'
+    optional: true

@@ -1,0 +1,10 @@
+appId: com.breakfree.app
+---
+- launchApp: { clearState: true }
+- tapOn: 'Hemen Başla'
+- tapOn: 'Giriş yap'
+- inputText: '${E2E_EMAIL:-maestro@example.com}'
+- tapOn: { id: 'password-input' }
+- inputText: '${E2E_PASSWORD:-Maestro12345!}'
+- tapOn: 'Giriş'
+- assertVisible: 'Wellness'
