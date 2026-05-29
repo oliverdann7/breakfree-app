@@ -7,9 +7,12 @@ import TalksListScreen from '../screens/Talks/TalksListScreen';
 import TalkDetailScreen from '../screens/Talks/TalkDetailScreen';
 import HealthMetricsScreen from '../screens/Health/HealthMetricsScreen';
 import CommunityScreen from '../screens/Community/CommunityScreen';
+import ChallengesScreen from '../screens/Community/ChallengesScreen';
+import LeaderboardScreen from '../screens/Community/LeaderboardScreen';
 import MentorScreen from '../screens/Mentor/MentorScreen';
 import ProfileScreen from '../screens/Profile/ProfileScreen';
 import EditProfileScreen from '../screens/Profile/EditProfileScreen';
+import PremiumScreen from '../screens/Premium/PremiumScreen';
 import VideoFeedScreen from '../screens/Videos/VideoFeedScreen';
 import VideoPlayerScreen from '../screens/Videos/VideoPlayerScreen';
 import { colors } from '../constants/designTokens';
@@ -18,6 +21,7 @@ const Tab = createBottomTabNavigator();
 const TalksStack = createStackNavigator();
 const ProfileStack = createStackNavigator();
 const VideoStack = createStackNavigator();
+const CommunityStack = createStackNavigator();
 
 function TabIcon({ label, focused }) {
   const icons = {
@@ -55,7 +59,18 @@ function ProfileStackNavigator() {
     <ProfileStack.Navigator screenOptions={{ headerShown: false }}>
       <ProfileStack.Screen name="ProfileMain" component={ProfileScreen} />
       <ProfileStack.Screen name="EditProfile" component={EditProfileScreen} />
+      <ProfileStack.Screen name="Premium" component={PremiumScreen} />
     </ProfileStack.Navigator>
+  );
+}
+
+function CommunityStackNavigator() {
+  return (
+    <CommunityStack.Navigator screenOptions={{ headerShown: false }}>
+      <CommunityStack.Screen name="CommunityFeed" component={CommunityScreen} />
+      <CommunityStack.Screen name="Challenges" component={ChallengesScreen} />
+      <CommunityStack.Screen name="Leaderboard" component={LeaderboardScreen} />
+    </CommunityStack.Navigator>
   );
 }
 
@@ -75,7 +90,7 @@ export default function AppNavigator() {
       <Tab.Screen name="Palestralar" component={TalksStackNavigator} />
       <Tab.Screen name="Videolar" component={VideoStackNavigator} />
       <Tab.Screen name="Sağlık" component={HealthMetricsScreen} />
-      <Tab.Screen name="Topluluk" component={CommunityScreen} />
+      <Tab.Screen name="Topluluk" component={CommunityStackNavigator} />
       <Tab.Screen name="Mentör" component={MentorScreen} />
       <Tab.Screen name="Profil" component={ProfileStackNavigator} />
     </Tab.Navigator>
