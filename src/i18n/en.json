@@ -146,5 +146,81 @@
     "nutrition": "Nutrition",
     "community": "Community",
     "stress": "Stress"
+  },
+  "premium": {
+    "kicker": "BREAKFREE PRO",
+    "headline": "Accelerate your wellness journey",
+    "subhead": "Advanced analytics, mentor sessions, and ad-free experience.",
+    "trial": "7-day free trial · Cancel anytime",
+    "subscribe": "Start with",
+    "submitting": "Processing...",
+    "fineprint": "Payment is charged via your Apple/Google account. Subscription auto-renews; cancel anytime in settings.",
+    "active": "Your Pro subscription is active",
+    "renewal": "Renews",
+    "cancel": "Cancel",
+    "monthly": "Monthly",
+    "annual": "Annual"
+  },
+  "challenges": {
+    "title": "Challenges",
+    "active": "active",
+    "loading": "Loading...",
+    "empty": "No active challenges right now.",
+    "emptySub": "New challenges coming soon.",
+    "daysLeft": "days left",
+    "lastDay": "Last day",
+    "join": "Join",
+    "completed": "complete",
+    "badges": "Your badges",
+    "participants": "participants"
+  },
+  "leaderboard": {
+    "title": "Leaderboard",
+    "rank": "Rank",
+    "you": "You"
+  },
+  "mentor": {
+    "directory": "Mentors",
+    "subtitle": "1-on-1 wellness guidance",
+    "search": "Search mentors or specialties...",
+    "categoryAll": "All",
+    "perSession": "/ session",
+    "about": "About",
+    "expertise": "Expertise",
+    "availability": "Availability",
+    "today": "Today",
+    "tomorrow": "Tomorrow",
+    "bookSession": "Book Session",
+    "booking": "Booking...",
+    "bookedTitle": "Session booked",
+    "noSlots": "No availability right now.",
+    "yearsExperience": "experience"
+  },
+  "privacy": {
+    "title": "Privacy & Data",
+    "intro": "Under KVKK and GDPR you have full control of your data. You can export your data or delete your account entirely.",
+    "exportTitle": "Download my data",
+    "exportDesc": "All your data including profile, health metrics, mentor sessions, and notifications is emailed to you as JSON.",
+    "exportAction": "Request data export",
+    "exportSubmitted": "Your request was received. Your data will be emailed within 24 hours.",
+    "integrationsTitle": "Third-party integrations",
+    "integrationsDesc": "Manage device connections like Apple Health, Google Fit, and Garmin from the Health tab.",
+    "deleteTitle": "Delete my account",
+    "deleteDesc": "All your data is permanently deleted after a 30-day cool-off period. You can cancel by signing in again during the cool-off.",
+    "deleteAction": "Delete my account",
+    "deleteConfirmTitle": "Are you sure you want to delete your account?",
+    "deleteConfirmMsg": "All your data will be permanently deleted. This cannot be undone.",
+    "submitting": "Submitting...",
+    "contact": "Questions: privacy@breakfree.tr · KVKK statement: breakfree.tr/legal/kvkk"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "unread": "unread",
+    "allRead": "All read",
+    "markAll": "Mark all read",
+    "empty": "No notifications",
+    "emptyDesc": "New talks, challenges, and mentor updates appear here.",
+    "now": "now",
+    "ago": "ago"
   }
 }
