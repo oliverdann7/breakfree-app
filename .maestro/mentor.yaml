@@ -1,0 +1,9 @@
+appId: com.breakfree.app
+---
+- launchApp
+- tapOn: 'Mentör'
+- assertVisible: 'Dr.'
+- tapOn: 'Mesaj'
+- inputText: 'Maestro test mesajı'
+- tapOn: 'Gönder'
+- assertVisible: 'Maestro test mesajı'

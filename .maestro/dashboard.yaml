@@ -1,0 +1,8 @@
+appId: com.breakfree.app
+---
+- launchApp
+- assertVisible: 'Ana Sayfa'
+- assertVisible: 'Wellness'
+- scrollUntilVisible:
+    element: 'Günün Planı'
+    direction: DOWN
