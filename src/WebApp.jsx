@@ -6,10 +6,23 @@ import { useAppSelector } from './store/hooks';
 import BreakFreeLanding from './components/BreakFreeLanding';
 import WebLoginModal from './components/WebLoginModal';
 import WebDashboard from './components/WebDashboard';
+import LegalPage from './components/web/LegalPage';
+import AdminPage from './components/web/AdminPage';
 
 function AppRouter() {
   const [showLogin, setShowLogin] = useState(false);
   const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated);
+
+  // Lightweight client-side routing for /legal/{section}.
+  // A single static route family doesn't need react-router.
+  const path = typeof window !== 'undefined' ? window.location.pathname : '/';
+  const legalMatch = path.match(/^\/legal(?:\/(privacy|terms|kvkk))?\/?$/);
+  if (legalMatch) {
+    return <LegalPage section={legalMatch[1] || 'privacy'} />;
+  }
+  if (path.startsWith('/admin')) {
+    return <AdminPage />;
+  }
 
   if (isAuthenticated) {
     return <WebDashboard />;

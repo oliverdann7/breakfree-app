@@ -3,6 +3,12 @@
   "outputDirectory": "dist",
   "framework": null,
   "cleanUrls": true,
+  "rewrites": [
+    { "source": "/legal", "destination": "/index.html" },
+    { "source": "/legal/:section", "destination": "/index.html" },
+    { "source": "/admin", "destination": "/index.html" },
+    { "source": "/admin/:path*", "destination": "/index.html" }
+  ],
   "headers": [
     {
       "source": "/(.*)",

@@ -10,6 +10,8 @@ import CommunityScreen from '../screens/Community/CommunityScreen';
 import ChallengesScreen from '../screens/Community/ChallengesScreen';
 import LeaderboardScreen from '../screens/Community/LeaderboardScreen';
 import MentorScreen from '../screens/Mentor/MentorScreen';
+import MentorDirectoryScreen from '../screens/Mentor/MentorDirectoryScreen';
+import MentorDetailScreen from '../screens/Mentor/MentorDetailScreen';
 import ProfileScreen from '../screens/Profile/ProfileScreen';
 import EditProfileScreen from '../screens/Profile/EditProfileScreen';
 import PremiumScreen from '../screens/Premium/PremiumScreen';
@@ -24,6 +26,7 @@ const TalksStack = createStackNavigator();
 const ProfileStack = createStackNavigator();
 const VideoStack = createStackNavigator();
 const CommunityStack = createStackNavigator();
+const MentorStack = createStackNavigator();
 
 function TabIcon({ label, focused }) {
   const icons = {
@@ -68,6 +71,16 @@ function ProfileStackNavigator() {
   );
 }
 
+function MentorStackNavigator() {
+  return (
+    <MentorStack.Navigator screenOptions={{ headerShown: false }}>
+      <MentorStack.Screen name="MentorHome" component={MentorScreen} />
+      <MentorStack.Screen name="MentorDirectory" component={MentorDirectoryScreen} />
+      <MentorStack.Screen name="MentorDetail" component={MentorDetailScreen} />
+    </MentorStack.Navigator>
+  );
+}
+
 function CommunityStackNavigator() {
   return (
     <CommunityStack.Navigator screenOptions={{ headerShown: false }}>
@@ -95,7 +108,7 @@ export default function AppNavigator() {
       <Tab.Screen name="Videolar" component={VideoStackNavigator} />
       <Tab.Screen name="Sağlık" component={HealthMetricsScreen} />
       <Tab.Screen name="Topluluk" component={CommunityStackNavigator} />
-      <Tab.Screen name="Mentör" component={MentorScreen} />
+      <Tab.Screen name="Mentör" component={MentorStackNavigator} />
       <Tab.Screen name="Profil" component={ProfileStackNavigator} />
     </Tab.Navigator>
   );

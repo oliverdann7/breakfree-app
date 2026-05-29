@@ -88,6 +88,19 @@ export const fetchMentorAssignment = createAsyncThunk(
   }
 );
 
+export const fetchAllMentors = createAsyncThunk(
+  'mentor/fetchAll',
+  async (_, { rejectWithValue }) => {
+    try {
+      if (!db) return [];
+      const snap = await getDocs(collection(db, 'mentors'));
+      return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
 export const fetchMentorProfile = createAsyncThunk(
   'mentor/fetchProfile',
   async (mentorId, { rejectWithValue }) => {
@@ -181,6 +194,7 @@ const mentorSlice = createSlice({
   initialState: {
     assignment: null,
     mentorProfile: null,
+    allMentors: [],
     latestMessage: null,
     messages: [],
     goals: [],
@@ -211,6 +225,9 @@ const mentorSlice = createSlice({
       })
       .addCase(fetchMentorProfile.fulfilled, (state, action) => {
         state.mentorProfile = action.payload;
+      })
+      .addCase(fetchAllMentors.fulfilled, (state, action) => {
+        state.allMentors = action.payload;
       })
       .addCase(fetchLatestMessage.fulfilled, (state, action) => {
         state.latestMessage = action.payload;
