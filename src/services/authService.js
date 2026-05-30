@@ -4,6 +4,7 @@ import {
   signOut,
   onAuthStateChanged,
   signInWithPopup,
+  sendPasswordResetEmail,
   GoogleAuthProvider,
   OAuthProvider,
 } from 'firebase/auth';
@@ -146,6 +147,17 @@ export const logout = async () => {
   try {
     checkFirebaseAvailable();
     await signOut(auth);
+  } catch (error) {
+    throw new Error(error.message);
+  }
+};
+
+export const sendPasswordReset = async (email) => {
+  try {
+    checkFirebaseAvailable();
+    if (!email) throw new Error('E-posta adresi gerekli');
+    await sendPasswordResetEmail(auth, email);
+    return { ok: true };
   } catch (error) {
     throw new Error(error.message);
   }

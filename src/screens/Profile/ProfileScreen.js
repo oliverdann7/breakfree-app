@@ -12,6 +12,7 @@ import { useTranslation } from 'react-i18next';
 import { useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { logout } from '../../store/slices/authSlice';
+import { sendPasswordReset } from '../../services/authService';
 import { updatePreferences, fetchUserStats } from '../../store/slices/userSlice';
 import Card from '../../components/common/Card';
 import { colors } from '../../constants/designTokens';
@@ -48,6 +49,35 @@ export default function ProfileScreen({ navigation }) {
       { text: 'İptal', style: 'cancel' },
       { text: 'Çıkış Yap', style: 'destructive', onPress: () => dispatch(logout()) },
     ]);
+  };
+
+  const handleChangePassword = () => {
+    const email = displayData.email || user?.email;
+    if (!email) {
+      Alert.alert('Hata', 'Hesap e-postası bulunamadı.');
+      return;
+    }
+    Alert.alert(
+      'Şifre Değiştir',
+      `${email} adresine bir şifre sıfırlama bağlantısı gönderelim mi?`,
+      [
+        { text: 'İptal', style: 'cancel' },
+        {
+          text: 'Gönder',
+          onPress: async () => {
+            try {
+              await sendPasswordReset(email);
+              Alert.alert(
+                'Bağlantı Gönderildi',
+                'Şifre sıfırlama bağlantısı e-postana gönderildi. Gelen kutunu kontrol et.'
+              );
+            } catch (e) {
+              Alert.alert('Hata', e.message || 'Bağlantı gönderilemedi.');
+            }
+          },
+        },
+      ]
+    );
   };
 
   const toggleLanguage = () => {
@@ -147,14 +177,18 @@ export default function ProfileScreen({ navigation }) {
 
         <Text style={styles.settingsSectionTitle}>Hesap</Text>
         <Card style={styles.settingsCard}>
-          <SettingRow icon="🔒" label="Şifre Değiştir" onPress={() => Alert.alert('Yakında')} />
+          <SettingRow icon="🔒" label="Şifre Değiştir" onPress={handleChangePassword} />
           <View style={styles.divider} />
-          <SettingRow icon="📱" label="Cihazları Yönet" onPress={() => Alert.alert('Yakında')} />
+          <SettingRow
+            icon="📱"
+            label="Cihazları Yönet"
+            onPress={() => navigation.navigate('ConnectedDevices')}
+          />
           <View style={styles.divider} />
           <SettingRow
             icon="📄"
             label="Gizlilik Politikası"
-            onPress={() => Alert.alert('Yakında')}
+            onPress={() => navigation.navigate('Privacy')}
           />
           <View style={styles.divider} />
           <SettingRow icon="🚪" label="Çıkış Yap" onPress={handleLogout} isDestructive />

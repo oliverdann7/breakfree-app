@@ -17,6 +17,7 @@ import EditProfileScreen from '../screens/Profile/EditProfileScreen';
 import PremiumScreen from '../screens/Premium/PremiumScreen';
 import PrivacyScreen from '../screens/Profile/PrivacyScreen';
 import NotificationsScreen from '../screens/Profile/NotificationsScreen';
+import ConnectedDevicesScreen from '../screens/Profile/ConnectedDevicesScreen';
 import VideoFeedScreen from '../screens/Videos/VideoFeedScreen';
 import VideoPlayerScreen from '../screens/Videos/VideoPlayerScreen';
 import { colors } from '../constants/designTokens';
@@ -67,6 +68,7 @@ function ProfileStackNavigator() {
       <ProfileStack.Screen name="Premium" component={PremiumScreen} />
       <ProfileStack.Screen name="Privacy" component={PrivacyScreen} />
       <ProfileStack.Screen name="Notifications" component={NotificationsScreen} />
+      <ProfileStack.Screen name="ConnectedDevices" component={ConnectedDevicesScreen} />
     </ProfileStack.Navigator>
   );
 }

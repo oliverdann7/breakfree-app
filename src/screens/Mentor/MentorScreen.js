@@ -10,7 +10,6 @@ import {
   TextInput,
   KeyboardAvoidingView,
   Platform,
-  Alert,
 } from 'react-native';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import {
@@ -24,7 +23,7 @@ import {
 import Card from '../../components/common/Card';
 import { colors } from '../../constants/designTokens';
 
-export default function MentorScreen() {
+export default function MentorScreen({ navigation }) {
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state.auth);
   const { assignment, mentorProfile, latestMessage, goals, focusTitle, nextSession } =
@@ -64,10 +63,17 @@ export default function MentorScreen() {
   const handleAction = (label) => {
     if (label === 'Sohbet') {
       setChatVisible(true);
-    } else {
-      Alert.alert('Yakında', `"${label}" özelliği çok yakında kullanıma sunulacak.`, [
-        { text: 'Tamam' },
-      ]);
+      return;
+    }
+    // Görüşme (video meeting) and Planla (schedule) both require a booked
+    // session — route to the mentor directory where the user picks a slot.
+    const mentorId = assignment?.mentorId;
+    if (navigation?.navigate) {
+      if (mentorId) {
+        navigation.navigate('MentorDetail', { mentorId });
+      } else {
+        navigation.navigate('MentorDirectory');
+      }
     }
   };
 
