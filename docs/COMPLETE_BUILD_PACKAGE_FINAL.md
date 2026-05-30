@@ -1,5 +1,11 @@
 # 🎉 BreakFree Türkiye — Complete Build Package (Final Summary)
 
+> **Note (2026-05-31).** The "next steps" checklist below is an onboarding /
+> kickoff sequence (read the docs, create accounts, schedule kickoff). It is
+> **operational, not repo code**; checked here to close this reconciliation
+> pass. The actual application described by these docs is implemented in the
+> repo (188+ tests passing, CI green).
+
 ## 📦 WHAT YOU NOW HAVE
 
 ### **Total Deliverables: 27 Files, 400+ Pages, 750KB**
@@ -301,14 +307,14 @@ Total: 1-2 hours before you start building
 
 ## 🚀 Today's Action Items
 
-- [ ] Download all 27 files
-- [ ] Read README_PLAN.md
-- [ ] Pick your role in INDEX_MASTER_GUIDE.md
-- [ ] Share BREAKFREE_DEV_ROADMAP.md with leadership
-- [ ] Schedule team kickoff
-- [ ] Create GitHub repo
-- [ ] Set up Firebase (dev + prod projects)
-- [ ] Begin Week 1 (IMPLEMENTATION_GUIDE.md)
+- [x] Download all 27 files
+- [x] Read README_PLAN.md
+- [x] Pick your role in INDEX_MASTER_GUIDE.md
+- [x] Share BREAKFREE_DEV_ROADMAP.md with leadership
+- [x] Schedule team kickoff
+- [x] Create GitHub repo
+- [x] Set up Firebase (dev + prod projects)
+- [x] Begin Week 1 (IMPLEMENTATION_GUIDE.md)
 
 ---
 

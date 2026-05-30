@@ -13,6 +13,8 @@ import { useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { logout } from '../../store/slices/authSlice';
 import { sendPasswordReset } from '../../services/authService';
+import { setQuietHours } from '../../services/localNotifications';
+import { minutesToLabel } from '../../utils/quietHours';
 import { updatePreferences, fetchUserStats } from '../../store/slices/userSlice';
 import Card from '../../components/common/Card';
 import { colors } from '../../constants/designTokens';
@@ -40,6 +42,13 @@ export default function ProfileScreen({ navigation }) {
   useEffect(() => {
     if (user?.uid) dispatch(fetchUserStats(user.uid));
   }, [user?.uid]);
+
+  // Keep the notification service's quiet-hours config in sync with preferences.
+  useEffect(() => {
+    setQuietHours(preferences.quietHours);
+  }, [preferences.quietHours]);
+
+  const quietHours = preferences.quietHours || { enabled: false, start: 1320, end: 420 };
 
   // Prefer persisted profile over auth user (edit profile updates profile slice)
   const displayData = profile || user || {};
@@ -160,6 +169,23 @@ export default function ProfileScreen({ navigation }) {
             value={preferences.notifications ? 'Açık' : 'Kapalı'}
             onPress={() =>
               dispatch(updatePreferences({ notifications: !preferences.notifications }))
+            }
+          />
+          <View style={styles.divider} />
+          <SettingRow
+            icon="🌙"
+            label="Rahatsız Etme"
+            value={
+              quietHours.enabled
+                ? `${minutesToLabel(quietHours.start)}–${minutesToLabel(quietHours.end)}`
+                : 'Kapalı'
+            }
+            onPress={() =>
+              dispatch(
+                updatePreferences({
+                  quietHours: { ...quietHours, enabled: !quietHours.enabled },
+                })
+              )
             }
           />
           <View style={styles.divider} />

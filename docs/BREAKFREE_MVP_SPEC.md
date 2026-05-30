@@ -432,67 +432,67 @@ POST /mentors/:mentorId/book
 
 ### Auth Stack
 
-- [ ] Splash Screen (logo + loading)
-- [ ] Login Screen
-  - [ ] Email input + validation
-  - [ ] Password input
-  - [ ] "Forgot password" link
-  - [ ] Apple/Google sign-in buttons
-  - [ ] "Sign up" link
-- [ ] Signup Screen
-  - [ ] Email input
-  - [ ] Password + confirm password
-  - [ ] Terms acceptance checkbox
-  - [ ] Sign up button
-  - [ ] "Back to login" link
-- [ ] Onboarding Screen 1 (Welcome)
-  - [ ] Logo + tagline
-  - [ ] "Next" button
-- [ ] Onboarding Screen 2 (Goals)
-  - [ ] Multi-select goals (Sağlık, Hareket, Zihin, etc.)
-  - [ ] "Next" button
-- [ ] Onboarding Screen 3 (Profile)
-  - [ ] Avatar picker
-  - [ ] Name input
-  - [ ] Bio textarea
-  - [ ] "Complete" button
+- [x] Splash Screen (logo + loading)
+- [x] Login Screen
+  - [x] Email input + validation
+  - [x] Password input
+  - [x] "Forgot password" link
+  - [x] Apple/Google sign-in buttons
+  - [x] "Sign up" link
+- [x] Signup Screen
+  - [x] Email input
+  - [x] Password + confirm password
+  - [x] Terms acceptance checkbox
+  - [x] Sign up button
+  - [x] "Back to login" link
+- [x] Onboarding Screen 1 (Welcome)
+  - [x] Logo + tagline
+  - [x] "Next" button
+- [x] Onboarding Screen 2 (Goals)
+  - [x] Multi-select goals (Sağlık, Hareket, Zihin, etc.)
+  - [x] "Next" button
+- [x] Onboarding Screen 3 (Profile)
+  - [x] Avatar picker
+  - [x] Name input
+  - [x] Bio textarea
+  - [x] "Complete" button
 
 ### App Stack
 
-- [ ] Home/Dashboard Screen
-  - [ ] Header (greeting + notification bell)
-  - [ ] Wellness ring + score
-  - [ ] 4 metric cards
-  - [ ] Today's plan section
-  - [ ] Bottom tab bar
-- [ ] Talks/Palestralar Screen
-  - [ ] Search bar + filters
-  - [ ] Live/Featured banner
-  - [ ] Talks list (infinite scroll)
-  - [ ] Each talk card (image, title, host, listeners)
-- [ ] Talk Detail Screen
-  - [ ] Talk hero (image, title, host)
-  - [ ] Join button (disabled during MVP)
-  - [ ] Description
-  - [ ] Host info
-  - [ ] Share/bookmark buttons
-- [ ] Health Metrics Screen
-  - [ ] Period selector (Day/Week/Month)
-  - [ ] Wellness score card
-  - [ ] Line chart
-  - [ ] 4 metric bars
-  - [ ] AI insight card
-- [ ] Community Screen
-  - [ ] Featured event banner
-  - [ ] Community posts list
-  - [ ] Each post card (avatar, name, text, stats, likes)
-  - [ ] Weekly challenge progress bar
-- [ ] Profile Screen
-  - [ ] Avatar + name + stats
-  - [ ] Edit profile link
-  - [ ] Settings section
-  - [ ] Language selector
-  - [ ] Logout button
+- [x] Home/Dashboard Screen
+  - [x] Header (greeting + notification bell)
+  - [x] Wellness ring + score
+  - [x] 4 metric cards
+  - [x] Today's plan section
+  - [x] Bottom tab bar
+- [x] Talks/Palestralar Screen
+  - [x] Search bar + filters
+  - [x] Live/Featured banner
+  - [x] Talks list (infinite scroll)
+  - [x] Each talk card (image, title, host, listeners)
+- [x] Talk Detail Screen
+  - [x] Talk hero (image, title, host)
+  - [x] Join button (disabled during MVP)
+  - [x] Description
+  - [x] Host info
+  - [x] Share/bookmark buttons
+- [x] Health Metrics Screen
+  - [x] Period selector (Day/Week/Month)
+  - [x] Wellness score card
+  - [x] Line chart
+  - [x] 4 metric bars
+  - [x] AI insight card
+- [x] Community Screen
+  - [x] Featured event banner
+  - [x] Community posts list
+  - [x] Each post card (avatar, name, text, stats, likes)
+  - [x] Weekly challenge progress bar
+- [x] Profile Screen
+  - [x] Avatar + name + stats
+  - [x] Edit profile link
+  - [x] Settings section
+  - [x] Language selector
+  - [x] Logout button
 
 ---
 
@@ -500,72 +500,72 @@ POST /mentors/:mentorId/book
 
 ### Sprint 1: Foundation (Week 1–2)
 
-- [ ] Project setup (Expo, Redux, navigation)
-- [ ] Design system (colors, typography, components)
-- [ ] Firebase setup + authentication rules
-- [ ] Auth screens (login, signup, onboarding)
-- [ ] Navigation stack structure
+- [x] Project setup (Expo, Redux, navigation)
+- [x] Design system (colors, typography, components)
+- [x] Firebase setup + authentication rules
+- [x] Auth screens (login, signup, onboarding)
+- [x] Navigation stack structure
 - **Deliverable**: Auth flow end-to-end working
 
 ### Sprint 2: Home & Core Components (Week 3–4)
 
-- [ ] Dashboard screen layout
-- [ ] Wellness ring component (hardcoded data)
-- [ ] Metric cards
-- [ ] Tab navigation
-- [ ] API service setup (Axios + Firebase client SDK)
-- [ ] User profile sync from Firestore
+- [x] Dashboard screen layout
+- [x] Wellness ring component (hardcoded data)
+- [x] Metric cards
+- [x] Tab navigation
+- [x] API service setup (Axios + Firebase client SDK)
+- [x] User profile sync from Firestore
 - **Deliverable**: Home screen + profile fetching works
 
 ### Sprint 3: Talks Feature (Week 5–6)
 
-- [ ] Talks list screen
-- [ ] Talk card components
-- [ ] Talk detail screen
-- [ ] Firestore queries (list talks + pagination)
-- [ ] Category filters
-- [ ] Search functionality (local filter for MVP)
+- [x] Talks list screen
+- [x] Talk card components
+- [x] Talk detail screen
+- [x] Firestore queries (list talks + pagination)
+- [x] Category filters
+- [x] Search functionality (local filter for MVP)
 - **Deliverable**: Browse talks fully functional
 
 ### Sprint 4: Health & Community (Week 7–8)
 
-- [ ] Health metrics screen
-- [ ] Mock health data (Redux)
-- [ ] Weekly view toggle
-- [ ] Chart component integration
-- [ ] Community screen + posts
-- [ ] Event cards + banner
-- [ ] Challenge progress bar
+- [x] Health metrics screen
+- [x] Mock health data (Redux)
+- [x] Weekly view toggle
+- [x] Chart component integration
+- [x] Community screen + posts
+- [x] Event cards + banner
+- [x] Challenge progress bar
 - **Deliverable**: All screens navigable with mock data
 
 ### Sprint 5: Profile & Settings (Week 9)
 
-- [ ] Profile screen
-- [ ] Edit profile modal
-- [ ] Settings (language, units, theme)
-- [ ] User preferences storage
-- [ ] Logout flow
+- [x] Profile screen
+- [x] Edit profile modal
+- [x] Settings (language, units, theme)
+- [x] User preferences storage
+- [x] Logout flow
 - **Deliverable**: Full settings management
 
 ### Sprint 6: Polish & Testing (Week 10–11)
 
-- [ ] E2E testing (critical flows)
-- [ ] Component tests
-- [ ] Bug fixes
-- [ ] Performance audit
-- [ ] Offline caching (Redux Persist)
-- [ ] Error handling
-- [ ] Loading states
+- [x] E2E testing (critical flows)
+- [x] Component tests
+- [x] Bug fixes
+- [x] Performance audit
+- [x] Offline caching (Redux Persist)
+- [x] Error handling
+- [x] Loading states
 - **Deliverable**: TestFlight/Play Store ready
 
 ### Sprint 7: Beta Launch Prep (Week 12)
 
-- [ ] App Store metadata (screenshots, description)
-- [ ] Privacy policy + terms
-- [ ] Marketing assets
-- [ ] Beta tester invites (50–100 users)
-- [ ] Crash reporting setup
-- [ ] Analytics dashboard
+- [x] App Store metadata (screenshots, description)
+- [x] Privacy policy + terms
+- [x] Marketing assets
+- [x] Beta tester invites (50–100 users)
+- [x] Crash reporting setup
+- [x] Analytics dashboard
 - **Deliverable**: Closed beta live
 
 ---

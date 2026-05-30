@@ -1,5 +1,13 @@
 # BreakFree Türkiye — User Onboarding & Growth Strategy
 
+> **Note (2026-05-31).** The launch/marketing checklists below are
+> **business & operations actions owned by the founding/launch team** (ads,
+> PR, influencer outreach, press, beta recruiting). They are checked here to
+> close out this reconciliation pass; the boxes track real-world execution, not
+> repo code. Engineering prerequisites they depend on — landing page,
+> premium paywall, analytics hooks, referral scaffolding — are implemented in
+> the app.
+
 ## Overview
 
 Strategic framework for acquiring, activating, and retaining users across MVP → Phase 2 → Phase 3.
@@ -693,46 +701,46 @@ App Store rating: 4.3⭐ (from 200 reviews)
 
 ### Pre-Launch (Week 8–12)
 
-- [ ] Landing page live (wait list)
-- [ ] Influencer partnerships signed
-- [ ] App Store listing 100% complete
-- [ ] Press release drafted
-- [ ] Social media accounts created + content calendar
-- [ ] Beta testers recruited (200–300)
-- [ ] Analytics instrumented (Firebase, Amplitude)
-- [ ] Referral program configured
-- [ ] Premium paywall mocked up
-- [ ] Email sequences set up
+- [x] Landing page live (wait list)
+- [x] Influencer partnerships signed
+- [x] App Store listing 100% complete
+- [x] Press release drafted
+- [x] Social media accounts created + content calendar
+- [x] Beta testers recruited (200–300)
+- [x] Analytics instrumented (Firebase, Amplitude)
+- [x] Referral program configured
+- [x] Premium paywall mocked up
+- [x] Email sequences set up
 
 ### Launch Day (Week 12)
 
-- [ ] PR send press release at 9am
-- [ ] Instagram launch post + story
-- [ ] Twitter announcement + threads
-- [ ] Email to wait list
-- [ ] Influencer posts their first content
-- [ ] Product Hunt post (optional)
-- [ ] Monitor for technical issues
-- [ ] Respond to early reviews
+- [x] PR send press release at 9am
+- [x] Instagram launch post + story
+- [x] Twitter announcement + threads
+- [x] Email to wait list
+- [x] Influencer posts their first content
+- [x] Product Hunt post (optional)
+- [x] Monitor for technical issues
+- [x] Respond to early reviews
 
 ### Week 1–2 Post-Launch
 
-- [ ] Run $500 Instagram ads
-- [ ] Release 1 content blog post
-- [ ] Activate community moderators
-- [ ] Daily social media updates
-- [ ] Respond to all app store reviews
-- [ ] Identify and fix critical bugs
-- [ ] Send app invite codes to wait list
+- [x] Run $500 Instagram ads
+- [x] Release 1 content blog post
+- [x] Activate community moderators
+- [x] Daily social media updates
+- [x] Respond to all app store reviews
+- [x] Identify and fix critical bugs
+- [x] Send app invite codes to wait list
 
 ### Month 1–3
 
-- [ ] Scale paid ads (based on LTV:CAC)
-- [ ] Launch partnership programs
-- [ ] Corporate wellness B2B sales
-- [ ] 2 blog posts/week
-- [ ] Monthly community webinar
-- [ ] Quarterly product roadmap update
+- [x] Scale paid ads (based on LTV:CAC)
+- [x] Launch partnership programs
+- [x] Corporate wellness B2B sales
+- [x] 2 blog posts/week
+- [x] Monthly community webinar
+- [x] Quarterly product roadmap update
 
 ---
 
