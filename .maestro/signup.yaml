@@ -1,0 +1,16 @@
+appId: com.breakfree.app
+---
+- launchApp:
+    clearState: true
+- assertVisible: 'Hemen Başla'
+- tapOn: 'Hemen Başla'
+- assertVisible: 'Kayıt ol'
+- tapOn: 'Kayıt ol'
+- inputText: 'maestro-${MAESTRO_RUN_ID}@example.com'
+- tapOn:
+    id: 'password-input'
+- inputText: 'Maestro12345!'
+- tapOn: 'Devam'
+- assertVisible: 'Hoş geldin'
+- tapOn: 'Başla'
+- assertVisible: 'Wellness'

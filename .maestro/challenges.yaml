@@ -1,0 +1,7 @@
+appId: com.breakfree.app
+---
+- launchApp
+- tapOn: 'Topluluk'
+- assertVisible: 'Meydan Okumalar'
+- tapOn: 'Meydan Okumalar'
+- assertVisible: 'Rozetlerin'

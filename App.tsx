@@ -10,6 +10,12 @@ import RootNavigator from './src/navigation/RootNavigator';
 import WebApp from './src/WebApp';
 import ErrorBoundary from './src/components/ErrorBoundary';
 import { registerForPushNotificationsAsync } from './src/services/notificationService';
+import { initSentry } from './src/services/sentryService';
+import { initRemoteConfig } from './src/services/remoteConfig';
+
+// Fire-and-forget at module load — both gracefully no-op when SDKs/keys missing.
+initSentry();
+initRemoteConfig();
 
 function LoadingScreen() {
   return (

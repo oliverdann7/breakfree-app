@@ -18,6 +18,9 @@ import communityReducer from './slices/communitySlice';
 import mentorReducer from './slices/mentorSlice';
 import challengesReducer from './slices/challengesSlice';
 import videosReducer from './slices/videosSlice';
+import healthReducer from './slices/healthSlice';
+import notificationsReducer from './slices/notificationsSlice';
+import premiumReducer from './slices/premiumSlice';
 
 // Wrap localStorage with async interface for redux-persist compatibility
 const createAsyncStorage = () => ({
@@ -47,6 +50,9 @@ const rootReducer = combineReducers({
   mentor: mentorReducer,
   challenges: challengesReducer,
   videos: videosReducer,
+  health: healthReducer,
+  notifications: notificationsReducer,
+  premium: premiumReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

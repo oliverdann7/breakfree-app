@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { logCrashReport } from '../services/monitoringService';
+import { captureException, addBreadcrumb } from '../services/sentryService';
 import { colors } from '../constants/designTokens';
 
 export default class ErrorBoundary extends React.Component {
@@ -16,6 +17,13 @@ export default class ErrorBoundary extends React.Component {
   componentDidCatch(error, info) {
     this.setState({ errorInfo: info });
     logCrashReport(error, info);
+    addBreadcrumb({
+      category: 'react',
+      level: 'error',
+      message: 'ErrorBoundary caught',
+      data: { componentStack: info?.componentStack?.split('\n').slice(0, 5).join('\n') },
+    });
+    captureException(error, { componentStack: info?.componentStack });
   }
 
   handleReset = () => {

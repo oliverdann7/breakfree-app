@@ -1,0 +1,8 @@
+appId: com.breakfree.app
+---
+- launchApp
+- tapOn: 'Profil'
+- tapOn: 'Premium'
+- assertVisible: 'BREAKFREE PRO'
+- assertVisible: 'BreakFree Pro Yıllık'
+- assertVisible: '7 gün ücretsiz'

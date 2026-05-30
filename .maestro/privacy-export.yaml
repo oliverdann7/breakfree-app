@@ -1,0 +1,11 @@
+appId: com.breakfree.app
+---
+- launchApp
+- tapOn: 'Profil'
+- tapOn:
+    text: 'Gizlilik'
+    matching:
+      contains: true
+- assertVisible: 'Gizlilik & Veriler'
+- tapOn: 'Veri dışa aktarma talebi'
+- assertVisible: 'Veri Dışa Aktarma'

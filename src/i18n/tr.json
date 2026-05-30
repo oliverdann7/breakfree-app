@@ -146,5 +146,81 @@
     "nutrition": "Beslenme",
     "community": "Topluluk",
     "stress": "Stres"
+  },
+  "premium": {
+    "kicker": "BREAKFREE PRO",
+    "headline": "Wellness yolculuğunu hızlandır",
+    "subhead": "Gelişmiş analiz, mentor seansları ve reklamsız deneyim.",
+    "trial": "7 gün ücretsiz dene · İstediğin zaman iptal et",
+    "subscribe": "ile başla",
+    "submitting": "İşleniyor...",
+    "fineprint": "Ödeme Apple/Google hesabınızdan tahsil edilir. Abonelik otomatik yenilenir; istediğin zaman ayarlardan iptal edebilirsin.",
+    "active": "Pro aboneliğin aktif",
+    "renewal": "Yenileme",
+    "cancel": "İptal et",
+    "monthly": "Aylık",
+    "annual": "Yıllık"
+  },
+  "challenges": {
+    "title": "Meydan Okumalar",
+    "active": "aktif",
+    "loading": "Yükleniyor...",
+    "empty": "Şu anda aktif bir meydan okuma yok.",
+    "emptySub": "Yeni meydan okumalar yakında geliyor.",
+    "daysLeft": "gün kaldı",
+    "lastDay": "Son gün",
+    "join": "Katıl",
+    "completed": "tamamlandı",
+    "badges": "Rozetlerin",
+    "participants": "katılımcı"
+  },
+  "leaderboard": {
+    "title": "Lider Tablosu",
+    "rank": "Sıralama",
+    "you": "Sen"
+  },
+  "mentor": {
+    "directory": "Mentörler",
+    "subtitle": "1-on-1 wellness rehberliği",
+    "search": "Mentör veya uzmanlık ara...",
+    "categoryAll": "Hepsi",
+    "perSession": "/ seans",
+    "about": "Hakkında",
+    "expertise": "Uzmanlık",
+    "availability": "Müsait Zamanlar",
+    "today": "Bugün",
+    "tomorrow": "Yarın",
+    "bookSession": "Seans Rezerve Et",
+    "booking": "Rezerve ediliyor...",
+    "bookedTitle": "Seans rezerve edildi",
+    "noSlots": "Şu anda müsait zaman yok.",
+    "yearsExperience": "deneyim"
+  },
+  "privacy": {
+    "title": "Gizlilik & Veriler",
+    "intro": "KVKK ve GDPR kapsamında verileriniz üzerinde tam kontrole sahipsiniz. Verilerinizi dışa aktarabilir veya hesabınızı tamamen silebilirsiniz.",
+    "exportTitle": "Verilerimi indir",
+    "exportDesc": "Profil, sağlık metrikleri, mentor seansları ve bildirimler dahil tüm verileriniz JSON formatında e-posta ile gönderilir.",
+    "exportAction": "Veri dışa aktarma talebi",
+    "exportSubmitted": "Talebin alındı. Verilerin 24 saat içinde e-postana gönderilecek.",
+    "integrationsTitle": "Üçüncü taraf entegrasyonlar",
+    "integrationsDesc": "Apple Health, Google Fit, Garmin gibi cihaz bağlantılarını Sağlık sekmesinden yönetebilirsiniz.",
+    "deleteTitle": "Hesabımı sil",
+    "deleteDesc": "Tüm verileriniz 30 günlük bekleme süresinden sonra kalıcı olarak silinir. Bekleme süresi içinde tekrar giriş yaparak vazgeçebilirsiniz.",
+    "deleteAction": "Hesabımı sil",
+    "deleteConfirmTitle": "Hesabını silmek istediğine emin misin?",
+    "deleteConfirmMsg": "Tüm verilerin kalıcı olarak silinecek. Bu işlem geri alınamaz.",
+    "submitting": "Gönderiliyor...",
+    "contact": "Sorularınız için: privacy@breakfree.tr · Aydınlatma metni: breakfree.tr/legal/kvkk"
+  },
+  "notifications": {
+    "title": "Bildirimler",
+    "unread": "okunmamış",
+    "allRead": "Tümü okundu",
+    "markAll": "Tümünü okundu",
+    "empty": "Bildirim yok",
+    "emptyDesc": "Yeni talk'lar, meydan okumalar ve mentor güncellemeleri burada görünür.",
+    "now": "şimdi",
+    "ago": "önce"
   }
 }

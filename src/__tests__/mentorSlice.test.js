@@ -3,6 +3,7 @@ import mentorReducer from '../store/slices/mentorSlice';
 const initialState = {
   assignment: null,
   mentorProfile: null,
+  allMentors: [],
   latestMessage: null,
   messages: [],
   goals: [],
