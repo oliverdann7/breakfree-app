@@ -11,7 +11,7 @@ const initialState = {
   hasCompletedOnboarding: false,
   preferences: { language: 'tr', units: 'metric', notifications: true },
   dailyPlan: null,
-  stats: { totalTalks: 0, streak: 0, points: 0 },
+  stats: { totalTalks: 0, streak: 0, longestStreak: 0, points: 0 },
   loading: false,
   error: null,
 };

@@ -12,6 +12,7 @@ import {
   limit,
 } from 'firebase/firestore';
 import { db } from '../../services/firebase';
+import { computeStreak } from '../../utils/streak';
 
 export const fetchUserProfile = createAsyncThunk(
   'user/fetchProfile',
@@ -88,7 +89,7 @@ export const fetchUserStats = createAsyncThunk(
   'user/fetchStats',
   async (uid, { rejectWithValue }) => {
     try {
-      if (!db) return { totalTalks: 0, streak: 0, points: 0 };
+      if (!db) return { totalTalks: 0, streak: 0, longestStreak: 0, points: 0 };
       const talksQ = query(collection(db, 'talks_participants'), where('uid', '==', uid));
       const talksSnap = await getDocs(talksQ);
       const totalTalks = talksSnap.size;
@@ -100,13 +101,9 @@ export const fetchUserStats = createAsyncThunk(
       );
       const metricsSnap = await getDocs(metricsQ);
       const metrics = metricsSnap.docs.map((d) => d.data());
-      let streak = 0;
-      for (const m of metrics) {
-        if (m.wellnessScore >= 50) streak++;
-        else break;
-      }
+      const { current: streak, longest: longestStreak } = computeStreak(metrics);
       const points = metrics.reduce((sum, m) => sum + (m.wellnessScore || 0), 0);
-      return { totalTalks, streak, points };
+      return { totalTalks, streak, longestStreak, points };
     } catch (error) {
       return rejectWithValue(error.message);
     }
@@ -134,7 +131,7 @@ const userSlice = createSlice({
     hasCompletedOnboarding: false,
     preferences: { language: 'tr', units: 'metric', notifications: true },
     dailyPlan: null,
-    stats: { totalTalks: 0, streak: 0, points: 0 },
+    stats: { totalTalks: 0, streak: 0, longestStreak: 0, points: 0 },
     loading: false,
     error: null,
   },

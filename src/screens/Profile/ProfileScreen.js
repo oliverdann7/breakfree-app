@@ -80,7 +80,8 @@ export default function ProfileScreen({ navigation }) {
           <View style={styles.statsRow}>
             {[
               { label: 'Talk', value: String(stats?.totalTalks || 0) },
-              { label: 'Gün', value: String(stats?.streak || 0) },
+              { label: 'Seri', value: `${stats?.streak || 0}g` },
+              { label: 'Rekor', value: `${stats?.longestStreak || 0}g` },
               { label: 'Puan', value: String(stats?.points || 0) },
             ].map((s) => (
               <View key={s.label} style={styles.statItem}>
@@ -203,7 +204,7 @@ const styles = StyleSheet.create({
   },
   statsRow: {
     flexDirection: 'row',
-    gap: 32,
+    gap: 24,
     marginTop: 12,
     marginBottom: 20,
   },
