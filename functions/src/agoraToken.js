@@ -1,13 +1,17 @@
 const functions = require('firebase-functions');
 const { RtcTokenBuilder, RtcRole } = require('agora-token');
+const { enforceRateLimit } = require('./rateLimiter');
 
 // Callable: mint an Agora RTC token for a talk channel.
 // Client calls: httpsCallable('mintAgoraToken')({ channelName, role: 'host'|'audience' })
 // Requires: env config agora.app_id + agora.app_certificate (firebase functions:config:set)
-exports.mintAgoraToken = functions.https.onCall((data, context) => {
+exports.mintAgoraToken = functions.https.onCall(async (data, context) => {
   if (!context.auth) {
     throw new functions.https.HttpsError('unauthenticated', 'Login required');
   }
+
+  // Cap token minting to 30 requests/minute per user to deter abuse.
+  await enforceRateLimit(context.auth.uid, 'mintAgoraToken', { max: 30, windowSeconds: 60 });
 
   const { channelName, role = 'audience' } = data || {};
   if (!channelName) {

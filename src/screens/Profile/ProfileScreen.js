@@ -12,6 +12,9 @@ import { useTranslation } from 'react-i18next';
 import { useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { logout } from '../../store/slices/authSlice';
+import { sendPasswordReset } from '../../services/authService';
+import { setQuietHours } from '../../services/localNotifications';
+import { minutesToLabel } from '../../utils/quietHours';
 import { updatePreferences, fetchUserStats } from '../../store/slices/userSlice';
 import Card from '../../components/common/Card';
 import { colors } from '../../constants/designTokens';
@@ -40,6 +43,13 @@ export default function ProfileScreen({ navigation }) {
     if (user?.uid) dispatch(fetchUserStats(user.uid));
   }, [user?.uid]);
 
+  // Keep the notification service's quiet-hours config in sync with preferences.
+  useEffect(() => {
+    setQuietHours(preferences.quietHours);
+  }, [preferences.quietHours]);
+
+  const quietHours = preferences.quietHours || { enabled: false, start: 1320, end: 420 };
+
   // Prefer persisted profile over auth user (edit profile updates profile slice)
   const displayData = profile || user || {};
 
@@ -48,6 +58,35 @@ export default function ProfileScreen({ navigation }) {
       { text: 'İptal', style: 'cancel' },
       { text: 'Çıkış Yap', style: 'destructive', onPress: () => dispatch(logout()) },
     ]);
+  };
+
+  const handleChangePassword = () => {
+    const email = displayData.email || user?.email;
+    if (!email) {
+      Alert.alert('Hata', 'Hesap e-postası bulunamadı.');
+      return;
+    }
+    Alert.alert(
+      'Şifre Değiştir',
+      `${email} adresine bir şifre sıfırlama bağlantısı gönderelim mi?`,
+      [
+        { text: 'İptal', style: 'cancel' },
+        {
+          text: 'Gönder',
+          onPress: async () => {
+            try {
+              await sendPasswordReset(email);
+              Alert.alert(
+                'Bağlantı Gönderildi',
+                'Şifre sıfırlama bağlantısı e-postana gönderildi. Gelen kutunu kontrol et.'
+              );
+            } catch (e) {
+              Alert.alert('Hata', e.message || 'Bağlantı gönderilemedi.');
+            }
+          },
+        },
+      ]
+    );
   };
 
   const toggleLanguage = () => {
@@ -134,6 +173,23 @@ export default function ProfileScreen({ navigation }) {
           />
           <View style={styles.divider} />
           <SettingRow
+            icon="🌙"
+            label="Rahatsız Etme"
+            value={
+              quietHours.enabled
+                ? `${minutesToLabel(quietHours.start)}–${minutesToLabel(quietHours.end)}`
+                : 'Kapalı'
+            }
+            onPress={() =>
+              dispatch(
+                updatePreferences({
+                  quietHours: { ...quietHours, enabled: !quietHours.enabled },
+                })
+              )
+            }
+          />
+          <View style={styles.divider} />
+          <SettingRow
             icon="📏"
             label="Birimler"
             value={preferences.units === 'metric' ? 'Metrik' : 'Imperial'}
@@ -147,14 +203,18 @@ export default function ProfileScreen({ navigation }) {
 
         <Text style={styles.settingsSectionTitle}>Hesap</Text>
         <Card style={styles.settingsCard}>
-          <SettingRow icon="🔒" label="Şifre Değiştir" onPress={() => Alert.alert('Yakında')} />
+          <SettingRow icon="🔒" label="Şifre Değiştir" onPress={handleChangePassword} />
           <View style={styles.divider} />
-          <SettingRow icon="📱" label="Cihazları Yönet" onPress={() => Alert.alert('Yakında')} />
+          <SettingRow
+            icon="📱"
+            label="Cihazları Yönet"
+            onPress={() => navigation.navigate('ConnectedDevices')}
+          />
           <View style={styles.divider} />
           <SettingRow
             icon="📄"
             label="Gizlilik Politikası"
-            onPress={() => Alert.alert('Yakında')}
+            onPress={() => navigation.navigate('Privacy')}
           />
           <View style={styles.divider} />
           <SettingRow icon="🚪" label="Çıkış Yap" onPress={handleLogout} isDestructive />

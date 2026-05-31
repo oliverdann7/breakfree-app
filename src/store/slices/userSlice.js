@@ -129,7 +129,12 @@ const userSlice = createSlice({
     uid: null,
     profile: null,
     hasCompletedOnboarding: false,
-    preferences: { language: 'tr', units: 'metric', notifications: true },
+    preferences: {
+      language: 'tr',
+      units: 'metric',
+      notifications: true,
+      quietHours: { enabled: false, start: 1320, end: 420 }, // 22:00 → 07:00
+    },
     dailyPlan: null,
     stats: { totalTalks: 0, streak: 0, longestStreak: 0, points: 0 },
     loading: false,

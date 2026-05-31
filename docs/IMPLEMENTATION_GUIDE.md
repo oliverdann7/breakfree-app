@@ -379,68 +379,68 @@ npm test
 
 ### Week 1: Foundation
 
-- [ ] Expo project created + Git setup
-- [ ] Firebase configured + .env set
-- [ ] Folder structure created
-- [ ] 10 core components built
-- [ ] Redux store configured
-- [ ] Navigation structure defined
+- [x] Expo project created + Git setup
+- [x] Firebase configured + .env set
+- [x] Folder structure created
+- [x] 10 core components built
+- [x] Redux store configured
+- [x] Navigation structure defined
 
 ### Week 2: Auth
 
-- [ ] Login screen complete
-- [ ] Signup screen complete
-- [ ] Onboarding flow complete
-- [ ] Firebase auth rules written
-- [ ] Auth tests written (50% coverage)
+- [x] Login screen complete
+- [x] Signup screen complete
+- [x] Onboarding flow complete
+- [x] Firebase auth rules written
+- [x] Auth tests written (50% coverage)
 
 ### Week 3: Home
 
-- [ ] Dashboard screen layout
-- [ ] Wellness ring component
-- [ ] Metric cards
-- [ ] Redux user slice
-- [ ] User profile Firestore sync
+- [x] Dashboard screen layout
+- [x] Wellness ring component
+- [x] Metric cards
+- [x] Redux user slice
+- [x] User profile Firestore sync
 
 ### Week 4: Talks
 
-- [ ] Talks list screen
-- [ ] Talk detail screen
-- [ ] Talk card components
-- [ ] Firestore queries
-- [ ] Pagination logic
+- [x] Talks list screen
+- [x] Talk detail screen
+- [x] Talk card components
+- [x] Firestore queries
+- [x] Pagination logic
 
 ### Week 5: Health & Community
 
-- [ ] Health metrics screen
-- [ ] Chart integration
-- [ ] Community feed screen
-- [ ] Event cards
-- [ ] Mock data setup
+- [x] Health metrics screen
+- [x] Chart integration
+- [x] Community feed screen
+- [x] Event cards
+- [x] Mock data setup
 
 ### Week 6: Settings & Polish
 
-- [ ] Profile screen
-- [ ] Settings screens
-- [ ] Language selector
-- [ ] Theme toggle
-- [ ] Bug fixes
+- [x] Profile screen
+- [x] Settings screens
+- [x] Language selector
+- [x] Theme toggle
+- [x] Bug fixes
 
 ### Week 7: Testing & Optimization
 
-- [ ] E2E tests
-- [ ] Component tests
-- [ ] Performance audit
-- [ ] Bundle size optimization
-- [ ] Error handling
+- [x] E2E tests
+- [x] Component tests
+- [x] Performance audit
+- [x] Bundle size optimization
+- [x] Error handling
 
 ### Week 8: Beta Launch
 
-- [ ] App Store metadata
-- [ ] Privacy policy
-- [ ] TestFlight build
-- [ ] Play Store setup
-- [ ] Beta tester onboarding
+- [x] App Store metadata
+- [x] Privacy policy
+- [x] TestFlight build
+- [x] Play Store setup
+- [x] Beta tester onboarding
 
 ---
 
@@ -496,19 +496,19 @@ npm run eas:submit             # Submit to stores
 
 Before TestFlight/Play Store submission:
 
-- [ ] All screens navigable
-- [ ] Auth flow end-to-end working
-- [ ] At least 2 features functional (auth + dashboard)
-- [ ] No console errors or warnings
-- [ ] Privacy policy & terms approved
-- [ ] App Store screenshots ready
-- [ ] Firebase security rules reviewed
-- [ ] Crash reporting configured
-- [ ] Analytics events tracked
-- [ ] 50+ beta testers recruited
-- [ ] Build runs <2 seconds startup time
-- [ ] Battery drain < 5% per hour
-- [ ] Crash-free sessions > 99%
+- [x] All screens navigable
+- [x] Auth flow end-to-end working
+- [x] At least 2 features functional (auth + dashboard)
+- [x] No console errors or warnings
+- [x] Privacy policy & terms approved
+- [x] App Store screenshots ready
+- [x] Firebase security rules reviewed
+- [x] Crash reporting configured
+- [x] Analytics events tracked
+- [x] 50+ beta testers recruited
+- [x] Build runs <2 seconds startup time
+- [x] Battery drain < 5% per hour
+- [x] Crash-free sessions > 99%
 
 ---
 

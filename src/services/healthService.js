@@ -7,6 +7,15 @@ import { Platform } from 'react-native';
 
 const isNative = Platform.OS === 'ios' || Platform.OS === 'android';
 
+// Native bridge integration seam. Stays null until the native modules
+// (react-native-health on iOS, react-native-google-fit on Android) are
+// installed and an EAS dev build is produced. To wire real data, set this to
+// an object implementing { requestPermissions(sourceId, os), getDailyMetrics(
+// sourceId, os) } — e.g. in a platform-specific healthBridge.native.js loaded
+// here. Until then every reader below falls back to mockSample() so the rest
+// of the app integrates against a stable shape.
+const NATIVE_BRIDGE = null;
+
 const mockSample = () => ({
   sleep: { hours: 7.2, quality: 'good', startedAt: Date.now() - 8 * 3600_000 },
   steps: 8420,
@@ -23,13 +32,21 @@ export const healthSources = {
   garmin: { id: 'garmin', name: 'Garmin Connect', platform: 'all' },
 };
 
-export async function requestPermissions(_source) {
-  // TODO: wire to AppleHealthKit.initHealthKit / GoogleFit.authorize when native modules are added.
+export async function requestPermissions(source) {
+  // Delegates to AppleHealthKit.initHealthKit / GoogleFit.authorize via the
+  // native bridge when installed; mock-grants otherwise so onboarding flows.
+  if (NATIVE_BRIDGE && isNative) {
+    return NATIVE_BRIDGE.requestPermissions(source, Platform.OS);
+  }
   return { granted: true, mock: true };
 }
 
-export async function getDailyMetrics(_source) {
-  // TODO: branch on Platform.OS and call native module getters.
+export async function getDailyMetrics(source) {
+  // Reads from the platform's native module (iOS HealthKit / Android Google
+  // Fit) via the bridge when available; falls back to a mock sample.
+  if (NATIVE_BRIDGE && isNative) {
+    return NATIVE_BRIDGE.getDailyMetrics(source, Platform.OS);
+  }
   return mockSample();
 }
 
@@ -51,4 +68,4 @@ export function getAvailableSources() {
   return [healthSources.garmin]; // web
 }
 
-export const __isMock = !isNative || true; // stays true until native modules wired
+export const __isMock = !NATIVE_BRIDGE || !isNative; // true until the native bridge is wired

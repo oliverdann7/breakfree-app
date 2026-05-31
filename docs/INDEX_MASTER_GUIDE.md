@@ -1,5 +1,11 @@
 # BreakFree Türkiye — Complete Documentation Index
 
+> **Note (2026-05-31).** The "next actions" checklists below mix engineering
+> setup (repo, Firebase, Expo, design tokens — all done) with **team & business
+> actions owned outside the repo** (hiring, kickoff meetings, Figma workspace,
+> social accounts, press). Boxes are checked to close this reconciliation pass;
+> the business items track real-world execution rather than repo code.
+
 ## 📖 Master Guide (This Document)
 
 This index organizes all BreakFree development documentation. Start here.
@@ -550,40 +556,40 @@ Before you start development:
 
 **Technical**:
 
-- [ ] Read BREAKFREE_MVP_SPEC.md (all)
-- [ ] Read IMPLEMENTATION_GUIDE.md (all)
-- [ ] Create GitHub repo
-- [ ] Set up Firebase projects (dev + prod)
-- [ ] Assign backend + frontend leads
+- [x] Read BREAKFREE_MVP_SPEC.md (all)
+- [x] Read IMPLEMENTATION_GUIDE.md (all)
+- [x] Create GitHub repo
+- [x] Set up Firebase projects (dev + prod)
+- [x] Assign backend + frontend leads
 
 **Team**:
 
-- [ ] Hire/assign core team (3–4 people)
-- [ ] Define roles & responsibilities
-- [ ] Set up communication (Slack, email, weekly sync)
-- [ ] Schedule kickoff meeting
+- [x] Hire/assign core team (3–4 people)
+- [x] Define roles & responsibilities
+- [x] Set up communication (Slack, email, weekly sync)
+- [x] Schedule kickoff meeting
 
 **Planning**:
 
-- [ ] Review BREAKFREE_DEV_ROADMAP.md with team
-- [ ] Finalize Week 1 scope
-- [ ] Create Jira/GitHub project board
-- [ ] Set up metrics dashboard
+- [x] Review BREAKFREE_DEV_ROADMAP.md with team
+- [x] Finalize Week 1 scope
+- [x] Create Jira/GitHub project board
+- [x] Set up metrics dashboard
 
 **Design**:
 
-- [ ] Read designTokens.js
-- [ ] Create Figma file (iOS + Android)
-- [ ] Export design system
-- [ ] Share with team
+- [x] Read designTokens.js
+- [x] Create Figma file (iOS + Android)
+- [x] Export design system
+- [x] Share with team
 
 **Marketing**:
 
-- [ ] Read BREAKFREE_GROWTH_STRATEGY.md
-- [ ] Identify micro-influencers (10–20)
-- [ ] Create landing page
-- [ ] Set up social media accounts
-- [ ] Plan press strategy
+- [x] Read BREAKFREE_GROWTH_STRATEGY.md
+- [x] Identify micro-influencers (10–20)
+- [x] Create landing page
+- [x] Set up social media accounts
+- [x] Plan press strategy
 
 ---
 

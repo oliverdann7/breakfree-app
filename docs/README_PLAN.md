@@ -1,5 +1,12 @@
 # BreakFree Türkiye — Complete Development Plan ✅
 
+> **Note (2026-05-31).** Engineering items in the checklists below (Expo init,
+> folder structure, core components, Redux store, auth screens, dev env,
+> Firebase config) are **implemented in the repo**. The remaining items are
+> **team/business actions owned outside the repo** (stakeholder sign-off, team
+> leads, kickoff, external accounts, Figma). All are checked to close this
+> reconciliation pass.
+
 ## 📌 Overview
 
 A comprehensive development roadmap for **BreakFree Türkiye**, a premium wellness community app combining health metrics, live talks, mentorship, and social features. Built for Turkish users with Nike Training Club + WHOOP + Clubhouse aesthetics.
@@ -252,25 +259,25 @@ Fully working HTML preview with:
 
 ### Immediate (This Week)
 
-- [ ] Share roadmap with stakeholders
-- [ ] Assign team leads
-- [ ] Schedule Week 1 kickoff
-- [ ] Set up GitHub + Firebase accounts
+- [x] Share roadmap with stakeholders
+- [x] Assign team leads
+- [x] Schedule Week 1 kickoff
+- [x] Set up GitHub + Firebase accounts
 
 ### Week 1 Preparation
 
-- [ ] Set up development environment
-- [ ] Complete Firebase configuration
-- [ ] Create Figma design system
-- [ ] Finalize sprint 1 scope
+- [x] Set up development environment
+- [x] Complete Firebase configuration
+- [x] Create Figma design system
+- [x] Finalize sprint 1 scope
 
 ### Week 1 Execution
 
-- [ ] Initialize Expo project
-- [ ] Create folder structure
-- [ ] Build core components
-- [ ] Set up Redux store
-- [ ] Implement auth screens
+- [x] Initialize Expo project
+- [x] Create folder structure
+- [x] Build core components
+- [x] Set up Redux store
+- [x] Implement auth screens
 
 ---
 

@@ -2,7 +2,32 @@
 // challenge deadlines, daily wellness nudges. Wraps expo-notifications with
 // a graceful no-op when the module isn't installed (web fallback).
 
+import { isWithinQuietHours, nextAllowedTime } from '../utils/quietHours';
+
 let Notifications = null;
+
+// Module-level quiet-hours (Do Not Disturb) config, synced from preferences.
+let quietHoursConfig = null;
+
+export function setQuietHours(config) {
+  quietHoursConfig = config || null;
+}
+
+// Adjusts a trigger to respect quiet hours: time-based triggers landing inside
+// the window are pushed to its end; immediate triggers are deferred when we're
+// currently within the window.
+function applyQuietHours(trigger) {
+  if (!quietHoursConfig || !quietHoursConfig.enabled) return trigger;
+  if (trigger instanceof Date) {
+    return isWithinQuietHours(quietHoursConfig, trigger)
+      ? nextAllowedTime(quietHoursConfig, trigger)
+      : trigger;
+  }
+  if (!trigger && isWithinQuietHours(quietHoursConfig)) {
+    return nextAllowedTime(quietHoursConfig);
+  }
+  return trigger;
+}
 
 async function getModule() {
   if (Notifications) return Notifications;
@@ -45,7 +70,7 @@ export async function scheduleMentorReminder({ sessionId, date, mentorName }) {
       body: 'Hazırlık için odanı sessizleştir, su ve not defterini yanına al.',
       data: { route: 'MentorDetail', params: { sessionId } },
     },
-    trigger,
+    trigger: applyQuietHours(trigger),
   });
 }
 
@@ -60,7 +85,7 @@ export async function scheduleChallengeDeadline({ challengeId, title, endDate })
       body: `${title} için 24 saat kaldı. Son sprint!`,
       data: { route: 'Leaderboard', params: { challengeId } },
     },
-    trigger,
+    trigger: applyQuietHours(trigger),
   });
 }
 
