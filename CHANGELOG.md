@@ -7,6 +7,13 @@ Versions follow SemVer; stores use `versionCode` (Android) / `buildNumber`
 
 ## [Unreleased] — closeout of Phase 2 + Phase 3 scaffolding
 
+### Added
+- Daily mood + hydration check-in on HealthMetricsScreen: 5-face mood picker
+  and a water (cups) field in the log sheet, surfaced as breakdown cards. The
+  daily wellness score now uses the canonical weighted algorithm
+  (`scoreDailyEntry`) across all five dimensions instead of an ad-hoc
+  sleep+steps average, and logging a single field reflects the whole day.
+
 ### Added — Phase 2 (Sprints 5–10)
 - Premium subscription: PremiumScreen + premiumSlice (Pro Monthly ₺29.99 /
   Annual ₺299.99), 7-day trial, RevenueCat webhook ingest in Cloud Functions

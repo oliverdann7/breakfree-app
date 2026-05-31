@@ -17,6 +17,17 @@ import { fetchMetrics, logMetric } from '../../store/slices/metricsSlice';
 import Card from '../../components/common/Card';
 import MetricCard from '../../components/features/MetricCard';
 import { colors } from '../../constants/designTokens';
+import { scoreDailyEntry } from '../../utils/wellnessScore';
+
+// 1-10 mood self-report mapped to five faces (per wellness algorithm §2.1)
+const MOOD_OPTIONS = [
+  { emoji: '😞', rating: 2, label: 'Çok kötü' },
+  { emoji: '🙁', rating: 4, label: 'Kötü' },
+  { emoji: '😐', rating: 6, label: 'İdare eder' },
+  { emoji: '🙂', rating: 8, label: 'İyi' },
+  { emoji: '😄', rating: 10, label: 'Harika' },
+];
+const ML_PER_CUP = 250;
 
 export default function HealthMetricsScreen() {
   const dispatch = useAppDispatch();
@@ -28,6 +39,8 @@ export default function HealthMetricsScreen() {
   const [steps, setSteps] = useState('');
   const [heartRate, setHeartRate] = useState('');
   const [calories, setCalories] = useState('');
+  const [hydrationCups, setHydrationCups] = useState('');
+  const [mood, setMood] = useState(null);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
@@ -45,30 +58,31 @@ export default function HealthMetricsScreen() {
       const st = parseInt(steps, 10);
       const hr = parseInt(heartRate, 10);
       const cal = parseInt(calories, 10);
+      const cups = parseFloat(hydrationCups);
       const data = {};
       if (!isNaN(sh) && sh > 0)
         data.sleep = { hours: sh, quality: sh >= 7 ? 'İyi' : sh >= 5 ? 'Orta' : 'Kötü' };
       if (!isNaN(st) && st > 0) data.steps = st;
       if (!isNaN(hr) && hr > 0) data.heartRate = hr;
       if (!isNaN(cal) && cal > 0) data.calories = cal;
+      if (!isNaN(cups) && cups > 0) data.hydration = Math.round(cups * ML_PER_CUP);
+      if (mood != null) data.mood = mood;
       if (Object.keys(data).length === 0) {
         Alert.alert('Hata', 'En az bir değer girin.');
         return;
       }
-      // Simple wellness score: average of available normalized values
-      const scores = [];
-      if (data.sleep) scores.push(Math.min(100, Math.round((data.sleep.hours / 8) * 100)));
-      if (data.steps) scores.push(Math.min(100, Math.round((data.steps / 10000) * 100)));
-      data.wellnessScore =
-        scores.length > 0
-          ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length)
-          : wellnessScore;
+
+      // Score the full day: combine today's entry with anything already logged,
+      // using the canonical weighted algorithm (sleep/activity/HR/hydration/mood).
+      data.wellnessScore = scoreDailyEntry(data, dm || {}) ?? wellnessScore;
 
       await dispatch(logMetric({ uid: user.uid, data })).unwrap();
       setSleepHours('');
       setSteps('');
       setHeartRate('');
       setCalories('');
+      setHydrationCups('');
+      setMood(null);
       setLogVisible(false);
     } catch (e) {
       Alert.alert('Hata', e.message || 'Kayıt başarısız.');
@@ -84,26 +98,45 @@ export default function HealthMetricsScreen() {
       ? Math.round(weeklyData.reduce((s, d) => s + (d.wellnessScore || 0), 0) / weeklyData.length)
       : 0;
 
+  const moodFace = dm?.mood != null ? MOOD_OPTIONS.find((m) => m.rating >= dm.mood) : null;
   const breakdown = [
     {
+      emoji: '😴',
       label: 'Uyku kalitesi',
       value: dm?.sleep?.hours ? Math.min(100, Math.round((dm.sleep.hours / 8) * 100)) : null,
       color: colors.cyan,
       sub: dm?.sleep ? `${dm.sleep.quality} · ${dm.sleep.hours}s` : 'Henüz kayıt yok',
     },
     {
+      emoji: '👟',
       label: 'Hareket',
       value: dm?.steps ? Math.min(100, Math.round((dm.steps / 10000) * 100)) : null,
       color: colors.gold,
       sub: dm?.steps ? `${(dm.steps / 1000).toFixed(1)}k adım` : 'Henüz kayıt yok',
     },
     {
+      emoji: '❤️',
       label: 'Nabız',
       value: dm?.heartRate ? Math.min(100, Math.round(((200 - dm.heartRate) / 120) * 100)) : null,
       color: colors.royal,
       sub: dm?.heartRate ? `${dm.heartRate} bpm dinlenme` : 'Henüz kayıt yok',
     },
     {
+      emoji: '💧',
+      label: 'Su',
+      value: dm?.hydration ? Math.min(100, Math.round((dm.hydration / 2000) * 100)) : null,
+      color: colors.cyan,
+      sub: dm?.hydration ? `${(dm.hydration / ML_PER_CUP).toFixed(0)} bardak` : 'Henüz kayıt yok',
+    },
+    {
+      emoji: moodFace?.emoji || '🙂',
+      label: 'Ruh hali',
+      value: dm?.mood != null ? Math.min(100, dm.mood * 10) : null,
+      color: colors.gold,
+      sub: moodFace ? moodFace.label : 'Henüz kayıt yok',
+    },
+    {
+      emoji: '🔥',
       label: 'Kalori',
       value: dm?.calories ? Math.min(100, Math.round((dm.calories / 2500) * 100)) : null,
       color: colors.gold,
@@ -179,10 +212,10 @@ export default function HealthMetricsScreen() {
             {breakdown.map((metric, i) => (
               <MetricCard
                 key={i}
-                emoji={i === 0 ? '😴' : i === 1 ? '👟' : i === 2 ? '❤️' : '🔥'}
+                emoji={metric.emoji}
                 label={metric.label}
                 value={metric.value ?? '—'}
-                unit={i === 0 ? 'puan' : i === 1 ? 'puan' : i === 2 ? 'puan' : 'puan'}
+                unit="puan"
                 color={metric.color}
               />
             ))}
@@ -202,6 +235,27 @@ export default function HealthMetricsScreen() {
             <View style={styles.modalHandle} />
             <Text style={styles.modalTitle}>Bugünü Kaydet</Text>
 
+            <View style={styles.logField}>
+              <Text style={styles.logFieldLabel}>🧠 Ruh halin nasıl?</Text>
+              <View style={styles.moodRow}>
+                {MOOD_OPTIONS.map((m) => {
+                  const active = mood === m.rating;
+                  return (
+                    <TouchableOpacity
+                      key={m.rating}
+                      style={[styles.moodOption, active && styles.moodOptionActive]}
+                      onPress={() => setMood(active ? null : m.rating)}
+                      accessibilityRole="button"
+                      accessibilityLabel={m.label}
+                      accessibilityState={{ selected: active }}
+                    >
+                      <Text style={styles.moodEmoji}>{m.emoji}</Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+            </View>
+
             {[
               {
                 label: '😴 Uyku (saat)',
@@ -217,6 +271,12 @@ export default function HealthMetricsScreen() {
                 placeholder: 'ör. 65',
               },
               { label: '🔥 Kalori', value: calories, set: setCalories, placeholder: 'ör. 1800' },
+              {
+                label: '💧 Su (bardak)',
+                value: hydrationCups,
+                set: setHydrationCups,
+                placeholder: 'ör. 8',
+              },
             ].map(({ label, value, set, placeholder }) => (
               <View key={label} style={styles.logField}>
                 <Text style={styles.logFieldLabel}>{label}</Text>
@@ -375,6 +435,23 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   logField: { marginBottom: 14 },
+  moodRow: { flexDirection: 'row', justifyContent: 'space-between', gap: 8 },
+  moodOption: {
+    flex: 1,
+    aspectRatio: 1,
+    maxWidth: 56,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 12,
+    backgroundColor: 'rgba(255,255,255,0.06)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.1)',
+  },
+  moodOptionActive: {
+    backgroundColor: 'rgba(212, 175, 55, 0.18)',
+    borderColor: colors.gold,
+  },
+  moodEmoji: { fontSize: 24 },
   logFieldLabel: {
     fontSize: 12,
     color: 'rgba(255,255,255,0.6)',

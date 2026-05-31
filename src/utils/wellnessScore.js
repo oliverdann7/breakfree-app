@@ -59,6 +59,20 @@ export function computeWellnessScore({ sleep, steps, heartRate, hydration, mood 
   return Math.round(weightedSum / totalWeight);
 }
 
+// Combine a freshly-entered metrics partial with the day's existing entry,
+// then score the full day with the canonical algorithm. Used by the health
+// log flow so logging a single field (e.g. just mood) reflects the whole day
+// rather than collapsing the score to that one dimension.
+export function scoreDailyEntry(entry = {}, existing = {}) {
+  return computeWellnessScore({
+    sleep: entry.sleep?.hours ?? existing.sleep?.hours,
+    steps: entry.steps ?? existing.steps,
+    heartRate: entry.heartRate ?? existing.heartRate,
+    hydration: entry.hydration ?? existing.hydration,
+    mood: entry.mood ?? existing.mood,
+  });
+}
+
 export function wellnessLabel(score) {
   if (score == null) return '—';
   if (score >= 85) return 'Mükemmel';
