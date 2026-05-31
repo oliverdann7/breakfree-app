@@ -13,6 +13,9 @@ Versions follow SemVer; stores use `versionCode` (Android) / `buildNumber`
   daily wellness score now uses the canonical weighted algorithm
   (`scoreDailyEntry`) across all five dimensions instead of an ad-hoc
   sleep+steps average, and logging a single field reflects the whole day.
+- Dashboard wellness card shows a qualitative status badge
+  (Mükemmel/İyi/Orta/Düşük/Dikkat) via the `wellnessLabel` helper, giving the
+  numeric ring meaning at a glance.
 
 ### Added — Phase 2 (Sprints 5–10)
 - Premium subscription: PremiumScreen + premiumSlice (Pro Monthly ₺29.99 /
