@@ -14,6 +14,7 @@ import { fetchUserProfile, fetchDailyPlan, completeTask } from '../../store/slic
 import WellnessRing from '../../components/features/WellnessRing';
 import Card from '../../components/common/Card';
 import { colors } from '../../constants/designTokens';
+import { wellnessLabel } from '../../utils/wellnessScore';
 
 const { width } = Dimensions.get('window');
 
@@ -61,6 +62,7 @@ export default function DashboardScreen() {
   const todayPlan = dailyPlan?.tasks || [];
 
   const dm = dailyMetrics;
+  const scoreLabel = wellnessScore ? wellnessLabel(wellnessScore) : null;
   const metrics = [
     {
       emoji: '😴',
@@ -122,6 +124,11 @@ export default function DashboardScreen() {
               <Text style={styles.wellnessSideTitle}>
                 Bugün <Text style={styles.wellnessSideAccent}>hazırsın.</Text>
               </Text>
+              {scoreLabel && (
+                <View style={styles.wellnessBadge}>
+                  <Text style={styles.wellnessBadgeText}>{scoreLabel}</Text>
+                </View>
+              )}
             </View>
           </View>
         </Card>
@@ -296,6 +303,22 @@ const styles = StyleSheet.create({
   wellnessSideAccent: {
     color: colors.gold,
     fontWeight: '600',
+  },
+  wellnessBadge: {
+    alignSelf: 'flex-start',
+    marginTop: 4,
+    paddingHorizontal: 10,
+    paddingVertical: 3,
+    borderRadius: 999,
+    backgroundColor: 'rgba(212, 175, 55, 0.15)',
+    borderWidth: 1,
+    borderColor: 'rgba(212, 175, 55, 0.4)',
+  },
+  wellnessBadgeText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: colors.gold,
+    letterSpacing: 0.3,
   },
   metricsGrid: {
     flexDirection: 'row',
