@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../../services/firebase';
+import { featureFlags } from '../../constants/featureFlags';
 
 export const PLANS = [
   {
@@ -49,48 +50,52 @@ export const fetchSubscription = createAsyncThunk(
   }
 );
 
-// Placeholder: real impl will call backend → Stripe/RevenueCat → webhook updates Firestore.
+// Entitlement is the server's call: a real purchase goes through the native
+// store → RevenueCat → `revenueCatWebhook` Cloud Function, which is the ONLY
+// writer of `users/{uid}/subscription/current` (clients are denied by the
+// Firestore rules). This thunk therefore never writes that doc itself.
+//   - When `mockPremiumPurchase` is on (dev), it returns a LOCAL, non-persisted
+//     active subscription so the Pro UI can be exercised; it is lost on reload
+//     and confers no real entitlement.
+//   - Otherwise it rejects, since native IAP is not wired yet.
 export const subscribe = createAsyncThunk(
   'premium/subscribe',
-  async ({ uid, planId }, { rejectWithValue }) => {
+  async ({ planId }, { rejectWithValue }) => {
     try {
       const plan = PLANS.find((p) => p.id === planId);
       if (!plan) throw new Error('Plan not found');
 
-      const subscription = {
+      if (!featureFlags.mockPremiumPurchase) {
+        return rejectWithValue('Satın alma şu anda kullanılamıyor. Mağaza entegrasyonu yakında.');
+      }
+
+      return {
         planId,
         status: 'active',
         startedAt: Date.now(),
         renewAt: Date.now() + (plan.interval === 'year' ? 365 : 30) * 86_400_000,
         trial: true,
-        provider: 'mock',
+        provider: 'mock-dev',
+        local: true,
       };
-
-      if (db && uid) {
-        await setDoc(doc(db, 'users', uid, 'subscription', 'current'), subscription);
-      }
-      return subscription;
     } catch (error) {
       return rejectWithValue(error.message);
     }
   }
 );
 
+// Real cancellation is handled by the store + RevenueCat, with the webhook
+// reflecting it into Firestore. Without the native SDK we can only mirror it
+// locally under the dev mock flag.
 export const cancelSubscription = createAsyncThunk(
   'premium/cancel',
-  async (uid, { rejectWithValue }) => {
-    try {
-      if (db && uid) {
-        await setDoc(
-          doc(db, 'users', uid, 'subscription', 'current'),
-          { status: 'cancelled', cancelledAt: Date.now() },
-          { merge: true }
-        );
-      }
-      return true;
-    } catch (error) {
-      return rejectWithValue(error.message);
+  async (_, { rejectWithValue }) => {
+    if (!featureFlags.mockPremiumPurchase) {
+      return rejectWithValue(
+        'Abonelik iptali mağaza üzerinden yönetilir. Yakında uygulama içinden de yapılabilecek.'
+      );
     }
+    return true;
   }
 );
 

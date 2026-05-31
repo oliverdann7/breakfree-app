@@ -21,6 +21,9 @@ export default function Button({
       onPress={onPress}
       activeOpacity={0.8}
       disabled={isDisabled}
+      accessibilityRole="button"
+      accessibilityLabel={title}
+      accessibilityState={{ disabled: isDisabled, busy: loading }}
     >
       {loading ? (
         <ActivityIndicator color={variant === 'outline' ? colors.cyan : colors.navy} size="small" />

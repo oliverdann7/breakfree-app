@@ -25,6 +25,7 @@ export default function Input({
           style={styles.input}
           value={value}
           onChangeText={onChangeText}
+          accessibilityLabel={label || placeholder}
           placeholder={placeholder}
           placeholderTextColor={colors.textTertiary}
           secureTextEntry={secureTextEntry && !visible}

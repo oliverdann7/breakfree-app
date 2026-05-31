@@ -1,28 +1,80 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+    function isAdmin() {
+      return isSignedIn() && request.auth.token.isAdmin == true;
+    }
+    // True when the update touches none of the document's keys except the
+    // allowed set (lets any user bump a shared counter without granting full
+    // write access to the document).
+    function onlyChanges(keys) {
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly(keys);
+    }
+
     match /users/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
+      allow read, write: if isOwner(userId);
+
       match /metrics/{document} {
-        allow read, write: if request.auth != null && request.auth.uid == userId;
+        allow read, write: if isOwner(userId);
+      }
+
+      // Subscription state is written exclusively by the RevenueCat webhook
+      // (Cloud Function via the admin SDK, which bypasses these rules). Clients
+      // may read their own status but can never write it, so Pro cannot be
+      // self-granted from the app.
+      match /subscription/{document} {
+        allow read: if isOwner(userId);
+        allow write: if false;
       }
     }
+
     match /talks/{talk} {
-      allow read: if request.auth != null;
-      allow create: if request.auth != null;
-      allow update, delete: if request.auth.token.isAdmin == true;
+      allow read: if isSignedIn();
+      allow create: if isSignedIn()
+        && request.resource.data.title is string
+        && request.resource.data.title.size() > 0;
+      // Admins may fully edit/remove a talk; any signed-in user may bump the
+      // live listener counter when they join (see talksSlice.joinTalk).
+      allow update: if isAdmin() || (isSignedIn() && onlyChanges(['listeners']));
+      allow delete: if isAdmin();
     }
+
     match /posts/{post} {
-      allow read: if request.auth != null;
-      allow create: if request.auth != null;
-      allow update, delete: if request.auth.uid == resource.data.authorId;
+      allow read: if isSignedIn();
+      allow create: if isSignedIn()
+        && request.resource.data.authorUid == request.auth.uid
+        && request.resource.data.text is string
+        && request.resource.data.text.size() > 0;
+      // Author may edit/delete their own post; anyone signed in may change only
+      // the like counter (see communitySlice.toggleLike).
+      allow update: if isSignedIn() && (
+        resource.data.authorUid == request.auth.uid
+        || onlyChanges(['likes'])
+      );
+      allow delete: if isSignedIn() && resource.data.authorUid == request.auth.uid;
+
       match /comments/{comment} {
-        allow read: if request.auth != null;
-        allow create: if request.auth != null;
+        allow read: if isSignedIn();
+        allow create: if isSignedIn()
+          && request.resource.data.authorUid == request.auth.uid;
+        allow update, delete: if isSignedIn()
+          && resource.data.authorUid == request.auth.uid;
       }
     }
+
+    // Like records are keyed `${uid}_${postId}` and carry a `uid` field. A user
+    // may only read or mutate their own like documents.
     match /liked_posts/{id} {
-      allow read, write: if request.auth != null;
+      allow read: if isSignedIn() && resource.data.uid == request.auth.uid;
+      allow create: if isSignedIn() && request.resource.data.uid == request.auth.uid;
+      allow delete: if isSignedIn() && resource.data.uid == request.auth.uid;
     }
   }
 }

@@ -1,37 +1,86 @@
-import React, { useMemo } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet, SafeAreaView } from 'react-native';
+import React, { useEffect, useMemo, useState } from 'react';
+import {
+  View,
+  Text,
+  ScrollView,
+  TouchableOpacity,
+  StyleSheet,
+  SafeAreaView,
+  ActivityIndicator,
+} from 'react-native';
+import { doc, getDoc } from 'firebase/firestore';
 import { useAppSelector } from '../../store/hooks';
+import { db } from '../../services/firebase';
 import Card from '../../components/common/Card';
 import { colors } from '../../constants/designTokens';
 
-// Mock leaderboard until a Cloud Function pre-computes rankings per challenge.
-const MOCK_LEADERBOARD = [
-  { rank: 1, name: 'Ayşe K.', value: 52340, emoji: '🌸', bg: '#EC4899' },
-  { rank: 2, name: 'Burak Y.', value: 51200, emoji: '🔥', bg: '#EF4444' },
-  { rank: 3, name: 'Elif M.', value: 49875, emoji: '🦋', bg: '#8B5CF6' },
-  { rank: 4, name: 'Mert C.', value: 48910, emoji: '⭐', bg: '#F59E0B' },
-  { rank: 5, name: 'Sen', value: 48400, emoji: '🧘', bg: '#0072B0', isMe: true },
-  { rank: 6, name: 'Ceren A.', value: 47220, emoji: '🌿', bg: '#10B981' },
-  { rank: 7, name: 'Deniz T.', value: 46100, emoji: '💫', bg: '#14B8D4' },
-  { rank: 8, name: 'Kemal Ö.', value: 44830, emoji: '🎯', bg: '#3B82F6' },
+// Dev-only seed so the screen renders before the `recomputeLeaderboard` Cloud
+// Function has populated `leaderboards/{challengeId}`. Production shows a real
+// empty state instead of fake rankings.
+const SEED_LEADERBOARD = [
+  { rank: 1, uid: 'seed1', name: 'Ayşe K.', value: 52340, emoji: '🌸', bg: '#EC4899' },
+  { rank: 2, uid: 'seed2', name: 'Burak Y.', value: 51200, emoji: '🔥', bg: '#EF4444' },
+  { rank: 3, uid: 'seed3', name: 'Elif M.', value: 49875, emoji: '🦋', bg: '#8B5CF6' },
+  { rank: 4, uid: 'seed4', name: 'Mert C.', value: 48910, emoji: '⭐', bg: '#F59E0B' },
+  { rank: 5, uid: 'seed5', name: 'Ceren A.', value: 47220, emoji: '🌿', bg: '#10B981' },
 ];
 
 export default function LeaderboardScreen({ navigation, route }) {
   const challengeId = route?.params?.challengeId;
   const { challenges } = useAppSelector((s) => s.challenges);
+  const { user } = useAppSelector((s) => s.auth);
   const challenge = useMemo(
     () => challenges.find((c) => c.id === challengeId),
     [challenges, challengeId]
   );
 
-  const myEntry = MOCK_LEADERBOARD.find((e) => e.isMe);
+  const [entries, setEntries] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    const load = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        if (!db || !challengeId) {
+          if (!cancelled) setEntries(__DEV__ ? SEED_LEADERBOARD : []);
+          return;
+        }
+        const snap = await getDoc(doc(db, 'leaderboards', challengeId));
+        const list = snap.exists() ? snap.data().entries || [] : [];
+        if (!cancelled) setEntries(list.length ? list : __DEV__ ? SEED_LEADERBOARD : []);
+      } catch (e) {
+        if (!cancelled) setError(e.message || 'Lider tablosu yüklenemedi.');
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    };
+    load();
+    return () => {
+      cancelled = true;
+    };
+  }, [challengeId]);
+
+  // Mark the signed-in user's own row.
+  const ranked = useMemo(
+    () => entries.map((e) => ({ ...e, isMe: user?.uid && e.uid === user.uid })),
+    [entries, user?.uid]
+  );
+  const myEntry = ranked.find((e) => e.isMe);
 
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 60 }}>
         <View style={styles.header}>
           {navigation && (
-            <TouchableOpacity onPress={() => navigation.goBack()} style={styles.back}>
+            <TouchableOpacity
+              onPress={() => navigation.goBack()}
+              style={styles.back}
+              accessibilityRole="button"
+              accessibilityLabel="Geri"
+            >
               <Text style={styles.backText}>←</Text>
             </TouchableOpacity>
           )}
@@ -42,37 +91,57 @@ export default function LeaderboardScreen({ navigation, route }) {
           </View>
         </View>
 
-        {myEntry && (
-          <Card style={styles.myCard}>
-            <View style={styles.podiumRow}>
-              <Text style={styles.rankBig}>#{myEntry.rank}</Text>
-              <View style={[styles.avatar, { backgroundColor: myEntry.bg }]}>
-                <Text style={styles.avatarEmoji}>{myEntry.emoji}</Text>
-              </View>
-              <View style={{ flex: 1 }}>
-                <Text style={styles.myName}>{myEntry.name}</Text>
-                <Text style={styles.myValue}>{myEntry.value.toLocaleString('tr-TR')}</Text>
-              </View>
-            </View>
-          </Card>
-        )}
-
-        <Text style={styles.sectionTitle}>Sıralama</Text>
-
-        {MOCK_LEADERBOARD.map((entry) => (
-          <View key={entry.rank} style={[styles.entryRow, entry.isMe && styles.entryRowMe]}>
-            <Text style={[styles.entryRank, entry.rank <= 3 && styles.entryRankTop]}>
-              {entry.rank <= 3 ? ['🥇', '🥈', '🥉'][entry.rank - 1] : `#${entry.rank}`}
-            </Text>
-            <View style={[styles.avatar, { backgroundColor: entry.bg, width: 32, height: 32 }]}>
-              <Text style={{ fontSize: 14 }}>{entry.emoji}</Text>
-            </View>
-            <Text style={[styles.entryName, entry.isMe && { color: colors.cyan }]}>
-              {entry.name}
-            </Text>
-            <Text style={styles.entryValue}>{entry.value.toLocaleString('tr-TR')}</Text>
+        {loading ? (
+          <ActivityIndicator color={colors.cyan} style={{ marginTop: 60 }} />
+        ) : error ? (
+          <View style={styles.stateBox}>
+            <Text style={styles.stateText}>{error}</Text>
           </View>
-        ))}
+        ) : ranked.length === 0 ? (
+          <View style={styles.stateBox}>
+            <Text style={styles.stateEmoji}>🏁</Text>
+            <Text style={styles.stateText}>
+              Henüz sıralama yok. Meydan okumaya katıl ve ilk sen ol!
+            </Text>
+          </View>
+        ) : (
+          <>
+            {myEntry && (
+              <Card style={styles.myCard}>
+                <View style={styles.podiumRow}>
+                  <Text style={styles.rankBig}>#{myEntry.rank}</Text>
+                  <View style={[styles.avatar, { backgroundColor: myEntry.bg }]}>
+                    <Text style={styles.avatarEmoji}>{myEntry.emoji}</Text>
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.myName}>{myEntry.name}</Text>
+                    <Text style={styles.myValue}>{myEntry.value.toLocaleString('tr-TR')}</Text>
+                  </View>
+                </View>
+              </Card>
+            )}
+
+            <Text style={styles.sectionTitle}>Sıralama</Text>
+
+            {ranked.map((entry) => (
+              <View
+                key={entry.uid || entry.rank}
+                style={[styles.entryRow, entry.isMe && styles.entryRowMe]}
+              >
+                <Text style={[styles.entryRank, entry.rank <= 3 && styles.entryRankTop]}>
+                  {entry.rank <= 3 ? ['🥇', '🥈', '🥉'][entry.rank - 1] : `#${entry.rank}`}
+                </Text>
+                <View style={[styles.avatar, { backgroundColor: entry.bg, width: 32, height: 32 }]}>
+                  <Text style={{ fontSize: 14 }}>{entry.emoji}</Text>
+                </View>
+                <Text style={[styles.entryName, entry.isMe && { color: colors.cyan }]}>
+                  {entry.name}
+                </Text>
+                <Text style={styles.entryValue}>{entry.value.toLocaleString('tr-TR')}</Text>
+              </View>
+            ))}
+          </>
+        )}
       </ScrollView>
     </SafeAreaView>
   );
@@ -93,6 +162,10 @@ const styles = StyleSheet.create({
   kicker: { color: colors.gold, fontSize: 10, letterSpacing: 2, fontWeight: '700' },
   title: { color: colors.textPrimary, fontSize: 22, fontWeight: '700', marginTop: 4 },
   subtitle: { color: colors.textSecondary, fontSize: 12, marginTop: 4, lineHeight: 17 },
+
+  stateBox: { alignItems: 'center', paddingVertical: 50, paddingHorizontal: 24, gap: 12 },
+  stateEmoji: { fontSize: 36 },
+  stateText: { color: colors.textSecondary, fontSize: 13, textAlign: 'center', lineHeight: 19 },
 
   myCard: {
     backgroundColor: 'rgba(20, 184, 212, 0.1)',
