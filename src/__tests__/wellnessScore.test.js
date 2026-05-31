@@ -1,5 +1,6 @@
 import {
   computeWellnessScore,
+  scoreDailyEntry,
   sleepScore,
   activityScore,
   heartRateScore,
@@ -55,6 +56,34 @@ describe('wellnessScore', () => {
   it('returns null when no data', () => {
     expect(computeWellnessScore({})).toBeNull();
     expect(computeWellnessScore()).toBeNull();
+  });
+
+  describe('scoreDailyEntry', () => {
+    it('merges a single new field over the existing day', () => {
+      // Existing day had a partial record (sleep 4h, 5k steps → 50); user logs only mood.
+      const existing = { sleep: { hours: 4 }, steps: 5000 };
+      const withoutMood = scoreDailyEntry({}, existing);
+      const withMood = scoreDailyEntry({ mood: 10 }, existing);
+      expect(withoutMood).toBe(50);
+      // A perfect mood nudges the weighted score up, not collapse it to mood-only.
+      expect(withMood).toBeGreaterThan(withoutMood);
+      expect(withMood).toBeLessThan(100);
+    });
+
+    it('new values override existing ones', () => {
+      const existing = { sleep: { hours: 4 } }; // would score 50
+      const score = scoreDailyEntry({ sleep: { hours: 8 } }, existing);
+      expect(score).toBe(100);
+    });
+
+    it('reads sleep hours from the nested shape', () => {
+      expect(scoreDailyEntry({ sleep: { hours: 8 } })).toBe(100);
+    });
+
+    it('returns null with no data on either side', () => {
+      expect(scoreDailyEntry()).toBeNull();
+      expect(scoreDailyEntry({}, {})).toBeNull();
+    });
   });
 
   it('wellnessLabel buckets', () => {
