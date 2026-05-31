@@ -7,6 +7,7 @@ import {
   StyleSheet,
   SafeAreaView,
   ActivityIndicator,
+  Alert,
 } from 'react-native';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import {
@@ -70,7 +71,9 @@ export default function PremiumScreen({ navigation }) {
     if (!user?.uid) return;
     setSubmitting(true);
     try {
-      await dispatch(subscribe({ uid: user.uid, planId: selected })).unwrap();
+      await dispatch(subscribe({ planId: selected })).unwrap();
+    } catch (err) {
+      Alert.alert('Abonelik', typeof err === 'string' ? err : 'Bir hata oluştu.');
     } finally {
       setSubmitting(false);
     }
@@ -80,7 +83,9 @@ export default function PremiumScreen({ navigation }) {
     if (!user?.uid) return;
     setSubmitting(true);
     try {
-      await dispatch(cancelSubscription(user.uid)).unwrap();
+      await dispatch(cancelSubscription()).unwrap();
+    } catch (err) {
+      Alert.alert('Abonelik', typeof err === 'string' ? err : 'Bir hata oluştu.');
     } finally {
       setSubmitting(false);
     }

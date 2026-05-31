@@ -15,6 +15,10 @@ export const featureFlags = {
   mentorBooking: envFlag('MENTOR_BOOKING', true), // mentor list + detail + booking
   challengesV2: envFlag('CHALLENGES_V2', true), // dedicated challenges/leaderboard screens
   premiumSubscription: envFlag('PREMIUM', false), // Stripe / RevenueCat
+  // Dev-only: let `subscribe` return a local, non-persisted "active" sub so the
+  // Pro UI can be exercised before the native IAP SDK lands. Never grants real
+  // entitlement — subscription docs are written server-side by the webhook only.
+  mockPremiumPurchase: envFlag('MOCK_PREMIUM', __DEV__ ?? false),
   pushNotifications: envFlag('PUSH', true), // expo-notifications
 
   // Phase 3

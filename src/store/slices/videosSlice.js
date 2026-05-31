@@ -49,12 +49,17 @@ const MOCK_VIDEOS = [
   },
 ];
 
+// Dev-only seed: lets the feed render before the real `videos` collection is
+// populated. In production an unconfigured/empty backend yields [] so the screen
+// shows a genuine empty state instead of fake content masquerading as real.
+const seedVideos = () => (__DEV__ ? MOCK_VIDEOS : []);
+
 export const fetchVideos = createAsyncThunk('videos/fetchAll', async (_, { rejectWithValue }) => {
   try {
-    if (!db) return MOCK_VIDEOS;
+    if (!db) return seedVideos();
     const q = query(collection(db, 'videos'), orderBy('publishedAt', 'desc'));
     const snap = await getDocs(q);
-    if (snap.empty) return MOCK_VIDEOS;
+    if (snap.empty) return seedVideos();
     return snap.docs.map((d) => ({ videoId: d.id, ...d.data() }));
   } catch (error) {
     return rejectWithValue(error.message);
@@ -65,7 +70,7 @@ export const fetchVideoById = createAsyncThunk(
   'videos/fetchById',
   async (videoId, { rejectWithValue }) => {
     try {
-      if (!db) return MOCK_VIDEOS.find((v) => v.videoId === videoId) || null;
+      if (!db) return seedVideos().find((v) => v.videoId === videoId) || null;
       const snap = await getDoc(doc(db, 'videos', videoId));
       if (!snap.exists()) throw new Error('Video not found');
       return { videoId: snap.id, ...snap.data() };
