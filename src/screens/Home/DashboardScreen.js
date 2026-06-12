@@ -8,6 +8,7 @@ import {
   SafeAreaView,
   Dimensions,
 } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { fetchMetrics } from '../../store/slices/metricsSlice';
 import { fetchUserProfile, fetchDailyPlan, completeTask } from '../../store/slices/userSlice';
@@ -15,6 +16,7 @@ import WellnessRing from '../../components/features/WellnessRing';
 import Card from '../../components/common/Card';
 import { colors } from '../../constants/designTokens';
 import { wellnessLabel } from '../../utils/wellnessScore';
+import { topInsight } from '../../utils/wellnessInsights';
 
 const { width } = Dimensions.get('window');
 
@@ -47,9 +49,20 @@ function todayLabel() {
 
 export default function DashboardScreen() {
   const dispatch = useAppDispatch();
+  const navigation = useNavigation();
   const { wellnessScore, dailyMetrics } = useAppSelector((state) => state.metrics);
   const { user } = useAppSelector((state) => state.auth);
   const { profile, dailyPlan } = useAppSelector((state) => state.user);
+  const insight = topInsight(dailyMetrics);
+
+  const handleInsightPress = () => {
+    if (!insight) return;
+    if (insight.screen) {
+      navigation.navigate(insight.tab, { screen: insight.screen, params: insight.params });
+    } else {
+      navigation.navigate(insight.tab);
+    }
+  };
 
   useEffect(() => {
     if (user?.uid) {
@@ -132,6 +145,32 @@ export default function DashboardScreen() {
             </View>
           </View>
         </Card>
+
+        {/* Personalized insight — surfaces the weakest dimension as a CTA */}
+        {insight && (
+          <TouchableOpacity
+            activeOpacity={0.85}
+            onPress={handleInsightPress}
+            accessibilityRole="button"
+            accessibilityLabel={`${insight.title}. ${insight.ctaLabel}`}
+            style={styles.insightWrapper}
+          >
+            <Card style={styles.insightCard}>
+              <View style={styles.insightRow}>
+                <Text style={styles.insightEmoji}>{insight.emoji}</Text>
+                <View style={styles.insightBody}>
+                  <Text style={styles.insightLabel}>Senin için</Text>
+                  <Text style={styles.insightTitle}>{insight.title}</Text>
+                  <Text style={styles.insightMessage}>{insight.message}</Text>
+                  <View style={styles.insightCta}>
+                    <Text style={styles.insightCtaText}>{insight.ctaLabel}</Text>
+                    <Text style={styles.insightCtaArrow}>→</Text>
+                  </View>
+                </View>
+              </View>
+            </Card>
+          </TouchableOpacity>
+        )}
 
         {/* Metrics Grid */}
         <View style={styles.metricsGrid}>
@@ -319,6 +358,63 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: colors.gold,
     letterSpacing: 0.3,
+  },
+  insightWrapper: {
+    marginHorizontal: 20,
+    marginBottom: 16,
+  },
+  insightCard: {
+    paddingVertical: 14,
+    paddingHorizontal: 14,
+    borderWidth: 1,
+    borderColor: 'rgba(20, 184, 212, 0.25)',
+    backgroundColor: 'rgba(20, 184, 212, 0.07)',
+  },
+  insightRow: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  insightEmoji: {
+    fontSize: 28,
+    lineHeight: 32,
+  },
+  insightBody: {
+    flex: 1,
+    gap: 2,
+  },
+  insightLabel: {
+    fontSize: 10,
+    color: 'rgba(255,255,255,0.45)',
+    fontWeight: '600',
+    letterSpacing: 0.3,
+    textTransform: 'uppercase',
+  },
+  insightTitle: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: colors.textPrimary,
+    marginTop: 2,
+  },
+  insightMessage: {
+    fontSize: 12,
+    color: 'rgba(255,255,255,0.65)',
+    lineHeight: 16,
+    marginTop: 4,
+  },
+  insightCta: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginTop: 8,
+  },
+  insightCtaText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: colors.cyan,
+  },
+  insightCtaArrow: {
+    fontSize: 12,
+    color: colors.cyan,
   },
   metricsGrid: {
     flexDirection: 'row',
