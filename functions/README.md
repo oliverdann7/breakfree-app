@@ -44,6 +44,18 @@ npm run deploy
 Requires the Firebase Blaze plan (pay-as-you-go) — outbound HTTP, scheduled
 triggers, and Cloud Storage backups all need it.
 
+## Tests
+
+```bash
+npm test              # unit suite
+npm run test:coverage # with coverage report
+```
+
+Pure unit tests — no emulator, no network. External SDKs (`firebase-admin`,
+`firebase-functions`, `agora-token`, `google-auth-library`) are redirected to
+hand-written mocks under `test/__mocks__/` via `jest.config.js`, so each handler
+is invoked directly with synthetic args. Run in CI by `functions-ci.yml`.
+
 ## Local emulator
 
 ```bash

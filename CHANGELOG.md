@@ -61,6 +61,17 @@ Versions follow SemVer; stores use `versionCode` (Android) / `buildNumber`
 ### Tests
 - 43 new unit tests covering wellnessScore, badges, premiumSlice,
   healthSlice, notificationsSlice, imageCdn, requestBatcher — all passing
+- Cloud Functions unit suite (32 tests, 7 files): rate limiter, RevenueCat
+  webhook, Agora token mint, leaderboard recompute + trigger, KVKK/GDPR
+  privacy export/delete, scheduled backup, and push fan-out. Runs with
+  hand-written firebase-admin / firebase-functions / agora-token mocks (no
+  emulator), 99% statement / 100% line coverage. Wired into `functions-ci.yml`
+  (`npm run test:coverage`) and a `functions/jest.config.js`. Closes the
+  roadmap §1.3 "Cloud Functions have zero tests" gap.
+
+### Fixed
+- `functions/package.json` was missing `google-auth-library`, a runtime
+  `require` in `scheduledBackup` — added to dependencies.
 
 ### Docs
 - docs/RUNBOOK.md — on-call, severity classes, hotfix flow, rollback,
