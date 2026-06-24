@@ -7,6 +7,21 @@ Versions follow SemVer; stores use `versionCode` (Android) / `buildNumber`
 
 ## [Unreleased] — closeout of Phase 2 + Phase 3 scaffolding
 
+### Changed
+- Extracted a shared `Avatar` component (`components/common/Avatar.js`),
+  replacing three near-identical local implementations in HealthStatusCard,
+  LeaderboardCard and CommunityScreen (roadmap §1.4 cleanup). The shared
+  component carries an `accessibilityLabel` (defaulting to the user's name),
+  a small step toward the §1.3 accessibility gap.
+
+### Removed
+- Deleted the unused `BreakFreeAppPreview.jsx` / `BreakFreeAppPreviewInline.jsx`
+  preview mockups (~4,350 lines of dead code, no imports anywhere; roadmap §1.4).
+
+### Fixed
+- Added missing `dispatch` to `useEffect` dependency arrays in MentorScreen and
+  VideoPlayerScreen (roadmap §1.4).
+
 ### Added
 - Daily mood + hydration check-in on HealthMetricsScreen: 5-face mood picker
   and a water (cups) field in the log sheet, surfaced as breakdown cards. The

@@ -38,14 +38,14 @@ export default function MentorScreen({ navigation }) {
       dispatch(fetchMentorAssignment(user.uid));
       dispatch(fetchLatestMessage(user.uid));
     }
-  }, [user?.uid]);
+  }, [user?.uid, dispatch]);
 
   useEffect(() => {
     const mentorId = assignment?.mentorId;
     if (mentorId && !mentorProfile) {
       dispatch(fetchMentorProfile(mentorId));
     }
-  }, [assignment?.mentorId, mentorProfile]);
+  }, [assignment?.mentorId, mentorProfile, dispatch]);
 
   const profile = mentorProfile || {
     name: 'Dr. Ayşe Demir',
