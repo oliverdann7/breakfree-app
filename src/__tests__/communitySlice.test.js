@@ -1,6 +1,7 @@
 import communityReducer, {
   realtimePostsUpdate,
   realtimeCommentsUpdate,
+  requestMorePosts,
 } from '../store/slices/communitySlice';
 
 const initialState = {
@@ -9,6 +10,8 @@ const initialState = {
   leaderboard: [],
   leaderboardLoading: false,
   loading: false,
+  loadingMorePosts: false,
+  hasMorePosts: true,
   postingComment: false,
   error: null,
 };
@@ -27,6 +30,36 @@ describe('communitySlice', () => {
     const state = communityReducer(initialState, realtimePostsUpdate(posts));
     expect(state.posts).toHaveLength(2);
     expect(state.posts[0].postId).toBe('p1');
+  });
+
+  it('handles paginated realtimePostsUpdate ({ posts, hasMore }) and clears load-more', () => {
+    const loading = { ...initialState, loadingMorePosts: true, hasMorePosts: true };
+    const state = communityReducer(
+      loading,
+      realtimePostsUpdate({ posts: [{ postId: 'p1' }], hasMore: false })
+    );
+    expect(state.posts).toHaveLength(1);
+    expect(state.hasMorePosts).toBe(false);
+    expect(state.loadingMorePosts).toBe(false);
+  });
+
+  it('handles requestMorePosts', () => {
+    const state = communityReducer(initialState, requestMorePosts());
+    expect(state.loadingMorePosts).toBe(true);
+  });
+
+  it('handles paginated fetchPosts.fulfilled ({ posts, hasMore })', () => {
+    const state = communityReducer(
+      { ...initialState, loadingMorePosts: true },
+      {
+        type: 'community/fetchPosts/fulfilled',
+        payload: { posts: [{ postId: 'p1' }, { postId: 'p2' }], hasMore: true },
+      }
+    );
+    expect(state.posts).toHaveLength(2);
+    expect(state.hasMorePosts).toBe(true);
+    expect(state.loadingMorePosts).toBe(false);
+    expect(state.loading).toBe(false);
   });
 
   it('handles realtimeCommentsUpdate', () => {
