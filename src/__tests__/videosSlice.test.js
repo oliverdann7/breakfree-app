@@ -2,6 +2,7 @@ import videosReducer, {
   setActiveCategory,
   clearCurrentVideo,
   updateLocalProgress,
+  isVideoLocked,
 } from '../store/slices/videosSlice';
 
 const initialState = {
@@ -98,5 +99,23 @@ describe('videosSlice', () => {
       payload: null,
     });
     expect(state.progress).toEqual({});
+  });
+
+  describe('isVideoLocked', () => {
+    it('locks premium content for non-premium users', () => {
+      expect(isVideoLocked({ isPremium: true }, false)).toBe(true);
+    });
+
+    it('unlocks premium content for premium users', () => {
+      expect(isVideoLocked({ isPremium: true }, true)).toBe(false);
+    });
+
+    it('never locks explicitly free content', () => {
+      expect(isVideoLocked({ isPremium: false }, false)).toBe(false);
+    });
+
+    it('defaults to locked when the flag is missing (non-premium)', () => {
+      expect(isVideoLocked({}, false)).toBe(true);
+    });
   });
 });
