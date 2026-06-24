@@ -10,7 +10,8 @@ import {
   Dimensions,
 } from 'react-native';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
-import { fetchVideos, setActiveCategory } from '../../store/slices/videosSlice';
+import { fetchVideos, setActiveCategory, isVideoLocked } from '../../store/slices/videosSlice';
+import { selectIsPremium } from '../../store/slices/premiumSlice';
 import VideoCard from '../../components/features/VideoCard';
 import { colors } from '../../constants/designTokens';
 
@@ -22,6 +23,7 @@ const CATEGORIES = ['Tümü', 'Zihin', 'Sağlık', 'Beslenme', 'Hareket', 'Uyku'
 export default function VideoFeedScreen({ navigation }) {
   const dispatch = useAppDispatch();
   const { allVideos, loading, activeCategory, progress } = useAppSelector((state) => state.videos);
+  const isPremium = useAppSelector(selectIsPremium);
 
   useEffect(() => {
     dispatch(fetchVideos());
@@ -72,17 +74,23 @@ export default function VideoFeedScreen({ navigation }) {
           </View>
         ) : (
           <View style={styles.grid}>
-            {filtered.map((video) => (
-              <View key={video.videoId} style={{ width: CARD_WIDTH }}>
-                <VideoCard
-                  video={video}
-                  progress={progress[video.videoId]}
-                  onPress={() =>
-                    navigation.navigate('VideoPlayer', { videoId: video.videoId, video })
-                  }
-                />
-              </View>
-            ))}
+            {filtered.map((video) => {
+              const locked = isVideoLocked(video, isPremium);
+              return (
+                <View key={video.videoId} style={{ width: CARD_WIDTH }}>
+                  <VideoCard
+                    video={video}
+                    progress={progress[video.videoId]}
+                    locked={locked}
+                    onPress={() =>
+                      locked
+                        ? navigation.navigate('Premium')
+                        : navigation.navigate('VideoPlayer', { videoId: video.videoId, video })
+                    }
+                  />
+                </View>
+              );
+            })}
           </View>
         )}
 

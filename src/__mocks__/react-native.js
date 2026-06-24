@@ -6,6 +6,9 @@ const ScrollView = (props) => React.createElement('ScrollView', props, props.chi
 const SafeAreaView = (props) => React.createElement('SafeAreaView', props, props.children);
 const TouchableOpacity = (props) => React.createElement('TouchableOpacity', props, props.children);
 const TextInput = (props) => React.createElement('TextInput', props);
+const Image = (props) => React.createElement('Image', props);
+Image.getSize = jest.fn();
+Image.prefetch = jest.fn();
 const ActivityIndicator = (props) => React.createElement('ActivityIndicator', props);
 const FlatList = (props) => React.createElement('FlatList', props);
 const Modal = (props) => React.createElement('Modal', props, props.children);
@@ -19,6 +22,7 @@ module.exports = {
   SafeAreaView,
   TouchableOpacity,
   TextInput,
+  Image,
   ActivityIndicator,
   FlatList,
   Modal,
@@ -61,10 +65,6 @@ module.exports = {
     sequence: jest.fn(),
     stagger: jest.fn(),
     delay: jest.fn(),
-  },
-  Image: {
-    getSize: jest.fn(),
-    prefetch: jest.fn(),
   },
   Alert: {
     alert: jest.fn(),

@@ -47,6 +47,7 @@ function VideoStackNavigator() {
     <VideoStack.Navigator screenOptions={{ headerShown: false }}>
       <VideoStack.Screen name="VideoFeed" component={VideoFeedScreen} />
       <VideoStack.Screen name="VideoPlayer" component={VideoPlayerScreen} />
+      <VideoStack.Screen name="Premium" component={PremiumScreen} />
     </VideoStack.Navigator>
   );
 }

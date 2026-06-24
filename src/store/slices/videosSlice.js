@@ -2,6 +2,9 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { collection, getDocs, doc, getDoc, query, orderBy, setDoc } from 'firebase/firestore';
 import { db } from '../../services/firebase';
 
+// Each video declares a provider-agnostic `source` + `sourceId` (see
+// utils/videoSource.js). `isPremium` gates playback behind a Pro subscription.
+// The YouTube entry doubles as a free taste; the rest are Pro-only.
 const MOCK_VIDEOS = [
   {
     videoId: 'v1',
@@ -9,9 +12,11 @@ const MOCK_VIDEOS = [
     description: 'Dr. Ayşe Demir ile günlük anksiyete yönetimi üzerine kapsamlı bir rehber.',
     hostName: 'Dr. Ayşe Demir',
     category: 'Zihin',
-    muxPlaybackId: null,
+    source: 'youtube',
+    sourceId: 'inpok4MKVLM',
     durationSeconds: 1842,
     publishedAt: Date.now() - 86400000 * 3,
+    isPremium: false,
     tags: ['anksiyete', 'stres', 'zihin'],
   },
   {
@@ -20,9 +25,11 @@ const MOCK_VIDEOS = [
     description: 'Güne mükemmel başlamanı sağlayacak 7 adımlı sabah rutini.',
     hostName: 'Burak Yılmaz',
     category: 'Sağlık',
-    muxPlaybackId: null,
+    source: 'youtube',
+    sourceId: 'ZToicYcHIOU',
     durationSeconds: 1260,
     publishedAt: Date.now() - 86400000 * 7,
+    isPremium: true,
     tags: ['sabah', 'rutin', 'enerji'],
   },
   {
@@ -31,9 +38,11 @@ const MOCK_VIDEOS = [
     description: 'Yeni başlayanlar için adım adım meditasyon rehberi.',
     hostName: 'Selin Arslan',
     category: 'Zihin',
-    muxPlaybackId: null,
+    source: 'mux',
+    sourceId: null,
     durationSeconds: 2100,
     publishedAt: Date.now() - 86400000 * 14,
+    isPremium: true,
     tags: ['meditasyon', 'mindfulness', 'nefes'],
   },
   {
@@ -42,9 +51,11 @@ const MOCK_VIDEOS = [
     description: 'Doğru beslenmeyle gün boyu enerjik kalmanın bilimsel sırları.',
     hostName: 'Prof. Mert Kaya',
     category: 'Beslenme',
-    muxPlaybackId: null,
+    source: 'mux',
+    sourceId: null,
     durationSeconds: 2760,
     publishedAt: Date.now() - 86400000 * 21,
+    isPremium: true,
     tags: ['beslenme', 'enerji', 'sağlık'],
   },
 ];
@@ -146,4 +157,9 @@ const videosSlice = createSlice({
 });
 
 export const { setActiveCategory, clearCurrentVideo, updateLocalProgress } = videosSlice.actions;
+
+// A video requires Pro unless it's explicitly free (`isPremium === false`).
+// Default-locked is intentional: legacy/new docs without the flag stay gated.
+export const isVideoLocked = (video, isPremium) => video?.isPremium !== false && !isPremium;
+
 export default videosSlice.reducer;

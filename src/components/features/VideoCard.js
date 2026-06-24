@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { colors } from '../../constants/designTokens';
+import { getThumbnailUrl } from '../../utils/videoSource';
 
 function formatDuration(secs) {
   if (!secs) return '';
@@ -9,10 +10,8 @@ function formatDuration(secs) {
   return `${m}:${String(s).padStart(2, '0')}`;
 }
 
-export default function VideoCard({ video, progress, onPress }) {
-  const thumbnailUrl = video.muxPlaybackId
-    ? `https://image.mux.com/${video.muxPlaybackId}/thumbnail.jpg?time=5&width=400`
-    : null;
+export default function VideoCard({ video, progress, locked = false, onPress }) {
+  const thumbnailUrl = getThumbnailUrl(video);
 
   const progressPct =
     progress && video.durationSeconds ? Math.min(1, progress / video.durationSeconds) : 0;
@@ -26,6 +25,11 @@ export default function VideoCard({ video, progress, onPress }) {
         ) : (
           <View style={styles.thumbnailPlaceholder}>
             <Text style={styles.thumbnailIcon}>▶</Text>
+          </View>
+        )}
+        {locked && (
+          <View style={styles.lockOverlay}>
+            <Text style={styles.lockBadge}>🔒 Pro</Text>
           </View>
         )}
         <View style={styles.durationBadge}>
@@ -75,6 +79,16 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(20,184,212,0.1)',
   },
   thumbnailIcon: { fontSize: 28, color: colors.cyan, opacity: 0.7 },
+  lockOverlay: {
+    position: 'absolute',
+    top: 8,
+    left: 8,
+    backgroundColor: 'rgba(201,150,26,0.92)',
+    borderRadius: 4,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+  },
+  lockBadge: { fontSize: 9, color: colors.navy, fontWeight: '700' },
   durationBadge: {
     position: 'absolute',
     bottom: 8,
