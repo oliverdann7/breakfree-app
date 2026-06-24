@@ -38,6 +38,7 @@ import {
 } from '../../store/slices/communitySlice';
 import { fetchActiveChallenges, joinChallenge } from '../../store/slices/challengesSlice';
 import Card from '../../components/common/Card';
+import Avatar from '../../components/common/Avatar';
 import LeaderboardCard from '../../components/features/LeaderboardCard';
 import HealthStatusCard from '../../components/features/HealthStatusCard';
 import { colors } from '../../constants/designTokens';
@@ -53,19 +54,6 @@ const AVATAR_COLORS = [
   '#F59E0B',
   '#EC4899',
 ];
-
-function Avatar({ emoji, bg, size = 40 }) {
-  return (
-    <View
-      style={[
-        styles.avatar,
-        { width: size, height: size, borderRadius: size / 2, backgroundColor: bg },
-      ]}
-    >
-      <Text style={{ fontSize: size * 0.44 }}>{emoji}</Text>
-    </View>
-  );
-}
 
 function StatsRow({ stats }) {
   return (
@@ -107,7 +95,7 @@ function PostCard({ post, onLike, onAddComment, onFetchComments, comments = [], 
   return (
     <Card style={styles.postCard}>
       <View style={styles.postHeader}>
-        <Avatar emoji={post.emoji} bg={post.bg} size={40} />
+        <Avatar emoji={post.emoji} bg={post.bg} size={40} label={post.author} />
         <View style={styles.postMeta}>
           <Text style={styles.postAuthor}>{post.author}</Text>
           <Text style={styles.postTime}>{post.time}</Text>
@@ -137,7 +125,12 @@ function PostCard({ post, onLike, onAddComment, onFetchComments, comments = [], 
         <View style={styles.commentsSection}>
           {comments.map((c) => (
             <View key={c.commentId || c.id} style={styles.commentRow}>
-              <Avatar emoji={c.authorEmoji || c.emoji} bg={c.authorBg || c.bg} size={28} />
+              <Avatar
+                emoji={c.authorEmoji || c.emoji}
+                bg={c.authorBg || c.bg}
+                size={28}
+                label={c.authorName || c.author}
+              />
               <View style={styles.commentBubble}>
                 <Text style={styles.commentAuthor}>{c.authorName || c.author}</Text>
                 <Text style={styles.commentText}>{c.text}</Text>
@@ -153,7 +146,12 @@ function PostCard({ post, onLike, onAddComment, onFetchComments, comments = [], 
             </View>
           ))}
           <View style={styles.commentInput}>
-            <Avatar emoji={myProfile.emoji} bg={myProfile.bg} size={28} />
+            <Avatar
+              emoji={myProfile.emoji}
+              bg={myProfile.bg}
+              size={28}
+              label={myProfile.nickname}
+            />
             <TextInput
               style={styles.commentField}
               placeholder="Yorum yaz..."
@@ -549,7 +547,12 @@ export default function CommunityScreen() {
             <Text style={styles.modalTitle}>Paylaş</Text>
 
             <View style={styles.composerRow}>
-              <Avatar emoji={myProfile.emoji} bg={myProfile.bg} size={40} />
+              <Avatar
+                emoji={myProfile.emoji}
+                bg={myProfile.bg}
+                size={40}
+                label={myProfile.nickname}
+              />
               <TextInput
                 style={[styles.textField, { flex: 1, marginBottom: 0 }]}
                 value={postText}
@@ -703,9 +706,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     marginBottom: 8,
   },
-
-  // Avatar
-  avatar: { alignItems: 'center', justifyContent: 'center' },
 
   // Stats row (shared stats card in post)
   statsRow: {

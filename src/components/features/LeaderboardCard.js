@@ -3,26 +3,10 @@ import { View, Text, StyleSheet } from 'react-native';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { fetchLeaderboard } from '../../store/slices/communitySlice';
 import Card from '../common/Card';
+import Avatar from '../common/Avatar';
 import { colors } from '../../constants/designTokens';
 
 const MEDALS = ['🥇', '🥈', '🥉'];
-
-function Avatar({ emoji, bg, size = 30 }) {
-  return (
-    <View
-      style={{
-        width: size,
-        height: size,
-        borderRadius: size / 2,
-        backgroundColor: bg,
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}
-    >
-      <Text style={{ fontSize: size * 0.44 }}>{emoji}</Text>
-    </View>
-  );
-}
 
 export default function LeaderboardCard() {
   const dispatch = useAppDispatch();
@@ -50,7 +34,12 @@ export default function LeaderboardCard() {
         return (
           <View key={u.uid} style={styles.row}>
             <Text style={styles.rank}>{MEDALS[i] || `${i + 1}.`}</Text>
-            <Avatar emoji={u.avatarEmoji || '🧘'} bg={u.avatarBg || colors.royal} size={30} />
+            <Avatar
+              emoji={u.avatarEmoji || '🧘'}
+              bg={u.avatarBg || colors.royal}
+              size={30}
+              label={u.displayName || 'Kullanıcı'}
+            />
             <Text style={styles.name} numberOfLines={1}>
               {u.displayName || 'Kullanıcı'}
             </Text>

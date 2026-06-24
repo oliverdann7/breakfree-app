@@ -58,7 +58,7 @@ export default function VideoPlayerScreen({ route, navigation }) {
     return () => {
       dispatch(clearCurrentVideo());
     };
-  }, [videoId]);
+  }, [videoId, dispatch]);
 
   const handleSaveProgress = useCallback(
     (time) => {

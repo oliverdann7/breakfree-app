@@ -1,21 +1,9 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import Card from '../common/Card';
+import Avatar from '../common/Avatar';
 import WellnessRing from './WellnessRing';
 import { colors } from '../../constants/designTokens';
-
-function Avatar({ emoji, bg, size }) {
-  return (
-    <View
-      style={[
-        styles.avatar,
-        { width: size, height: size, borderRadius: size / 2, backgroundColor: bg },
-      ]}
-    >
-      <Text style={{ fontSize: size * 0.44 }}>{emoji}</Text>
-    </View>
-  );
-}
 
 function Pill({ icon, value, label }) {
   return (
@@ -63,7 +51,7 @@ export default function HealthStatusCard({
     <Card style={[styles.card, compact && styles.cardCompact]}>
       <View style={styles.header}>
         <View style={styles.left}>
-          <Avatar emoji={emoji} bg={bg} size={avatarSize} />
+          <Avatar emoji={emoji} bg={bg} size={avatarSize} label={name} />
           <View style={styles.nameBlock}>
             <Text style={[styles.name, compact && styles.nameCompact]}>{name}</Text>
             {time ? <Text style={styles.time}>{time}</Text> : null}
@@ -107,7 +95,6 @@ const styles = StyleSheet.create({
   cardCompact: { gap: 8 },
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   left: { flexDirection: 'row', alignItems: 'center', gap: 10, flex: 1 },
-  avatar: { alignItems: 'center', justifyContent: 'center' },
   nameBlock: { gap: 2, flex: 1 },
   name: { fontSize: 15, fontWeight: '700', color: colors.textPrimary },
   nameCompact: { fontSize: 13 },
