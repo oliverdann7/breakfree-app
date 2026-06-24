@@ -11,6 +11,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  ActivityIndicator,
 } from 'react-native';
 import {
   collection,
@@ -35,6 +36,8 @@ import {
   fetchComments,
   addComment,
   realtimePostsUpdate,
+  requestMorePosts,
+  POSTS_PAGE_SIZE,
 } from '../../store/slices/communitySlice';
 import { fetchActiveChallenges, joinChallenge } from '../../store/slices/challengesSlice';
 import Card from '../../components/common/Card';
@@ -178,7 +181,9 @@ export default function CommunityScreen() {
   const { user } = useAppSelector((state) => state.auth);
   const { profile: reduxProfile } = useAppSelector((state) => state.user);
   const { dailyMetrics, wellnessScore } = useAppSelector((state) => state.metrics);
-  const { posts, commentsByPost } = useAppSelector((state) => state.community);
+  const { posts, commentsByPost, loadingMorePosts, hasMorePosts } = useAppSelector(
+    (state) => state.community
+  );
   const { stats } = useAppSelector((state) => state.user);
   const {
     challenges,
@@ -196,18 +201,27 @@ export default function CommunityScreen() {
 
   const [myProfile, setMyProfile] = useState(initProfile);
 
+  // Realtime feed window. Grows by POSTS_PAGE_SIZE each time the user scrolls
+  // to the end; the listener re-subscribes with the larger limit.
+  const [pageSize, setPageSize] = useState(POSTS_PAGE_SIZE);
   const unsubPostsRef = useRef(null);
 
   useEffect(() => {
     if (user?.uid) dispatch(fetchUserStats(user.uid));
     if (user?.uid) dispatch(fetchActiveChallenges(user.uid));
+  }, [user?.uid, dispatch]);
 
+  useEffect(() => {
     if (!db) {
-      dispatch(fetchPosts(user?.uid));
+      dispatch(fetchPosts({ uid: user?.uid, pageSize }));
       return;
     }
 
-    const q = query(collection(db, 'posts'), orderBy('createdAt', 'desc'), firestoreLimit(20));
+    const q = query(
+      collection(db, 'posts'),
+      orderBy('createdAt', 'desc'),
+      firestoreLimit(pageSize)
+    );
     const unsub = onSnapshot(q, async (snap) => {
       const uid = user?.uid;
       const posts = await Promise.all(
@@ -222,11 +236,17 @@ export default function CommunityScreen() {
           return post;
         })
       );
-      dispatch(realtimePostsUpdate(posts));
+      dispatch(realtimePostsUpdate({ posts, hasMore: snap.docs.length >= pageSize }));
     });
     unsubPostsRef.current = unsub;
     return () => unsub();
-  }, [user?.uid]);
+  }, [user?.uid, pageSize, dispatch]);
+
+  const handleLoadMore = () => {
+    if (loadingMorePosts || !hasMorePosts || posts.length === 0) return;
+    dispatch(requestMorePosts());
+    setPageSize((size) => size + POSTS_PAGE_SIZE);
+  };
 
   // Profile edit modal
   const [profileVisible, setProfileVisible] = useState(false);
@@ -432,6 +452,19 @@ export default function CommunityScreen() {
         contentContainerStyle={{ paddingBottom: 32 }}
         showsVerticalScrollIndicator={false}
         ListHeaderComponent={<ListHeader />}
+        onEndReached={handleLoadMore}
+        onEndReachedThreshold={0.5}
+        ListFooterComponent={
+          loadingMorePosts ? (
+            <ActivityIndicator
+              color={colors.cyan}
+              style={styles.feedFooter}
+              accessibilityLabel="Daha fazla gönderi yükleniyor"
+            />
+          ) : !hasMorePosts && posts.length > 0 ? (
+            <Text style={styles.feedEnd}>Akışın sonuna ulaştın</Text>
+          ) : null
+        }
         renderItem={({ item }) => (
           <PostCard
             post={item}
@@ -702,6 +735,13 @@ const styles = StyleSheet.create({
     color: colors.textPrimary,
     paddingHorizontal: 16,
     marginBottom: 8,
+  },
+  feedFooter: { paddingVertical: 24 },
+  feedEnd: {
+    textAlign: 'center',
+    color: colors.textTertiary,
+    fontSize: 12,
+    paddingVertical: 24,
   },
 
   // Avatar

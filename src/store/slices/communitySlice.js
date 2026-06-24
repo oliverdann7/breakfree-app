@@ -15,12 +15,19 @@ import {
 } from 'firebase/firestore';
 import { db } from '../../services/firebase';
 
+// One feed "page". The realtime listener grows its limit by this each time the
+// user reaches the end of the list (see CommunityScreen), so a single snapshot
+// always holds the newest N posts.
+export const POSTS_PAGE_SIZE = 20;
+
 export const fetchPosts = createAsyncThunk(
   'community/fetchPosts',
-  async (uid, { rejectWithValue }) => {
+  async (arg, { rejectWithValue }) => {
+    // Back-compat: callers may pass a bare uid (legacy) or { uid, pageSize }.
+    const { uid, pageSize = POSTS_PAGE_SIZE } = arg && typeof arg === 'object' ? arg : { uid: arg };
     try {
-      if (!db) return [];
-      const q = query(collection(db, 'posts'), orderBy('createdAt', 'desc'), limit(20));
+      if (!db) return { posts: [], hasMore: false };
+      const q = query(collection(db, 'posts'), orderBy('createdAt', 'desc'), limit(pageSize));
       const snap = await getDocs(q);
       const posts = await Promise.all(
         snap.docs.map(async (d) => {
@@ -34,7 +41,8 @@ export const fetchPosts = createAsyncThunk(
           return post;
         })
       );
-      return posts;
+      // A full page back means there may be older posts beyond this window.
+      return { posts, hasMore: snap.docs.length >= pageSize };
     } catch (error) {
       return rejectWithValue(error.message);
     }
@@ -149,12 +157,26 @@ const communitySlice = createSlice({
     leaderboard: [],
     leaderboardLoading: false,
     loading: false,
+    loadingMorePosts: false,
+    hasMorePosts: true,
     postingComment: false,
     error: null,
   },
   reducers: {
     realtimePostsUpdate: (state, action) => {
-      state.posts = action.payload;
+      // Accept a bare array (legacy) or { posts, hasMore } from the paginated
+      // realtime listener. A fresh snapshot always ends an in-flight load-more.
+      const payload = action.payload;
+      if (Array.isArray(payload)) {
+        state.posts = payload;
+      } else {
+        state.posts = payload.posts;
+        if (typeof payload.hasMore === 'boolean') state.hasMorePosts = payload.hasMore;
+      }
+      state.loadingMorePosts = false;
+    },
+    requestMorePosts: (state) => {
+      state.loadingMorePosts = true;
     },
     realtimeCommentsUpdate: (state, action) => {
       const { postId, comments } = action.payload;
@@ -169,7 +191,14 @@ const communitySlice = createSlice({
       })
       .addCase(fetchPosts.fulfilled, (state, action) => {
         state.loading = false;
-        state.posts = action.payload;
+        state.loadingMorePosts = false;
+        const payload = action.payload;
+        if (Array.isArray(payload)) {
+          state.posts = payload;
+        } else {
+          state.posts = payload.posts;
+          if (typeof payload.hasMore === 'boolean') state.hasMorePosts = payload.hasMore;
+        }
       })
       .addCase(fetchPosts.rejected, (state, action) => {
         state.loading = false;
@@ -214,5 +243,6 @@ const communitySlice = createSlice({
   },
 });
 
-export const { realtimePostsUpdate, realtimeCommentsUpdate } = communitySlice.actions;
+export const { realtimePostsUpdate, realtimeCommentsUpdate, requestMorePosts } =
+  communitySlice.actions;
 export default communitySlice.reducer;

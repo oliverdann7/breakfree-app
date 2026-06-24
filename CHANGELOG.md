@@ -8,6 +8,12 @@ Versions follow SemVer; stores use `versionCode` (Android) / `buildNumber`
 ## [Unreleased] — closeout of Phase 2 + Phase 3 scaffolding
 
 ### Added
+- Community feed infinite scroll (roadmap §1.3): the realtime listener now
+  grows its window by `POSTS_PAGE_SIZE` (20) each time the user reaches the end
+  of the list, instead of hard-capping at the newest 20 posts. Pagination state
+  (`hasMorePosts`, `loadingMorePosts`) lives in `communitySlice`; the feed shows
+  a loading spinner while fetching and an "Akışın sonuna ulaştın" marker at the
+  end. `fetchPosts` accepts `{ uid, pageSize }` (bare-uid calls still work).
 - Daily mood + hydration check-in on HealthMetricsScreen: 5-face mood picker
   and a water (cups) field in the log sheet, surfaced as breakdown cards. The
   daily wellness score now uses the canonical weighted algorithm
