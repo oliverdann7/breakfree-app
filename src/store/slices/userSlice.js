@@ -130,7 +130,9 @@ const userSlice = createSlice({
     profile: null,
     hasCompletedOnboarding: false,
     preferences: {
-      language: 'tr',
+      // 'auto' follows the device locale (TR default) until the user picks a
+      // language; toggling in Settings sets an explicit 'tr' | 'en'.
+      language: 'auto',
       units: 'metric',
       notifications: true,
       quietHours: { enabled: false, start: 1320, end: 420 }, // 22:00 → 07:00

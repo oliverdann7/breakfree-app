@@ -34,7 +34,7 @@ export const signup = async (email, password, displayName) => {
       goals: [],
       createdAt: Date.now(),
       updatedAt: Date.now(),
-      preferences: { language: 'tr', units: 'metric', notifications: true },
+      preferences: { language: 'auto', units: 'metric', notifications: true },
     });
 
     const token = await user.getIdToken();
@@ -90,7 +90,7 @@ export const loginWithGoogle = async () => {
         goals: [],
         createdAt: Date.now(),
         updatedAt: Date.now(),
-        preferences: { language: 'tr', units: 'metric', notifications: true },
+        preferences: { language: 'auto', units: 'metric', notifications: true },
       });
     }
 
@@ -125,7 +125,7 @@ export const loginWithApple = async () => {
         displayName: user.displayName || 'Apple User',
         createdAt: Date.now(),
         updatedAt: Date.now(),
-        preferences: { language: 'tr', units: 'metric', notifications: true },
+        preferences: { language: 'auto', units: 'metric', notifications: true },
       });
     }
 
