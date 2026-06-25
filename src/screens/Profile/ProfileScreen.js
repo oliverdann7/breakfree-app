@@ -89,8 +89,12 @@ export default function ProfileScreen({ navigation }) {
     );
   };
 
+  // Drive display/toggle off the active i18n language, not the stored
+  // preference (which may be 'auto').
+  const activeLanguage = i18n.language === 'en' ? 'en' : 'tr';
+
   const toggleLanguage = () => {
-    const next = preferences.language === 'tr' ? 'en' : 'tr';
+    const next = activeLanguage === 'tr' ? 'en' : 'tr';
     dispatch(updatePreferences({ language: next }));
     i18n.changeLanguage(next);
   };
@@ -159,7 +163,7 @@ export default function ProfileScreen({ navigation }) {
           <SettingRow
             icon="🌍"
             label="Dil"
-            value={preferences.language === 'tr' ? 'Türkçe' : 'English'}
+            value={activeLanguage === 'tr' ? 'Türkçe' : 'English'}
             onPress={toggleLanguage}
           />
           <View style={styles.divider} />

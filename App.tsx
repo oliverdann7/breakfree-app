@@ -1,4 +1,5 @@
 import './src/i18n'; // initialise i18next before anything renders
+import { syncLanguage } from './src/i18n';
 import React, { useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { Platform, View, ActivityIndicator } from 'react-native';
@@ -34,10 +35,17 @@ function LoadingScreen() {
 
 function MobileAppContent() {
   const { user } = useSelector((s: any) => s.auth);
+  const language = useSelector((s: any) => s.user?.preferences?.language);
 
   useEffect(() => {
     registerForPushNotificationsAsync(user?.uid);
   }, [user?.uid]);
+
+  // Restore the persisted language once the store has rehydrated, and keep
+  // i18next in sync with later preference changes.
+  useEffect(() => {
+    syncLanguage(language);
+  }, [language]);
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>

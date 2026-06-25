@@ -10,7 +10,7 @@ const initialState = {
   profile: null,
   hasCompletedOnboarding: false,
   preferences: {
-    language: 'tr',
+    language: 'auto',
     units: 'metric',
     notifications: true,
     quietHours: { enabled: false, start: 1320, end: 420 },
@@ -73,7 +73,7 @@ describe('userSlice', () => {
     expect(state.loading).toBe(false);
     expect(state.uid).toBe('123');
     expect(state.profile).toEqual(profile);
-    expect(state.preferences.language).toBe('tr');
+    expect(state.preferences.language).toBe('auto');
   });
 
   it('handles fetchUserProfile.fulfilled with preferences override', () => {

@@ -23,6 +23,15 @@ Versions follow SemVer; stores use `versionCode` (Android) / `buildNumber`
   VideoPlayerScreen (roadmap §1.4).
 
 ### Added
+- i18n locale foundation (roadmap C4, step 1 — unblocks the string sweep):
+  device-locale detection at startup (`getDeviceLocales` — browser languages on
+  web, guarded `Intl` on native) and a pure, tested `resolveLocale` helper
+  (saved choice → device locale → TR default). The user's saved language is now
+  **restored on every cold start** via `syncLanguage` in `App` — previously the
+  app reset to Turkish on launch regardless of the saved preference.
+  `preferences.language` gains an `'auto'` sentinel (follow device) distinct
+  from an explicit `'tr'`/`'en'`; the Settings toggle drives off the active i18n
+  language. +9 `resolveLocale` unit tests.
 - Community feed infinite scroll (roadmap §1.3): the realtime listener now
   grows its window by `POSTS_PAGE_SIZE` (20) each time the user reaches the end
   of the list, instead of hard-capping at the newest 20 posts. Pagination state
