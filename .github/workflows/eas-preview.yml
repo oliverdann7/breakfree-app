@@ -1,8 +1,8 @@
 name: EAS Preview Build
 
-# Triggers a preview build on TestFlight Internal + Play Internal Testing.
-# Manually run from Actions tab; auto-runs on push to main once EXPO_TOKEN is set.
-# Required secret: EXPO_TOKEN (https://expo.dev/accounts/[account]/settings/access-tokens)
+# Manually triggered preview build on TestFlight Internal + Play Internal Testing.
+# Run it from the Actions tab once the EXPO_TOKEN secret is set.
+# Get a token: https://expo.dev/accounts/[account]/settings/access-tokens
 
 on:
   workflow_dispatch:
@@ -17,8 +17,16 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    if: ${{ secrets.EXPO_TOKEN != '' }}
+    env:
+      # `secrets` is not allowed in `if:` conditions, so surface it as an env
+      # var and guard the build in a step instead.
+      EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
     steps:
+      - name: Require EXPO_TOKEN
+        if: env.EXPO_TOKEN == ''
+        run: |
+          echo "::error::EXPO_TOKEN secret is not set. Add it under Settings → Secrets → Actions, then re-run."
+          exit 1
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
@@ -27,6 +35,6 @@ jobs:
       - uses: expo/expo-github-action@v8
         with:
           eas-version: latest
-          token: ${{ secrets.EXPO_TOKEN }}
+          token: ${{ env.EXPO_TOKEN }}
       - run: npm install --legacy-peer-deps
       - run: eas build --platform ${{ inputs.platform }} --profile preview --non-interactive --no-wait
