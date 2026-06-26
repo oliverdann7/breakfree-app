@@ -1,10 +1,12 @@
 import React from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, SafeAreaView } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import BreakFreeLogo from '../../components/branding/BreakFreeLogo';
 import Button from '../../components/common/Button';
 import { colors } from '../../constants/designTokens';
 
 export default function LandingScreen({ navigation }) {
+  const { t } = useTranslation();
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
@@ -20,18 +22,16 @@ export default function LandingScreen({ navigation }) {
             {'\n'}
             <Text style={{ color: colors.cyan }}>Live Better.</Text>
           </Text>
-          <Text style={styles.heroSubtitle}>
-            Türkiye&apos;nin en dinamik wellness topluluğuyla birleşin
-          </Text>
+          <Text style={styles.heroSubtitle}>{t('landing.heroSubtitle')}</Text>
 
           <View style={styles.ctaButtons}>
             <Button
-              title="Kayıt Ol"
+              title={t('auth.signup')}
               onPress={() => navigation.navigate('Signup')}
               style={styles.primaryBtn}
             />
             <Button
-              title="Giriş Yap"
+              title={t('auth.login')}
               variant="outline"
               onPress={() => navigation.navigate('Login')}
               style={styles.secondaryBtn}
@@ -41,152 +41,94 @@ export default function LandingScreen({ navigation }) {
 
         {/* Features Section */}
         <View style={styles.featuresSection}>
-          <Text style={styles.sectionTitle}>Neden BreakFree?</Text>
+          <Text style={styles.sectionTitle}>{t('landing.whyTitle')}</Text>
 
           <View style={styles.featuresList}>
-            <View style={styles.featureCard}>
-              <View style={styles.featureIconBg}>
-                <Text style={styles.featureIcon}>💪</Text>
+            {[
+              { icon: '💪', nameKey: 'f1Name', descKey: 'f1Desc' },
+              { icon: '🤝', nameKey: 'f2Name', descKey: 'f2Desc' },
+              { icon: '📊', nameKey: 'f3Name', descKey: 'f3Desc' },
+              { icon: '🎯', nameKey: 'f4Name', descKey: 'f4Desc' },
+              { icon: '🎓', nameKey: 'f5Name', descKey: 'f5Desc' },
+              { icon: '🔔', nameKey: 'f6Name', descKey: 'f6Desc' },
+            ].map((f) => (
+              <View key={f.nameKey} style={styles.featureCard}>
+                <View style={styles.featureIconBg}>
+                  <Text style={styles.featureIcon}>{f.icon}</Text>
+                </View>
+                <Text style={styles.featureName}>{t(`landing.${f.nameKey}`)}</Text>
+                <Text style={styles.featureDesc}>{t(`landing.${f.descKey}`)}</Text>
               </View>
-              <Text style={styles.featureName}>Kişisel Gelişim</Text>
-              <Text style={styles.featureDesc}>
-                Alışkanlıklarını izle, ilerlemenizi ölçü ve hedeflerine odaklan
-              </Text>
-            </View>
-
-            <View style={styles.featureCard}>
-              <View style={styles.featureIconBg}>
-                <Text style={styles.featureIcon}>🤝</Text>
-              </View>
-              <Text style={styles.featureName}>Topluluk Desteği</Text>
-              <Text style={styles.featureDesc}>
-                Aynı amaçlarını paylaşan kişilerle bağlan ve birbirini destekle
-              </Text>
-            </View>
-
-            <View style={styles.featureCard}>
-              <View style={styles.featureIconBg}>
-                <Text style={styles.featureIcon}>📊</Text>
-              </View>
-              <Text style={styles.featureName}>İlerleme Takibi</Text>
-              <Text style={styles.featureDesc}>
-                Detaylı istatistikler ve grafiklerle gelişimini görselleştir
-              </Text>
-            </View>
-
-            <View style={styles.featureCard}>
-              <View style={styles.featureIconBg}>
-                <Text style={styles.featureIcon}>🎯</Text>
-              </View>
-              <Text style={styles.featureName}>Hedef Yönetimi</Text>
-              <Text style={styles.featureDesc}>
-                Gerçekçi hedefler belirle ve adım adım başarı doğru ilerle
-              </Text>
-            </View>
-
-            <View style={styles.featureCard}>
-              <View style={styles.featureIconBg}>
-                <Text style={styles.featureIcon}>🎓</Text>
-              </View>
-              <Text style={styles.featureName}>Wellness İçeriği</Text>
-              <Text style={styles.featureDesc}>
-                Uzmanlardan öğretici konuşmalar ve wellness rehberleri
-              </Text>
-            </View>
-
-            <View style={styles.featureCard}>
-              <View style={styles.featureIconBg}>
-                <Text style={styles.featureIcon}>🔔</Text>
-              </View>
-              <Text style={styles.featureName}>Motivasyon Desteği</Text>
-              <Text style={styles.featureDesc}>
-                Günlük reminders ve topluluk önerileri seni motive tutsun
-              </Text>
-            </View>
+            ))}
           </View>
         </View>
 
         {/* Stats Section */}
         <View style={styles.statsSection}>
-          <View style={styles.statItem}>
-            <Text style={styles.statNumber}>50K+</Text>
-            <Text style={styles.statLabel}>Topluluk Üyesi</Text>
-          </View>
-          <View style={styles.statDivider} />
-          <View style={styles.statItem}>
-            <Text style={styles.statNumber}>1M+</Text>
-            <Text style={styles.statLabel}>Hedef Başarısı</Text>
-          </View>
-          <View style={styles.statDivider} />
-          <View style={styles.statItem}>
-            <Text style={styles.statNumber}>4.8★</Text>
-            <Text style={styles.statLabel}>Kullanıcı Puanı</Text>
-          </View>
+          {[
+            { numKey: 'communityNumber', labelKey: 'communityLabel' },
+            { numKey: 'goalsNumber', labelKey: 'goalsLabel' },
+            { numKey: 'ratingNumber', labelKey: 'ratingLabel' },
+          ].map((s, i) => (
+            <React.Fragment key={s.numKey}>
+              {i > 0 && <View style={styles.statDivider} />}
+              <View style={styles.statItem}>
+                <Text style={styles.statNumber}>{t(`landing.${s.numKey}`)}</Text>
+                <Text style={styles.statLabel}>{t(`landing.${s.labelKey}`)}</Text>
+              </View>
+            </React.Fragment>
+          ))}
         </View>
 
         {/* Testimonials Section */}
         <View style={styles.testimonialsSection}>
-          <Text style={styles.sectionTitle}>Kullanıcılarımızdan Haberler</Text>
+          <Text style={styles.sectionTitle}>{t('landing.testimonialsTitle')}</Text>
 
-          <View style={styles.testimonialCard}>
-            <Text style={styles.testimonialText}>
-              {`'BreakFree benim yaşamı değiştirdi. Artık sabahları kalkarken hedefli hissediyorum.'`}
-            </Text>
-            <Text style={styles.testimonialAuthor}>— Ayşe K., İstanbul</Text>
-          </View>
-
-          <View style={styles.testimonialCard}>
-            <Text style={styles.testimonialText}>
-              {`'Topluluk desteği bana güç veriyor. Hiç yalnız hissetmiyorum artık.'`}
-            </Text>
-            <Text style={styles.testimonialAuthor}>— Mehmet T., Ankara</Text>
-          </View>
-
-          <View style={styles.testimonialCard}>
-            <Text style={styles.testimonialText}>
-              {`'İlerleme takibi sayesinde gerçekten ne kadar ilerlediğimi görebiliyorum.'`}
-            </Text>
-            <Text style={styles.testimonialAuthor}>— Fatih D., İzmir</Text>
-          </View>
+          {[
+            { textKey: 'testimonial1', authorKey: 'testimonial1Author' },
+            { textKey: 'testimonial2', authorKey: 'testimonial2Author' },
+            { textKey: 'testimonial3', authorKey: 'testimonial3Author' },
+          ].map((item) => (
+            <View key={item.textKey} style={styles.testimonialCard}>
+              <Text style={styles.testimonialText}>{`'${t(`landing.${item.textKey}`)}'`}</Text>
+              <Text style={styles.testimonialAuthor}>{t(`landing.${item.authorKey}`)}</Text>
+            </View>
+          ))}
         </View>
 
         {/* Activities Section */}
         <View style={styles.sectionPadded}>
-          <Text style={styles.sectionTitle}>Aktiviteler</Text>
+          <Text style={styles.sectionTitle}>{t('landing.activitiesTitle')}</Text>
           <View style={styles.activitiesGrid}>
-            {['🧘 Yoga', '🏃 Koşu', '🧠 Meditasyon', '💪 Güç', '🤸 Esneklik', '✨ Wellness'].map(
-              (activity) => (
-                <View key={activity} style={styles.activityCard}>
-                  <Text style={styles.activityText}>{activity}</Text>
-                </View>
-              )
-            )}
+            {['act1', 'act2', 'act3', 'act4', 'act5', 'act6'].map((key) => (
+              <View key={key} style={styles.activityCard}>
+                <Text style={styles.activityText}>{t(`landing.${key}`)}</Text>
+              </View>
+            ))}
           </View>
         </View>
 
         {/* Events Section */}
         <View style={styles.sectionPaddedAlt}>
-          <Text style={styles.sectionTitle}>Etkinlikler & Yarışmalar</Text>
+          <Text style={styles.sectionTitle}>{t('landing.eventsTitle')}</Text>
           <View style={styles.eventsList}>
-            <View style={styles.eventCard}>
-              <Text style={styles.eventTitle}>30 Günlük Challenge</Text>
-              <Text style={styles.eventDate}>Başlıyor</Text>
-            </View>
-            <View style={styles.eventCard}>
-              <Text style={styles.eventTitle}>Topluluk Koşusu</Text>
-              <Text style={styles.eventDate}>Her Pazar</Text>
-            </View>
-            <View style={styles.eventCard}>
-              <Text style={styles.eventTitle}>Wellness Atölyesi</Text>
-              <Text style={styles.eventDate}>Aylık</Text>
-            </View>
+            {[
+              { titleKey: 'event1Title', dateKey: 'event1Date' },
+              { titleKey: 'event2Title', dateKey: 'event2Date' },
+              { titleKey: 'event3Title', dateKey: 'event3Date' },
+            ].map((ev) => (
+              <View key={ev.titleKey} style={styles.eventCard}>
+                <Text style={styles.eventTitle}>{t(`landing.${ev.titleKey}`)}</Text>
+                <Text style={styles.eventDate}>{t(`landing.${ev.dateKey}`)}</Text>
+              </View>
+            ))}
           </View>
         </View>
 
         {/* Social Contact Section */}
         <View style={styles.contactSection}>
-          <Text style={styles.footerTitle}>Bize Ulaşın</Text>
-          <Text style={styles.footerDesc}>Sorularınız var mı? Sosyal medyada bize takip edin</Text>
+          <Text style={styles.footerTitle}>{t('landing.contactTitle')}</Text>
+          <Text style={styles.footerDesc}>{t('landing.contactDesc')}</Text>
 
           <View style={styles.socialButtons}>
             <TouchableOpacity
@@ -221,21 +163,19 @@ export default function LandingScreen({ navigation }) {
 
         {/* CTA Footer */}
         <View style={styles.footerSection}>
-          <Text style={styles.footerTitle}>Bugün Başlayın</Text>
-          <Text style={styles.footerDesc}>
-            Ücretsiz hesap oluştur ve sağlıklı yaşamın yolculuğuna başla
-          </Text>
+          <Text style={styles.footerTitle}>{t('landing.startTitle')}</Text>
+          <Text style={styles.footerDesc}>{t('landing.startDesc')}</Text>
 
           <Button
-            title="Şimdi Kayıt Ol"
+            title={t('auth.signupNow')}
             onPress={() => navigation.navigate('Signup')}
             style={styles.footerBtn}
           />
 
           <View style={styles.loginLink}>
-            <Text style={styles.loginText}>Zaten üye misin? </Text>
+            <Text style={styles.loginText}>{t('landing.loginHint')} </Text>
             <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-              <Text style={styles.loginLinkText}>Giriş Yap</Text>
+              <Text style={styles.loginLinkText}>{t('auth.login')}</Text>
             </TouchableOpacity>
           </View>
         </View>

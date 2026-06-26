@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import {
   updateProfile,
@@ -13,17 +14,19 @@ import { colors } from '../../constants/designTokens';
 
 const { width } = Dimensions.get('window');
 
-const GOALS = [
-  { id: 'sleep', label: 'Uyku', emoji: '😴', desc: 'Uyku kaliteni artır' },
-  { id: 'fitness', label: 'Fitness', emoji: '💪', desc: 'Formda kal' },
-  { id: 'mindfulness', label: 'Zihin', emoji: '🧘', desc: 'Farkındalık geliştir' },
-  { id: 'nutrition', label: 'Beslenme', emoji: '🥗', desc: 'Doğru beslen' },
-  { id: 'community', label: 'Topluluk', emoji: '🤝', desc: 'Bağlantı kur' },
-  { id: 'stress', label: 'Stres', emoji: '🌿', desc: 'Stresi yönet' },
-];
+const GOAL_IDS = ['sleep', 'fitness', 'mindfulness', 'nutrition', 'community', 'stress'];
+const GOAL_EMOJIS = {
+  sleep: '😴',
+  fitness: '💪',
+  mindfulness: '🧘',
+  nutrition: '🥗',
+  community: '🤝',
+  stress: '🌿',
+};
 
 export default function OnboardingScreen({ _navigation }) {
   const dispatch = useAppDispatch();
+  const { t } = useTranslation();
   const auth = useAppSelector((state) => state.auth);
 
   const [step, setStep] = useState(0);
@@ -49,15 +52,13 @@ export default function OnboardingScreen({ _navigation }) {
     // Step 0: Welcome
     <View key="welcome" style={styles.stepContainer}>
       <Text style={styles.welcomeEmoji}>🌟</Text>
-      <Text style={styles.stepTitle}>BreakFree&apos;ye{'\n'}Hoş Geldin!</Text>
-      <Text style={styles.stepDesc}>
-        Türkiye&apos;nin en iyi wellness topluluğuna katıldın. Hedeflerine ulaşman için buradayız.
-      </Text>
+      <Text style={styles.stepTitle}>{t('onboarding.welcome')}</Text>
+      <Text style={styles.stepDesc}>{t('onboarding.welcomeDesc')}</Text>
       <View style={styles.featureList}>
         {[
-          { emoji: '🎙', text: 'Uzman talk&apos;larına katıl' },
-          { emoji: '📊', text: 'Sağlık metriklerini takip et' },
-          { emoji: '👥', text: 'Toplulukla bağlantı kur' },
+          { emoji: '🎙', text: t('talks.title') },
+          { emoji: '📊', text: t('health.title') },
+          { emoji: '👥', text: t('community.title') },
         ].map((f) => (
           <View key={f.emoji} style={styles.featureRow}>
             <Text style={styles.featureEmoji}>{f.emoji}</Text>
@@ -69,25 +70,22 @@ export default function OnboardingScreen({ _navigation }) {
 
     // Step 1: Goals
     <View key="goals" style={styles.stepContainer}>
-      <Text style={styles.stepTitle}>Hedeflerini{'\n'}Seç</Text>
-      <Text style={styles.stepDesc}>
-        Sana en uygun içerikleri gösterebilmemiz için hedeflerini belirt. Birden fazla seçebilirsin.
-      </Text>
+      <Text style={styles.stepTitle}>{t('onboarding.goals')}</Text>
+      <Text style={styles.stepDesc}>{t('onboarding.goalsDesc')}</Text>
       <View style={styles.goalsGrid}>
-        {GOALS.map((goal) => {
-          const selected = selectedGoals.includes(goal.id);
+        {GOAL_IDS.map((id) => {
+          const selected = selectedGoals.includes(id);
           return (
             <TouchableOpacity
-              key={goal.id}
+              key={id}
               style={[styles.goalCard, selected && styles.goalCardSelected]}
-              onPress={() => toggleGoal(goal.id)}
+              onPress={() => toggleGoal(id)}
               activeOpacity={0.7}
             >
-              <Text style={styles.goalEmoji}>{goal.emoji}</Text>
+              <Text style={styles.goalEmoji}>{GOAL_EMOJIS[id]}</Text>
               <Text style={[styles.goalLabel, selected && styles.goalLabelSelected]}>
-                {goal.label}
+                {t(`goals.${id}`)}
               </Text>
-              <Text style={styles.goalDesc}>{goal.desc}</Text>
             </TouchableOpacity>
           );
         })}
@@ -96,26 +94,24 @@ export default function OnboardingScreen({ _navigation }) {
 
     // Step 2: Profile
     <View key="profile" style={styles.stepContainer}>
-      <Text style={styles.stepTitle}>Profilini{'\n'}Tamamla</Text>
-      <Text style={styles.stepDesc}>
-        Topluluk seni tanısın. Bunları daha sonra değiştirebilirsin.
-      </Text>
+      <Text style={styles.stepTitle}>{t('onboarding.profile')}</Text>
+      <Text style={styles.stepDesc}>{t('onboarding.profileDesc')}</Text>
       <View style={styles.avatarCircle}>
         <Text style={styles.avatarText}>{name ? name[0].toUpperCase() : '?'}</Text>
       </View>
       <Input
-        label="Ad Soyad"
+        label={t('auth.displayName')}
         value={name}
         onChangeText={setName}
-        placeholder="Adın Soyadın"
+        placeholder={t('auth.namePlaceholder')}
         autoCapitalize="words"
         style={styles.profileInput}
       />
       <Input
-        label="Biyografi (isteğe bağlı)"
+        label={t('profile.bio')}
         value={bio}
         onChangeText={setBio}
-        placeholder="Kendini kısaca tanıt..."
+        placeholder={t('community.bioPlaceholder')}
         autoCapitalize="sentences"
         style={styles.profileInput}
       />
@@ -140,14 +136,14 @@ export default function OnboardingScreen({ _navigation }) {
       <View style={styles.footer}>
         {step > 0 && (
           <Button
-            title="Geri"
+            title={t('common.back')}
             variant="ghost"
             onPress={() => setStep((s) => s - 1)}
             style={styles.backBtn}
           />
         )}
         <Button
-          title={step === 2 ? 'Başla 🚀' : 'İleri'}
+          title={step === 2 ? t('onboarding.start') : t('onboarding.next')}
           onPress={() => {
             if (step < 2) setStep((s) => s + 1);
             else handleComplete();

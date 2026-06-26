@@ -23,6 +23,7 @@ import {
   getDoc,
 } from 'firebase/firestore';
 import { db } from '../../services/firebase';
+import { useTranslation } from 'react-i18next';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import {
   updateProfile,
@@ -59,12 +60,17 @@ const AVATAR_COLORS = [
 ];
 
 function StatsRow({ stats }) {
+  const { t } = useTranslation();
   return (
     <View style={styles.statsRow}>
       {[
-        { icon: '⭐', label: 'Wellness', value: stats.wellness },
-        { icon: '👟', label: 'Adım', value: `${(stats.steps / 1000).toFixed(1)}k` },
-        { icon: '😴', label: 'Uyku', value: `${stats.sleep}s` },
+        { icon: '⭐', label: t('community.statsWellness'), value: stats.wellness },
+        {
+          icon: '👟',
+          label: t('community.statsSteps'),
+          value: `${(stats.steps / 1000).toFixed(1)}k`,
+        },
+        { icon: '😴', label: t('community.statsSleep'), value: `${stats.sleep}s` },
       ].map((s, i) => (
         <React.Fragment key={s.label}>
           {i > 0 && <View style={styles.statsDivider} />}
@@ -80,6 +86,7 @@ function StatsRow({ stats }) {
 }
 
 function PostCard({ post, onLike, onAddComment, onFetchComments, comments = [], myProfile }) {
+  const { t } = useTranslation();
   const [expanded, setExpanded] = useState(false);
   const [commentText, setCommentText] = useState('');
 
@@ -157,7 +164,7 @@ function PostCard({ post, onLike, onAddComment, onFetchComments, comments = [], 
             />
             <TextInput
               style={styles.commentField}
-              placeholder="Yorum yaz..."
+              placeholder={t('community.commentPlaceholder')}
               placeholderTextColor="rgba(255,255,255,0.3)"
               value={commentText}
               onChangeText={setCommentText}
@@ -175,6 +182,7 @@ function PostCard({ post, onLike, onAddComment, onFetchComments, comments = [], 
 }
 
 export default function CommunityScreen() {
+  const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state.auth);
   const { profile: reduxProfile } = useAppSelector((state) => state.user);
@@ -338,9 +346,21 @@ export default function CommunityScreen() {
           </Text>
           <View style={styles.profileStats}>
             {[
-              { label: 'Wellness', value: wellnessScore || '—', color: colors.cyan },
-              { label: 'Seri', value: `${stats?.streak || 0}g`, color: colors.gold },
-              { label: 'Talk', value: String(stats?.totalTalks || 0), color: colors.cyan },
+              {
+                label: t('community.statsWellness'),
+                value: wellnessScore || '—',
+                color: colors.cyan,
+              },
+              {
+                label: t('profile.statStreak'),
+                value: `${stats?.streak || 0}g`,
+                color: colors.gold,
+              },
+              {
+                label: t('profile.statTalks'),
+                value: String(stats?.totalTalks || 0),
+                color: colors.cyan,
+              },
             ].map((s) => (
               <View key={s.label} style={styles.profileStat}>
                 <Text style={[styles.profileStatVal, { color: s.color }]}>{s.value}</Text>
@@ -355,14 +375,16 @@ export default function CommunityScreen() {
       {/* Header row */}
       <View style={styles.header}>
         <View>
-          <Text style={styles.title}>Topluluk</Text>
+          <Text style={styles.title}>{t('community.title')}</Text>
           <Text style={styles.subtitle}>
-            akışı <Text style={{ color: colors.gold }}>·</Text>{' '}
-            {posts.length > 0 ? `${posts.length} gönderi` : 'yükleniyor...'}
+            {t('community.feed')} <Text style={{ color: colors.gold }}>·</Text>{' '}
+            {posts.length > 0
+              ? t('community.postsCount', { count: posts.length })
+              : t('community.loadingPosts')}
           </Text>
         </View>
         <TouchableOpacity style={styles.createBtn} onPress={() => setPostVisible(true)}>
-          <Text style={styles.createBtnText}>+ Paylaş</Text>
+          <Text style={styles.createBtnText}>{t('community.share')}</Text>
         </TouchableOpacity>
       </View>
 
@@ -379,13 +401,17 @@ export default function CommunityScreen() {
           return (
             <Card key={challenge.id} style={styles.challengeCard}>
               <View style={styles.challengeHeader}>
-                <Text style={styles.challengeTitle}>🏆 {challenge.title || 'Meydan Okuma'}</Text>
+                <Text style={styles.challengeTitle}>
+                  🏆 {challenge.title || t('community.challengeDefault')}
+                </Text>
                 <Text style={styles.challengeDays}>
-                  {daysLeft > 0 ? `${daysLeft} gün kaldı` : 'Son gün'}
+                  {daysLeft > 0
+                    ? t('challenges.daysLeft', { count: daysLeft })
+                    : t('challenges.lastDay')}
                 </Text>
               </View>
               <Text style={styles.challengeDesc}>
-                {challenge.description || 'Hedefini tamamla!'}
+                {challenge.description || t('challenges.emptySub')}
               </Text>
               {hasJoined ? (
                 <>
@@ -404,7 +430,7 @@ export default function CommunityScreen() {
                     dispatch(joinChallenge({ challengeId: challenge.id, uid: user?.uid }))
                   }
                 >
-                  <Text style={styles.joinBtnText}>Katıl →</Text>
+                  <Text style={styles.joinBtnText}>{t('community.joinBtn')}</Text>
                 </TouchableOpacity>
               )}
             </Card>
@@ -413,9 +439,9 @@ export default function CommunityScreen() {
       ) : challengesLoading ? null : (
         <Card style={styles.challengeCard}>
           <View style={styles.challengeHeader}>
-            <Text style={styles.challengeTitle}>🏆 Aktif Meydan Okuma</Text>
+            <Text style={styles.challengeTitle}>{t('community.activeChallenge')}</Text>
           </View>
-          <Text style={styles.challengeDesc}>Şu anda aktif bir meydan okuma bulunmuyor.</Text>
+          <Text style={styles.challengeDesc}>{t('community.noChallenge')}</Text>
         </Card>
       )}
 
@@ -438,7 +464,7 @@ export default function CommunityScreen() {
         />
       )}
 
-      <Text style={styles.feedTitle}>Son Paylaşımlar</Text>
+      <Text style={styles.feedTitle}>{t('community.recentPosts')}</Text>
     </>
   );
 
@@ -457,10 +483,10 @@ export default function CommunityScreen() {
             <ActivityIndicator
               color={colors.cyan}
               style={styles.feedFooter}
-              accessibilityLabel="Daha fazla gönderi yükleniyor"
+              accessibilityLabel={t('community.loadingMore')}
             />
           ) : !hasMorePosts && posts.length > 0 ? (
-            <Text style={styles.feedEnd}>Akışın sonuna ulaştın</Text>
+            <Text style={styles.feedEnd}>{t('community.feedEnd')}</Text>
           ) : null
         }
         renderItem={({ item }) => (
@@ -484,7 +510,7 @@ export default function CommunityScreen() {
           >
             <View style={styles.modalHandle} />
             <ScrollView showsVerticalScrollIndicator={false}>
-              <Text style={styles.modalTitle}>Profili Düzenle</Text>
+              <Text style={styles.modalTitle}>{t('community.editProfileTitle')}</Text>
 
               {/* Preview */}
               <View style={styles.previewRow}>
@@ -492,13 +518,15 @@ export default function CommunityScreen() {
                   <Text style={styles.previewEmoji}>{draft.emoji}</Text>
                 </View>
                 <View>
-                  <Text style={styles.previewName}>{draft.nickname || 'Kullanıcı adın'}</Text>
-                  <Text style={styles.previewHint}>Önizleme</Text>
+                  <Text style={styles.previewName}>
+                    {draft.nickname || t('community.usernamePlaceholder')}
+                  </Text>
+                  <Text style={styles.previewHint}>{t('community.preview')}</Text>
                 </View>
               </View>
 
               {/* Emoji picker */}
-              <Text style={styles.pickerLabel}>Emoji</Text>
+              <Text style={styles.pickerLabel}>{t('community.emojiLabel')}</Text>
               <View style={styles.emojiGrid}>
                 {AVATAR_EMOJIS.map((em) => (
                   <TouchableOpacity
@@ -518,7 +546,7 @@ export default function CommunityScreen() {
               </View>
 
               {/* Color picker */}
-              <Text style={styles.pickerLabel}>Renk</Text>
+              <Text style={styles.pickerLabel}>{t('community.colorLabel')}</Text>
               <View style={styles.colorRow}>
                 {AVATAR_COLORS.map((color) => (
                   <TouchableOpacity
@@ -534,22 +562,22 @@ export default function CommunityScreen() {
               </View>
 
               {/* Nickname */}
-              <Text style={styles.pickerLabel}>Kullanıcı adı</Text>
+              <Text style={styles.pickerLabel}>{t('community.usernameLabel')}</Text>
               <TextInput
                 style={styles.textField}
                 value={draft.nickname}
                 onChangeText={(v) => setDraft((d) => ({ ...d, nickname: v }))}
-                placeholder="Kullanıcı adın..."
+                placeholder={t('community.usernamePlaceholder')}
                 placeholderTextColor="rgba(255,255,255,0.3)"
               />
 
               {/* Bio */}
-              <Text style={styles.pickerLabel}>Bio</Text>
+              <Text style={styles.pickerLabel}>{t('community.bioLabel')}</Text>
               <TextInput
                 style={[styles.textField, { height: 80 }]}
                 value={draft.bio}
                 onChangeText={(v) => setDraft((d) => ({ ...d, bio: v }))}
-                placeholder="Kendini tanıt..."
+                placeholder={t('community.bioPlaceholder')}
                 placeholderTextColor="rgba(255,255,255,0.3)"
                 multiline
                 textAlignVertical="top"
@@ -557,10 +585,10 @@ export default function CommunityScreen() {
 
               <View style={styles.modalActions}>
                 <TouchableOpacity style={styles.saveBtn} onPress={saveProfile}>
-                  <Text style={styles.saveBtnText}>Kaydet</Text>
+                  <Text style={styles.saveBtnText}>{t('common.save')}</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.cancelBtn} onPress={() => setProfileVisible(false)}>
-                  <Text style={styles.cancelBtnText}>İptal</Text>
+                  <Text style={styles.cancelBtnText}>{t('common.cancel')}</Text>
                 </TouchableOpacity>
               </View>
               <View style={{ height: 24 }} />
@@ -577,7 +605,7 @@ export default function CommunityScreen() {
             style={styles.modalSheet}
           >
             <View style={styles.modalHandle} />
-            <Text style={styles.modalTitle}>Paylaş</Text>
+            <Text style={styles.modalTitle}>{t('community.shareTitle')}</Text>
 
             <View style={styles.composerRow}>
               <Avatar
@@ -590,7 +618,7 @@ export default function CommunityScreen() {
                 style={[styles.textField, { flex: 1, marginBottom: 0 }]}
                 value={postText}
                 onChangeText={setPostText}
-                placeholder="Bir şeyler paylaş..."
+                placeholder={t('community.postPlaceholder')}
                 placeholderTextColor="rgba(255,255,255,0.3)"
                 multiline
                 autoFocus
@@ -606,7 +634,7 @@ export default function CommunityScreen() {
                 {shareStats && <Text style={styles.toggleCheckMark}>✓</Text>}
               </View>
               <Text style={[styles.statsToggleText, shareStats && { color: colors.gold }]}>
-                Wellness istatistiklerimi paylaş
+                {t('community.shareStatsLabel')}
               </Text>
             </TouchableOpacity>
 
@@ -626,7 +654,7 @@ export default function CommunityScreen() {
                 onPress={submitPost}
                 disabled={!postText.trim()}
               >
-                <Text style={styles.saveBtnText}>Paylaş</Text>
+                <Text style={styles.saveBtnText}>{t('community.postBtn')}</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.cancelBtn}
@@ -636,7 +664,7 @@ export default function CommunityScreen() {
                   setShareStats(false);
                 }}
               >
-                <Text style={styles.cancelBtnText}>İptal</Text>
+                <Text style={styles.cancelBtnText}>{t('common.cancel')}</Text>
               </TouchableOpacity>
             </View>
             <View style={{ height: 24 }} />

@@ -35,7 +35,7 @@ function SettingRow({ icon, label, value, onPress, rightElement, isDestructive }
 
 export default function ProfileScreen({ navigation }) {
   const dispatch = useAppDispatch();
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { user } = useAppSelector((state) => state.auth);
   const { preferences, profile, stats } = useAppSelector((state) => state.user);
 
@@ -54,39 +54,32 @@ export default function ProfileScreen({ navigation }) {
   const displayData = profile || user || {};
 
   const handleLogout = () => {
-    Alert.alert('Çıkış Yap', 'Hesabından çıkmak istediğine emin misin?', [
-      { text: 'İptal', style: 'cancel' },
-      { text: 'Çıkış Yap', style: 'destructive', onPress: () => dispatch(logout()) },
+    Alert.alert(t('profile.logoutTitle'), t('profile.logoutConfirm'), [
+      { text: t('common.cancel'), style: 'cancel' },
+      { text: t('profile.logout'), style: 'destructive', onPress: () => dispatch(logout()) },
     ]);
   };
 
   const handleChangePassword = () => {
     const email = displayData.email || user?.email;
     if (!email) {
-      Alert.alert('Hata', 'Hesap e-postası bulunamadı.');
+      Alert.alert(t('auth.error'), t('auth.noEmailError'));
       return;
     }
-    Alert.alert(
-      'Şifre Değiştir',
-      `${email} adresine bir şifre sıfırlama bağlantısı gönderelim mi?`,
-      [
-        { text: 'İptal', style: 'cancel' },
-        {
-          text: 'Gönder',
-          onPress: async () => {
-            try {
-              await sendPasswordReset(email);
-              Alert.alert(
-                'Bağlantı Gönderildi',
-                'Şifre sıfırlama bağlantısı e-postana gönderildi. Gelen kutunu kontrol et.'
-              );
-            } catch (e) {
-              Alert.alert('Hata', e.message || 'Bağlantı gönderilemedi.');
-            }
-          },
+    Alert.alert(t('auth.passwordResetTitle'), t('auth.passwordResetMsg', { email }), [
+      { text: t('common.cancel'), style: 'cancel' },
+      {
+        text: t('auth.passwordResetSend'),
+        onPress: async () => {
+          try {
+            await sendPasswordReset(email);
+            Alert.alert(t('auth.passwordResetSentTitle'), t('auth.passwordResetSentMsg'));
+          } catch (e) {
+            Alert.alert(t('auth.error'), e.message || t('auth.passwordResetSendError'));
+          }
         },
-      ]
-    );
+      },
+    ]);
   };
 
   // Drive display/toggle off the active i18n language, not the stored
@@ -122,10 +115,10 @@ export default function ProfileScreen({ navigation }) {
           {/* Stats */}
           <View style={styles.statsRow}>
             {[
-              { label: 'Talk', value: String(stats?.totalTalks || 0) },
-              { label: 'Seri', value: `${stats?.streak || 0}g` },
-              { label: 'Rekor', value: `${stats?.longestStreak || 0}g` },
-              { label: 'Puan', value: String(stats?.points || 0) },
+              { label: t('profile.statTalks'), value: String(stats?.totalTalks || 0) },
+              { label: t('profile.statStreak'), value: `${stats?.streak || 0}g` },
+              { label: t('profile.statRecord'), value: `${stats?.longestStreak || 0}g` },
+              { label: t('profile.statPoints'), value: String(stats?.points || 0) },
             ].map((s) => (
               <View key={s.label} style={styles.statItem}>
                 <Text style={styles.statValue}>{s.value}</Text>
@@ -138,13 +131,13 @@ export default function ProfileScreen({ navigation }) {
             style={styles.editBtn}
             onPress={() => navigation.navigate('EditProfile')}
           >
-            <Text style={styles.editBtnText}>Profili Düzenle</Text>
+            <Text style={styles.editBtnText}>{t('profile.editProfile')}</Text>
           </TouchableOpacity>
         </View>
 
         {/* Goals */}
         <Card style={styles.goalsCard}>
-          <Text style={styles.sectionTitle}>Hedeflerim</Text>
+          <Text style={styles.sectionTitle}>{t('profile.myGoals')}</Text>
           <View style={styles.goalsRow}>
             {(displayData.goals?.length
               ? displayData.goals
@@ -158,19 +151,19 @@ export default function ProfileScreen({ navigation }) {
         </Card>
 
         {/* Settings */}
-        <Text style={styles.settingsSectionTitle}>Ayarlar</Text>
+        <Text style={styles.settingsSectionTitle}>{t('profile.settings')}</Text>
         <Card style={styles.settingsCard}>
           <SettingRow
             icon="🌍"
-            label="Dil"
-            value={activeLanguage === 'tr' ? 'Türkçe' : 'English'}
+            label={t('profile.language')}
+            value={activeLanguage === 'tr' ? t('profile.turkish') : t('profile.english')}
             onPress={toggleLanguage}
           />
           <View style={styles.divider} />
           <SettingRow
             icon="🔔"
-            label="Bildirimler"
-            value={preferences.notifications ? 'Açık' : 'Kapalı'}
+            label={t('profile.notifications')}
+            value={preferences.notifications ? t('profile.on') : t('profile.off')}
             onPress={() =>
               dispatch(updatePreferences({ notifications: !preferences.notifications }))
             }
@@ -178,11 +171,11 @@ export default function ProfileScreen({ navigation }) {
           <View style={styles.divider} />
           <SettingRow
             icon="🌙"
-            label="Rahatsız Etme"
+            label={t('profile.dnd')}
             value={
               quietHours.enabled
                 ? `${minutesToLabel(quietHours.start)}–${minutesToLabel(quietHours.end)}`
-                : 'Kapalı'
+                : t('profile.off')
             }
             onPress={() =>
               dispatch(
@@ -195,8 +188,8 @@ export default function ProfileScreen({ navigation }) {
           <View style={styles.divider} />
           <SettingRow
             icon="📏"
-            label="Birimler"
-            value={preferences.units === 'metric' ? 'Metrik' : 'Imperial'}
+            label={t('profile.units')}
+            value={preferences.units === 'metric' ? t('profile.metric') : t('profile.imperial')}
             onPress={() =>
               dispatch(
                 updatePreferences({ units: preferences.units === 'metric' ? 'imperial' : 'metric' })
@@ -205,26 +198,30 @@ export default function ProfileScreen({ navigation }) {
           />
         </Card>
 
-        <Text style={styles.settingsSectionTitle}>Hesap</Text>
+        <Text style={styles.settingsSectionTitle}>{t('profile.account')}</Text>
         <Card style={styles.settingsCard}>
-          <SettingRow icon="🔒" label="Şifre Değiştir" onPress={handleChangePassword} />
+          <SettingRow
+            icon="🔒"
+            label={t('profile.changePassword')}
+            onPress={handleChangePassword}
+          />
           <View style={styles.divider} />
           <SettingRow
             icon="📱"
-            label="Cihazları Yönet"
+            label={t('profile.manageDevices')}
             onPress={() => navigation.navigate('ConnectedDevices')}
           />
           <View style={styles.divider} />
           <SettingRow
             icon="📄"
-            label="Gizlilik Politikası"
+            label={t('profile.privacyPolicy')}
             onPress={() => navigation.navigate('Privacy')}
           />
           <View style={styles.divider} />
-          <SettingRow icon="🚪" label="Çıkış Yap" onPress={handleLogout} isDestructive />
+          <SettingRow icon="🚪" label={t('profile.logout')} onPress={handleLogout} isDestructive />
         </Card>
 
-        <Text style={styles.version}>BreakFree v1.0.0</Text>
+        <Text style={styles.version}>{t('profile.version')}</Text>
         <View style={{ height: 32 }} />
       </ScrollView>
     </SafeAreaView>
