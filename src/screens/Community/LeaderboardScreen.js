@@ -8,6 +8,7 @@ import {
   SafeAreaView,
   ActivityIndicator,
 } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { doc, getDoc } from 'firebase/firestore';
 import { useAppSelector } from '../../store/hooks';
 import { db } from '../../services/firebase';
@@ -26,6 +27,7 @@ const SEED_LEADERBOARD = [
 ];
 
 export default function LeaderboardScreen({ navigation, route }) {
+  const { t } = useTranslation();
   const challengeId = route?.params?.challengeId;
   const { challenges } = useAppSelector((s) => s.challenges);
   const { user } = useAppSelector((s) => s.auth);
@@ -52,7 +54,7 @@ export default function LeaderboardScreen({ navigation, route }) {
         const list = snap.exists() ? snap.data().entries || [] : [];
         if (!cancelled) setEntries(list.length ? list : __DEV__ ? SEED_LEADERBOARD : []);
       } catch (e) {
-        if (!cancelled) setError(e.message || 'Lider tablosu yüklenemedi.');
+        if (!cancelled) setError(e.message || t('leaderboard.error'));
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -79,14 +81,14 @@ export default function LeaderboardScreen({ navigation, route }) {
               onPress={() => navigation.goBack()}
               style={styles.back}
               accessibilityRole="button"
-              accessibilityLabel="Geri"
+              accessibilityLabel={t('common.back')}
             >
               <Text style={styles.backText}>←</Text>
             </TouchableOpacity>
           )}
           <View style={{ flex: 1 }}>
-            <Text style={styles.kicker}>LİDER TABLOSU</Text>
-            <Text style={styles.title}>{challenge?.title || 'Meydan Okuma'}</Text>
+            <Text style={styles.kicker}>{t('leaderboard.titleLabel')}</Text>
+            <Text style={styles.title}>{challenge?.title || t('leaderboard.challenge')}</Text>
             {challenge?.description && <Text style={styles.subtitle}>{challenge.description}</Text>}
           </View>
         </View>
@@ -100,9 +102,7 @@ export default function LeaderboardScreen({ navigation, route }) {
         ) : ranked.length === 0 ? (
           <View style={styles.stateBox}>
             <Text style={styles.stateEmoji}>🏁</Text>
-            <Text style={styles.stateText}>
-              Henüz sıralama yok. Meydan okumaya katıl ve ilk sen ol!
-            </Text>
+            <Text style={styles.stateText}>{t('leaderboard.noRanking')}</Text>
           </View>
         ) : (
           <>
@@ -121,7 +121,7 @@ export default function LeaderboardScreen({ navigation, route }) {
               </Card>
             )}
 
-            <Text style={styles.sectionTitle}>Sıralama</Text>
+            <Text style={styles.sectionTitle}>{t('leaderboard.rank')}</Text>
 
             {ranked.map((entry) => (
               <View

@@ -9,12 +9,14 @@ import {
   Platform,
   ActivityIndicator,
 } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { sendPasswordResetEmail } from 'firebase/auth';
 import { auth } from '../../services/firebase';
 import BreakFreeLogo from '../../components/branding/BreakFreeLogo';
 import { colors } from '../../constants/designTokens';
 
 export default function ForgotPasswordScreen({ navigation }) {
+  const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
@@ -22,11 +24,11 @@ export default function ForgotPasswordScreen({ navigation }) {
 
   const handleSend = async () => {
     if (!email || !/\S+@\S+\.\S+/.test(email)) {
-      setError('Geçerli bir e-posta girin');
+      setError(t('auth.emailInvalid'));
       return;
     }
     if (!auth) {
-      setError('Firebase yapılandırılmamış. Lütfen .env.local dosyasını ayarlayın.');
+      setError(t('auth.noFirebase'));
       return;
     }
     setLoading(true);
@@ -35,7 +37,7 @@ export default function ForgotPasswordScreen({ navigation }) {
       await sendPasswordResetEmail(auth, email);
       setSent(true);
     } catch (e) {
-      setError(e.message || 'Bir hata oluştu. Tekrar deneyin.');
+      setError(e.message || t('auth.sendError'));
     } finally {
       setLoading(false);
     }
@@ -48,38 +50,36 @@ export default function ForgotPasswordScreen({ navigation }) {
     >
       <View style={styles.container}>
         <TouchableOpacity style={styles.back} onPress={() => navigation.goBack()}>
-          <Text style={styles.backText}>← Geri</Text>
+          <Text style={styles.backText}>{t('auth.backBtn')}</Text>
         </TouchableOpacity>
 
         <BreakFreeLogo variant="symbol" size="small" />
 
-        <Text style={styles.title}>Şifreni Sıfırla</Text>
-        <Text style={styles.subtitle}>E-posta adresini gir, sıfırlama bağlantısı gönderelim.</Text>
+        <Text style={styles.title}>{t('auth.forgotPasswordTitle')}</Text>
+        <Text style={styles.subtitle}>{t('auth.forgotPasswordDesc')}</Text>
 
         {sent ? (
           <View style={styles.successBox}>
             <Text style={styles.successIcon}>✉️</Text>
-            <Text style={styles.successTitle}>E-posta gönderildi!</Text>
-            <Text style={styles.successText}>
-              {email} adresine sıfırlama bağlantısı gönderdik. Gelen kutunu kontrol et.
-            </Text>
+            <Text style={styles.successTitle}>{t('auth.forgotPasswordSentTitle')}</Text>
+            <Text style={styles.successText}>{t('auth.forgotPasswordSentDesc', { email })}</Text>
             <TouchableOpacity style={styles.doneBtn} onPress={() => navigation.goBack()}>
-              <Text style={styles.doneBtnText}>Giriş Ekranına Dön</Text>
+              <Text style={styles.doneBtnText}>{t('auth.backToLogin')}</Text>
             </TouchableOpacity>
           </View>
         ) : (
           <>
             <View style={styles.fieldWrapper}>
-              <Text style={styles.fieldLabel}>E-posta</Text>
+              <Text style={styles.fieldLabel}>{t('auth.email')}</Text>
               <View style={[styles.inputBox, error && styles.inputBoxError]}>
                 <TextInput
                   style={styles.textInput}
                   value={email}
-                  onChangeText={(t) => {
-                    setEmail(t);
+                  onChangeText={(txt) => {
+                    setEmail(txt);
                     setError('');
                   }}
-                  placeholder="ornek@email.com"
+                  placeholder={t('auth.emailPlaceholder')}
                   placeholderTextColor="rgba(255,255,255,0.22)"
                   keyboardType="email-address"
                   autoCapitalize="none"
@@ -98,7 +98,7 @@ export default function ForgotPasswordScreen({ navigation }) {
               {loading ? (
                 <ActivityIndicator color={colors.navyDeep} size="small" />
               ) : (
-                <Text style={styles.sendBtnText}>Sıfırlama Gönder</Text>
+                <Text style={styles.sendBtnText}>{t('auth.forgotPasswordBtn')}</Text>
               )}
             </TouchableOpacity>
           </>

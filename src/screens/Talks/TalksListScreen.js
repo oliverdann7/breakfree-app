@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, SafeAreaView } from 'react-native';
 import { collection, query, orderBy, onSnapshot } from 'firebase/firestore';
 import { db } from '../../services/firebase';
@@ -14,6 +15,7 @@ import {
 } from '../../store/slices/talksSlice';
 
 export default function TalksListScreen({ navigation }) {
+  const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const { allTalks, loading } = useAppSelector((state) => state.talks);
   const unsubRef = useRef(null);
@@ -42,24 +44,22 @@ export default function TalksListScreen({ navigation }) {
         {/* Header */}
         <View style={styles.header}>
           <View>
-            <Text style={styles.headerTitle}>
-              Palestralar <Text style={styles.headerAccent}>&</Text> sesler
-            </Text>
-            <Text style={styles.headerSub}>Türkiye&apos;nin en güçlü zihinleri</Text>
+            <Text style={styles.headerTitle}>{t('talks.title')}</Text>
+            <Text style={styles.headerSub}>{t('talks.subtitle')}</Text>
           </View>
           {allTalks.length === 0 && !loading && (
             <TouchableOpacity
               onPress={() => dispatch(seedTalks()).then(() => dispatch(fetchTalks()))}
               style={styles.seedBtn}
             >
-              <Text style={styles.seedBtnText}>Yükle</Text>
+              <Text style={styles.seedBtnText}>{t('talks.loadSeed')}</Text>
             </TouchableOpacity>
           )}
         </View>
 
         {loading && (
           <View style={{ padding: 40, alignItems: 'center' }}>
-            <Text style={{ color: colors.textTertiary }}>Yükleniyor...</Text>
+            <Text style={{ color: colors.textTertiary }}>{t('common.loading')}</Text>
           </View>
         )}
 
@@ -74,7 +74,7 @@ export default function TalksListScreen({ navigation }) {
                 marginBottom: 6,
               }}
             >
-              Henüz palestra yok
+              {t('talks.empty')}
             </Text>
             <Text
               style={{
@@ -84,13 +84,13 @@ export default function TalksListScreen({ navigation }) {
                 textAlign: 'center',
               }}
             >
-              İlk palestrayı ekleyerek topluluğa öncülük et!
+              {t('talks.emptySub')}
             </Text>
             <TouchableOpacity
               onPress={() => dispatch(seedTalks()).then(() => dispatch(fetchTalks()))}
               style={styles.seedActionBtn}
             >
-              <Text style={styles.seedActionBtnText}>Örnek Palestraları Yükle</Text>
+              <Text style={styles.seedActionBtnText}>{t('talks.loadSeed')}</Text>
             </TouchableOpacity>
           </View>
         )}
@@ -100,9 +100,11 @@ export default function TalksListScreen({ navigation }) {
             <View style={styles.liveHeader}>
               <View style={styles.liveBadge}>
                 <View style={styles.liveDot} />
-                <Text style={styles.liveBadgeText}>Canlı</Text>
+                <Text style={styles.liveBadgeText}>{t('talks.liveBadge')}</Text>
               </View>
-              <Text style={styles.liveCount}>{liveTalk.listeners} dinleyici</Text>
+              <Text style={styles.liveCount}>
+                {t('talks.listenersLabel', { count: liveTalk.listeners })}
+              </Text>
             </View>
             <Text style={styles.liveTitle}>{liveTalk.title}</Text>
             <View style={styles.liveHosts}>
@@ -115,7 +117,7 @@ export default function TalksListScreen({ navigation }) {
               onPress={() => dispatch(joinTalk(liveTalk.talkId))}
             >
               <Text style={styles.liveButtonIcon}>🎧</Text>
-              <Text style={styles.liveButtonText}>Şimdi dinle</Text>
+              <Text style={styles.liveButtonText}>{t('talks.listenNow')}</Text>
             </TouchableOpacity>
           </Card>
         )}
@@ -140,7 +142,7 @@ export default function TalksListScreen({ navigation }) {
         <View style={styles.listSectionWrapper}>
           <View style={styles.listSection}>
             <View style={styles.listHeader}>
-              <Text style={styles.sectionTitle}>Yaklaşanlar</Text>
+              <Text style={styles.sectionTitle}>{t('talks.upcoming')}</Text>
             </View>
             {upcoming.map((talk) => (
               <TalkCard
@@ -157,7 +159,7 @@ export default function TalksListScreen({ navigation }) {
           <View style={styles.listSectionWrapper}>
             <View style={styles.listSection}>
               <View style={styles.listHeader}>
-                <Text style={styles.sectionTitle}>Geçmiş Palestralar</Text>
+                <Text style={styles.sectionTitle}>{t('talks.past')}</Text>
               </View>
               {ended.map((talk) => (
                 <TalkCard

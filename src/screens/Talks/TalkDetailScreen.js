@@ -8,6 +8,7 @@ import {
   SafeAreaView,
   Alert,
 } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { fetchTalkById, clearCurrentTalk, joinTalk } from '../../store/slices/talksSlice';
 import Button from '../../components/common/Button';
@@ -15,6 +16,7 @@ import Card from '../../components/common/Card';
 import { colors } from '../../constants/designTokens';
 
 export default function TalkDetailScreen({ route, navigation }) {
+  const { t } = useTranslation();
   const { talkId } = route.params;
   const dispatch = useAppDispatch();
   const { currentTalk } = useAppSelector((state) => state.talks);
@@ -29,7 +31,7 @@ export default function TalkDetailScreen({ route, navigation }) {
   if (!currentTalk) {
     return (
       <View style={styles.loading}>
-        <Text style={styles.loadingText}>Yükleniyor...</Text>
+        <Text style={styles.loadingText}>{t('common.loading')}</Text>
       </View>
     );
   }
@@ -50,7 +52,7 @@ export default function TalkDetailScreen({ route, navigation }) {
         {/* Hero */}
         <View style={styles.hero}>
           <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
-            <Text style={styles.backText}>← Geri</Text>
+            <Text style={styles.backText}>{t('auth.backBtn')}</Text>
           </TouchableOpacity>
           <View style={styles.heroImage}>
             <Text style={styles.heroEmoji}>{categoryEmoji}</Text>
@@ -73,7 +75,7 @@ export default function TalkDetailScreen({ route, navigation }) {
             </View>
             <View>
               <Text style={styles.hostName}>{currentTalk.host.name}</Text>
-              <Text style={styles.hostLabel}>Konuşmacı</Text>
+              <Text style={styles.hostLabel}>{t('mentor.hostLabel')}</Text>
             </View>
           </View>
 
@@ -81,23 +83,23 @@ export default function TalkDetailScreen({ route, navigation }) {
           <View style={styles.statsRow}>
             <View style={styles.statItem}>
               <Text style={styles.statValue}>{currentTalk.duration} dk</Text>
-              <Text style={styles.statLabel}>Süre</Text>
+              <Text style={styles.statLabel}>{t('talks.duration')}</Text>
             </View>
             <View style={styles.statDivider} />
             <View style={styles.statItem}>
               <Text style={styles.statValue}>{currentTalk.listeners}</Text>
-              <Text style={styles.statLabel}>Dinleyici</Text>
+              <Text style={styles.statLabel}>{t('talks.listeners')}</Text>
             </View>
             <View style={styles.statDivider} />
             <View style={styles.statItem}>
               <Text style={styles.statValue}>{currentTalk.category}</Text>
-              <Text style={styles.statLabel}>Kategori</Text>
+              <Text style={styles.statLabel}>{t('talks.categories')}</Text>
             </View>
           </View>
 
           {/* Description */}
           <Card style={styles.descCard}>
-            <Text style={styles.descTitle}>Açıklama</Text>
+            <Text style={styles.descTitle}>{t('talks.description')}</Text>
             <Text style={styles.descText}>{currentTalk.description}</Text>
           </Card>
 
@@ -106,37 +108,40 @@ export default function TalkDetailScreen({ route, navigation }) {
             <Button
               title={
                 isLive
-                  ? "🎙 Talk'a Katıl"
+                  ? `🎙 ${t('talks.joinTalk')}`
                   : currentTalk.status === 'scheduled'
-                    ? '🔔 Hatırlatıcı Kur'
-                    : '🎵 Kaydı Dinle'
+                    ? `🔔 ${t('talks.setReminder')}`
+                    : `🎵 ${t('talks.listenRecording')}`
               }
               onPress={() => {
                 if (isLive) {
                   dispatch(joinTalk(talkId));
-                  Alert.alert('Katıldın!', `${currentTalk.title} talk'ına başarıyla katıldın.`);
+                  Alert.alert(
+                    t('talks.joinedTitle'),
+                    t('talks.joinedMsg', { title: currentTalk.title })
+                  );
                 } else if (currentTalk.status === 'scheduled') {
                   Alert.alert(
-                    'Hatırlatıcı Kuruldu',
-                    `${currentTalk.title} başladığında sana haber vereceğiz.`
+                    t('talks.reminderTitle'),
+                    t('talks.reminderMsg', { title: currentTalk.title })
                   );
                 } else {
-                  Alert.alert('Kayıt', 'Bu talk kaydı yakında eklenecek.');
+                  Alert.alert(t('talks.recordingTitle'), t('talks.recordingMsg'));
                 }
               }}
             />
             <View style={styles.secondaryActions}>
               <TouchableOpacity
                 style={styles.iconBtn}
-                onPress={() => Alert.alert('Kaydedildi', 'Talk kaydedildi.')}
+                onPress={() => Alert.alert(t('talks.savedTitle'), t('talks.savedMsg'))}
               >
-                <Text style={styles.iconBtnText}>🔖 Kaydet</Text>
+                <Text style={styles.iconBtnText}>🔖 {t('talks.save')}</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.iconBtn}
-                onPress={() => Alert.alert('Paylaş', 'Paylaşma bağlantısı kopyalandı.')}
+                onPress={() => Alert.alert(t('community.shareTitle'), t('talks.sharedMsg'))}
               >
-                <Text style={styles.iconBtnText}>📤 Paylaş</Text>
+                <Text style={styles.iconBtnText}>📤 {t('talks.share')}</Text>
               </TouchableOpacity>
             </View>
           </View>

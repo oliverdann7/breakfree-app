@@ -1,4 +1,5 @@
 import React, { useRef, useState, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   View,
   Text,
@@ -34,6 +35,7 @@ function formatTime(secs) {
 }
 
 export default function VideoPlayerScreen({ route, navigation }) {
+  const { t } = useTranslation();
   const { videoId, video: routeVideo } = route.params || {};
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state.auth);
@@ -118,13 +120,13 @@ export default function VideoPlayerScreen({ route, navigation }) {
       return (
         <View style={styles.playerPlaceholder}>
           <Text style={styles.lockIcon}>🔒</Text>
-          <Text style={styles.lockTitle}>Pro içerik</Text>
-          <Text style={styles.playerNote}>Bu videoyu izlemek için BreakFree Pro gerekli.</Text>
+          <Text style={styles.lockTitle}>{t('video.proTitle')}</Text>
+          <Text style={styles.playerNote}>{t('video.proDesc')}</Text>
           <TouchableOpacity
             style={styles.upgradeBtn}
             onPress={() => navigation.navigate('Premium')}
           >
-            <Text style={styles.upgradeText}>{"Pro'ya geç"}</Text>
+            <Text style={styles.upgradeText}>{t('video.proUpgrade')}</Text>
           </TouchableOpacity>
         </View>
       );
@@ -134,7 +136,7 @@ export default function VideoPlayerScreen({ route, navigation }) {
       return (
         <View style={styles.playerPlaceholder}>
           <Text style={styles.playerIcon}>🎬</Text>
-          <Text style={styles.playerNote}>Video henüz yüklenmedi</Text>
+          <Text style={styles.playerNote}>{t('video.notLoaded')}</Text>
         </View>
       );
     }
@@ -240,7 +242,7 @@ export default function VideoPlayerScreen({ route, navigation }) {
         {/* Video info */}
         <View style={styles.infoSection}>
           <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
-            <Text style={styles.backText}>← Geri</Text>
+            <Text style={styles.backText}>{t('auth.backBtn')}</Text>
           </TouchableOpacity>
           {video && (
             <>
@@ -257,7 +259,7 @@ export default function VideoPlayerScreen({ route, navigation }) {
         {/* Related */}
         {relatedVideos.length > 0 && (
           <View style={styles.related}>
-            <Text style={styles.relatedTitle}>İlgili videolar</Text>
+            <Text style={styles.relatedTitle}>{t('video.relatedVideos')}</Text>
             {relatedVideos.map((v) => (
               <View key={v.videoId} style={styles.relatedItem}>
                 <VideoCard
@@ -288,7 +290,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  playerLoading: { ...StyleSheet.absoluteFillObject, alignItems: 'center', justifyContent: 'center' },
+  playerLoading: {
+    ...StyleSheet.absoluteFillObject,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   playerPlaceholder: { alignItems: 'center', gap: 8, paddingHorizontal: 20 },
   playerIcon: { fontSize: 48, color: colors.cyan, opacity: 0.6 },
   lockIcon: { fontSize: 40 },

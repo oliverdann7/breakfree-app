@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   View,
   Text,
@@ -56,6 +57,7 @@ function PlanCard({ plan, selected, onSelect }) {
 }
 
 export default function PremiumScreen({ navigation }) {
+  const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state.auth);
   const { subscription, loading } = useAppSelector((state) => state.premium);
@@ -73,7 +75,7 @@ export default function PremiumScreen({ navigation }) {
     try {
       await dispatch(subscribe({ planId: selected })).unwrap();
     } catch (err) {
-      Alert.alert('Abonelik', typeof err === 'string' ? err : 'Bir hata oluştu.');
+      Alert.alert(t('premium.kicker'), typeof err === 'string' ? err : t('common.error'));
     } finally {
       setSubmitting(false);
     }
@@ -85,7 +87,7 @@ export default function PremiumScreen({ navigation }) {
     try {
       await dispatch(cancelSubscription()).unwrap();
     } catch (err) {
-      Alert.alert('Abonelik', typeof err === 'string' ? err : 'Bir hata oluştu.');
+      Alert.alert(t('premium.kicker'), typeof err === 'string' ? err : t('common.error'));
     } finally {
       setSubmitting(false);
     }
@@ -109,34 +111,32 @@ export default function PremiumScreen({ navigation }) {
             </TouchableOpacity>
           )}
           <View style={{ flex: 1 }}>
-            <Text style={styles.kicker}>BREAKFREE PRO</Text>
-            <Text style={styles.title}>Wellness yolculuğunu hızlandır</Text>
-            <Text style={styles.subtitle}>
-              Gelişmiş analiz, mentor seansları ve reklamsız deneyim.
-            </Text>
+            <Text style={styles.kicker}>{t('premium.kicker')}</Text>
+            <Text style={styles.title}>{t('premium.headline')}</Text>
+            <Text style={styles.subtitle}>{t('premium.subhead')}</Text>
           </View>
         </View>
 
         {isPremium && subscription?.status === 'active' ? (
           <View style={styles.activeBanner}>
-            <Text style={styles.activeIcon}>✨</Text>
+            <Text style={styles.activeIcon}>{t('premium.activeEmoji')}</Text>
             <View style={{ flex: 1 }}>
-              <Text style={styles.activeTitle}>Pro aboneliğin aktif</Text>
+              <Text style={styles.activeTitle}>{t('premium.active')}</Text>
               <Text style={styles.activeMeta}>
-                Yenileme:{' '}
+                {t('premium.renewalLabel')}{' '}
                 {subscription.renewAt
                   ? new Date(subscription.renewAt).toLocaleDateString('tr-TR')
                   : '—'}
               </Text>
             </View>
             <TouchableOpacity onPress={handleCancel} style={styles.cancelLink}>
-              <Text style={styles.cancelLinkText}>İptal et</Text>
+              <Text style={styles.cancelLinkText}>{t('premium.cancel')}</Text>
             </TouchableOpacity>
           </View>
         ) : (
           <>
             <View style={styles.trial}>
-              <Text style={styles.trialText}>7 gün ücretsiz dene · İstediğin zaman iptal et</Text>
+              <Text style={styles.trialText}>{t('premium.trial')}</Text>
             </View>
 
             {PLANS.map((p) => (
@@ -151,15 +151,12 @@ export default function PremiumScreen({ navigation }) {
             >
               <Text style={styles.ctaText}>
                 {submitting
-                  ? 'İşleniyor...'
-                  : `${PLANS.find((p) => p.id === selected)?.name} ile başla`}
+                  ? t('premium.submitting')
+                  : t('premium.subscribe', { plan: PLANS.find((p) => p.id === selected)?.name })}
               </Text>
             </TouchableOpacity>
 
-            <Text style={styles.fineprint}>
-              Ödeme Apple/Google hesabınızdan tahsil edilir. Abonelik otomatik yenilenir; istediğin
-              zaman ayarlardan iptal edebilirsin.
-            </Text>
+            <Text style={styles.fineprint}>{t('premium.fineprint')}</Text>
           </>
         )}
       </ScrollView>

@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, SafeAreaView } from 'react-native';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { connectSource, disconnectSource, syncDaily } from '../../store/slices/healthSlice';
@@ -11,17 +12,18 @@ const SOURCE_ICONS = {
   garmin: '⌚',
 };
 
-function lastSyncLabel(ts) {
+function lastSyncLabel(ts, t) {
   if (!ts) return null;
   const mins = Math.floor((Date.now() - ts) / 60000);
-  if (mins < 1) return 'şimdi senkronize edildi';
-  if (mins < 60) return `${mins}dk önce senkronize edildi`;
+  if (mins < 1) return t('devices.syncNow');
+  if (mins < 60) return t('devices.syncMins', { count: mins });
   const hours = Math.floor(mins / 60);
-  if (hours < 24) return `${hours}sa önce senkronize edildi`;
-  return `${Math.floor(hours / 24)}g önce senkronize edildi`;
+  if (hours < 24) return t('devices.syncHours', { count: hours });
+  return t('devices.syncDays', { count: Math.floor(hours / 24) });
 }
 
 export default function ConnectedDevicesScreen({ navigation }) {
+  const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const { connectedSources, syncStatus, lastSync } = useAppSelector((s) => s.health);
   const sources = getAvailableSources();
@@ -48,19 +50,16 @@ export default function ConnectedDevicesScreen({ navigation }) {
             </TouchableOpacity>
           )}
           <View style={{ flex: 1 }}>
-            <Text style={styles.title}>Cihazları Yönet</Text>
+            <Text style={styles.title}>{t('devices.title')}</Text>
             <Text style={styles.subtitle}>
               {connectedSources.length > 0
-                ? `${connectedSources.length} cihaz bağlı`
-                : 'Bağlı cihaz yok'}
+                ? t('devices.subtitleSome', { count: connectedSources.length })
+                : t('devices.subtitleNone')}
             </Text>
           </View>
         </View>
 
-        <Text style={styles.intro}>
-          Sağlık verilerini otomatik senkronize etmek için bir kaynak bağla. Uyku, adım, kalp atışı
-          ve daha fazlası wellness skorunu besler.
-        </Text>
+        <Text style={styles.intro}>{t('devices.desc')}</Text>
 
         {sources.map((src) => {
           const connected = isConnected(src.id);
@@ -72,9 +71,9 @@ export default function ConnectedDevicesScreen({ navigation }) {
                 <Text style={styles.rowStatus}>
                   {connected
                     ? syncStatus === 'syncing'
-                      ? 'Senkronize ediliyor…'
-                      : lastSyncLabel(lastSync) || 'Bağlı'
-                    : 'Bağlı değil'}
+                      ? t('devices.syncing')
+                      : lastSyncLabel(lastSync, t) || t('devices.connected')
+                    : t('devices.disconnected')}
                 </Text>
               </View>
               <TouchableOpacity
@@ -83,17 +82,14 @@ export default function ConnectedDevicesScreen({ navigation }) {
                 style={[styles.btn, connected ? styles.btnDisconnect : styles.btnConnect]}
               >
                 <Text style={[styles.btnText, connected && styles.btnTextDisconnect]}>
-                  {connected ? 'Kaldır' : 'Bağla'}
+                  {connected ? t('devices.remove') : t('devices.connect')}
                 </Text>
               </TouchableOpacity>
             </View>
           );
         })}
 
-        <Text style={styles.footnote}>
-          Verilerin cihazından güvenli şekilde alınır ve yalnızca senin wellness skorun için
-          kullanılır. İstediğin zaman bağlantıyı kaldırabilirsin.
-        </Text>
+        <Text style={styles.footnote}>{t('devices.privacyNote')}</Text>
       </ScrollView>
     </SafeAreaView>
   );
