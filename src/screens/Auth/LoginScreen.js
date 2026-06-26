@@ -11,12 +11,14 @@ import {
   ActivityIndicator,
   Alert,
 } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { login, loginWithGoogle, loginWithApple } from '../../store/slices/authSlice';
 import { colors } from '../../constants/designTokens';
 
 export default function LoginScreen({ navigation }) {
   const dispatch = useAppDispatch();
+  const { t } = useTranslation();
   const { isLoading, error } = useAppSelector((state) => state.auth);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -24,7 +26,7 @@ export default function LoginScreen({ navigation }) {
 
   const handleLogin = () => {
     if (!email.trim() || !password.trim()) {
-      Alert.alert('Hata', 'Lütfen e-posta ve şifrenizi girin.');
+      Alert.alert(t('auth.error'), t('auth.errorEmpty'));
       return;
     }
     dispatch(login({ email: email.trim(), password }));
@@ -51,15 +53,15 @@ export default function LoginScreen({ navigation }) {
             <Text style={styles.logoText}>BreakFree</Text>
           </View>
 
-          <Text style={styles.title}>Hoş geldin</Text>
-          <Text style={styles.subtitle}>Devam etmek için giriş yap</Text>
+          <Text style={styles.title}>{t('auth.welcomeBack')}</Text>
+          <Text style={styles.subtitle}>{t('auth.continueLogin')}</Text>
 
           {/* Email */}
           <View style={styles.inputGroup}>
-            <Text style={styles.inputLabel}>E-posta</Text>
+            <Text style={styles.inputLabel}>{t('auth.email')}</Text>
             <TextInput
               style={styles.input}
-              placeholder="ornek@email.com"
+              placeholder={t('auth.emailPlaceholder')}
               placeholderTextColor="rgba(255,255,255,0.25)"
               value={email}
               onChangeText={setEmail}
@@ -71,7 +73,7 @@ export default function LoginScreen({ navigation }) {
 
           {/* Password */}
           <View style={styles.inputGroup}>
-            <Text style={styles.inputLabel}>Şifre</Text>
+            <Text style={styles.inputLabel}>{t('auth.password')}</Text>
             <View style={styles.passwordRow}>
               <TextInput
                 style={[styles.input, { flex: 1, marginBottom: 0 }]}
@@ -106,26 +108,26 @@ export default function LoginScreen({ navigation }) {
             {isLoading ? (
               <ActivityIndicator color={colors.navy} size="small" />
             ) : (
-              <Text style={styles.loginBtnText}>Giriş Yap</Text>
+              <Text style={styles.loginBtnText}>{t('auth.login')}</Text>
             )}
           </TouchableOpacity>
 
           {/* Divider */}
           <View style={styles.dividerRow}>
             <View style={styles.divider} />
-            <Text style={styles.dividerText}>veya</Text>
+            <Text style={styles.dividerText}>{t('auth.or')}</Text>
             <View style={styles.divider} />
           </View>
 
           {/* Social buttons */}
           <TouchableOpacity style={styles.socialBtn} onPress={handleGoogle}>
             <Text style={{ fontSize: 16 }}>🔵</Text>
-            <Text style={styles.socialBtnText}>Google ile devam et</Text>
+            <Text style={styles.socialBtnText}>{t('auth.googleContinue')}</Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.socialBtn} onPress={handleApple}>
             <Text style={{ fontSize: 16 }}>🍎</Text>
-            <Text style={styles.socialBtnText}>Apple ile devam et</Text>
+            <Text style={styles.socialBtnText}>{t('auth.appleContinue')}</Text>
           </TouchableOpacity>
 
           {/* Forgot password */}
@@ -133,14 +135,14 @@ export default function LoginScreen({ navigation }) {
             style={styles.forgotBtn}
             onPress={() => navigation.navigate('ForgotPassword')}
           >
-            <Text style={styles.forgotText}>Şifremi unuttum</Text>
+            <Text style={styles.forgotText}>{t('auth.forgotPasswordLink')}</Text>
           </TouchableOpacity>
 
           {/* Signup link */}
           <View style={styles.signupRow}>
-            <Text style={styles.signupText}>Hesabın yok mu? </Text>
+            <Text style={styles.signupText}>{t('auth.noAccount')} </Text>
             <TouchableOpacity onPress={() => navigation.navigate('Signup')}>
-              <Text style={styles.signupLink}>Kaydol</Text>
+              <Text style={styles.signupLink}>{t('auth.signup')}</Text>
             </TouchableOpacity>
           </View>
         </View>

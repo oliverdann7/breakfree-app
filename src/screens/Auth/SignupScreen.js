@@ -9,6 +9,7 @@ import {
   Platform,
   Alert,
 } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { signup, clearError } from '../../store/slices/authSlice';
 import Button from '../../components/common/Button';
@@ -17,6 +18,7 @@ import { colors } from '../../constants/designTokens';
 
 export default function SignupScreen({ navigation }) {
   const dispatch = useAppDispatch();
+  const { t } = useTranslation();
   const { isLoading, error } = useAppSelector((state) => state.auth);
 
   const [displayName, setDisplayName] = useState('');
@@ -28,13 +30,13 @@ export default function SignupScreen({ navigation }) {
 
   const validate = () => {
     const e = {};
-    if (!displayName.trim()) e.displayName = 'Ad Soyad zorunlu';
-    if (!email) e.email = 'E-posta zorunlu';
-    else if (!/\S+@\S+\.\S+/.test(email)) e.email = 'Geçerli bir e-posta girin';
-    if (!password) e.password = 'Şifre zorunlu';
-    else if (password.length < 6) e.password = 'En az 6 karakter olmalı';
-    if (password !== confirmPassword) e.confirmPassword = 'Şifreler eşleşmiyor';
-    if (!agreed) e.terms = 'Koşulları kabul etmelisiniz';
+    if (!displayName.trim()) e.displayName = t('auth.nameRequired');
+    if (!email) e.email = t('auth.emailRequired');
+    else if (!/\S+@\S+\.\S+/.test(email)) e.email = t('auth.emailInvalid');
+    if (!password) e.password = t('auth.passwordRequired');
+    else if (password.length < 6) e.password = t('auth.passwordMin');
+    if (password !== confirmPassword) e.confirmPassword = t('auth.passwordMismatch');
+    if (!agreed) e.terms = t('auth.termsRequired');
     setErrors(e);
     return Object.keys(e).length === 0;
   };
@@ -47,7 +49,7 @@ export default function SignupScreen({ navigation }) {
     if (signup.fulfilled.match(result)) {
       navigation.navigate('Onboarding');
     } else {
-      Alert.alert('Kayıt Başarısız', result.payload || 'Bir hata oluştu.');
+      Alert.alert(t('auth.signupFailed'), result.payload || t('common.error'));
     }
   };
 
@@ -58,42 +60,42 @@ export default function SignupScreen({ navigation }) {
     >
       <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
         <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
-          <Text style={styles.backText}>← Geri</Text>
+          <Text style={styles.backText}>{t('auth.backBtn')}</Text>
         </TouchableOpacity>
 
         <View style={styles.form}>
-          <Text style={styles.title}>Hesap Oluştur</Text>
-          <Text style={styles.subtitle}>BreakFree topluluğuna katıl</Text>
+          <Text style={styles.title}>{t('auth.createAccount')}</Text>
+          <Text style={styles.subtitle}>{t('auth.joinCommunity')}</Text>
 
           <Input
-            label="Ad Soyad"
+            label={t('auth.displayName')}
             value={displayName}
             onChangeText={setDisplayName}
-            placeholder="Adın Soyadın"
+            placeholder={t('auth.namePlaceholder')}
             autoCapitalize="words"
             error={errors.displayName}
           />
           <Input
-            label="E-posta"
+            label={t('auth.email')}
             value={email}
             onChangeText={setEmail}
-            placeholder="ornek@email.com"
+            placeholder={t('auth.emailPlaceholder')}
             keyboardType="email-address"
             error={errors.email}
           />
           <Input
-            label="Şifre"
+            label={t('auth.password')}
             value={password}
             onChangeText={setPassword}
-            placeholder="En az 6 karakter"
+            placeholder={t('auth.passwordPlaceholder')}
             secureTextEntry
             error={errors.password}
           />
           <Input
-            label="Şifre Tekrar"
+            label={t('auth.confirmPassword')}
             value={confirmPassword}
             onChangeText={setConfirmPassword}
-            placeholder="Şifreni tekrar gir"
+            placeholder={t('auth.confirmPasswordPlaceholder')}
             secureTextEntry
             error={errors.confirmPassword}
           />
@@ -107,8 +109,8 @@ export default function SignupScreen({ navigation }) {
               {agreed && <Text style={styles.checkmark}>✓</Text>}
             </View>
             <Text style={styles.termsText}>
-              <Text style={styles.termsLink}>Kullanım Koşulları</Text> ve{' '}
-              <Text style={styles.termsLink}>Gizlilik Politikası</Text>&apos;nı kabul ediyorum
+              <Text style={styles.termsLink}>{t('auth.terms')}</Text> {t('auth.termsAccept')}{' '}
+              <Text style={styles.termsLink}>{t('auth.privacy')}</Text>
             </Text>
           </TouchableOpacity>
           {errors.terms && <Text style={styles.errorSmall}>{errors.terms}</Text>}
@@ -116,7 +118,7 @@ export default function SignupScreen({ navigation }) {
           {error && <Text style={styles.errorBanner}>{error}</Text>}
 
           <Button
-            title="Kayıt Ol"
+            title={t('auth.signup')}
             onPress={handleSignup}
             loading={isLoading}
             style={styles.signupBtn}
@@ -124,9 +126,9 @@ export default function SignupScreen({ navigation }) {
         </View>
 
         <View style={styles.footer}>
-          <Text style={styles.footerText}>Zaten hesabın var mı? </Text>
+          <Text style={styles.footerText}>{t('auth.hasAccount')} </Text>
           <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-            <Text style={styles.footerLink}>Giriş Yap</Text>
+            <Text style={styles.footerLink}>{t('auth.login')}</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
