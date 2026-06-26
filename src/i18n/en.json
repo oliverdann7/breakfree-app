@@ -53,7 +53,17 @@
     "todaysPlan": "Today's Plan",
     "dailyMetrics": "Daily Metrics",
     "quickAccess": "Quick Access",
-    "wellnessScore": "Wellness Score"
+    "wellnessScore": "Wellness Score",
+    "wellnessYours": "Your wellness score",
+    "readyPrefix": "Today",
+    "readyAccent": "you're ready.",
+    "insightKicker": "For you",
+    "live": "Live",
+    "noRecord": "No data",
+    "resting": "Resting",
+    "active": "Active",
+    "goalPercent": "Goal {{pct}}%",
+    "hoursSuffix": "h"
   },
   "talks": {
     "title": "Talks",

@@ -53,7 +53,17 @@
     "todaysPlan": "Bugünkü Plan",
     "dailyMetrics": "Günlük Metrikler",
     "quickAccess": "Hızlı Erişim",
-    "wellnessScore": "Wellness Skoru"
+    "wellnessScore": "Wellness Skoru",
+    "wellnessYours": "Wellness skorun",
+    "readyPrefix": "Bugün",
+    "readyAccent": "hazırsın.",
+    "insightKicker": "Senin için",
+    "live": "Canlı",
+    "noRecord": "Kayıt yok",
+    "resting": "Dinlenme",
+    "active": "Aktif",
+    "goalPercent": "Hedef %{{pct}}",
+    "hoursSuffix": "s"
   },
   "talks": {
     "title": "Palestralar",
