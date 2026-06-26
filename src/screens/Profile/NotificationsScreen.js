@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   View,
   Text,
@@ -21,17 +22,18 @@ const ICONS = {
   system: '🔔',
 };
 
-function timeAgo(ts) {
+function timeAgo(ts, t) {
   if (!ts) return '';
   const mins = Math.floor((Date.now() - ts) / 60000);
-  if (mins < 1) return 'şimdi';
-  if (mins < 60) return `${mins}dk`;
+  if (mins < 1) return t('notifications.now');
+  if (mins < 60) return t('notifications.mins', { count: mins });
   const hours = Math.floor(mins / 60);
-  if (hours < 24) return `${hours}sa`;
-  return `${Math.floor(hours / 24)}g`;
+  if (hours < 24) return t('notifications.hours', { count: hours });
+  return t('notifications.days', { count: Math.floor(hours / 24) });
 }
 
 export default function NotificationsScreen({ navigation }) {
+  const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((s) => s.auth);
   const { items, unreadCount, loading } = useAppSelector((s) => s.notifications);
@@ -66,9 +68,11 @@ export default function NotificationsScreen({ navigation }) {
             </TouchableOpacity>
           )}
           <View style={{ flex: 1 }}>
-            <Text style={styles.title}>Bildirimler</Text>
+            <Text style={styles.title}>{t('notifications.title')}</Text>
             <Text style={styles.subtitle}>
-              {unreadCount > 0 ? `${unreadCount} okunmamış` : 'Tümü okundu'}
+              {unreadCount > 0
+                ? t('notifications.unread', { count: unreadCount })
+                : t('notifications.allRead')}
             </Text>
           </View>
           {unreadCount > 0 && (
@@ -76,7 +80,7 @@ export default function NotificationsScreen({ navigation }) {
               onPress={() => user?.uid && dispatch(markAllRead(user.uid))}
               style={styles.markAll}
             >
-              <Text style={styles.markAllText}>Tümünü okundu</Text>
+              <Text style={styles.markAllText}>{t('notifications.markAll')}</Text>
             </TouchableOpacity>
           )}
         </View>
@@ -84,10 +88,8 @@ export default function NotificationsScreen({ navigation }) {
         {items.length === 0 ? (
           <View style={styles.empty}>
             <Text style={styles.emptyIcon}>🔕</Text>
-            <Text style={styles.emptyTitle}>Bildirim yok</Text>
-            <Text style={styles.emptyDesc}>
-              Yeni talk&apos;lar, meydan okumalar ve mentor güncellemeleri burada görünür.
-            </Text>
+            <Text style={styles.emptyTitle}>{t('notifications.empty')}</Text>
+            <Text style={styles.emptyDesc}>{t('notifications.emptyDesc')}</Text>
           </View>
         ) : (
           items.map((n) => (
@@ -105,7 +107,9 @@ export default function NotificationsScreen({ navigation }) {
                     {n.body}
                   </Text>
                 ) : null}
-                <Text style={styles.rowTime}>{timeAgo(n.createdAt)} önce</Text>
+                <Text style={styles.rowTime}>
+                  {timeAgo(n.createdAt, t)} {t('notifications.ago')}
+                </Text>
               </View>
               {!n.read && <View style={styles.unreadDot} />}
             </TouchableOpacity>

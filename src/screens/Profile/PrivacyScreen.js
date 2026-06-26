@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   View,
   Text,
@@ -15,6 +16,7 @@ import Card from '../../components/common/Card';
 import { colors } from '../../constants/designTokens';
 
 export default function PrivacyScreen({ navigation }) {
+  const { t } = useTranslation();
   const { user } = useAppSelector((s) => s.auth);
   const [submitting, setSubmitting] = useState(false);
 
@@ -30,27 +32,25 @@ export default function PrivacyScreen({ navigation }) {
         });
       }
       Alert.alert(
-        type === 'export' ? 'Veri Dışa Aktarma' : 'Hesap Silme',
-        type === 'export'
-          ? 'Talebin alındı. Verilerin 24 saat içinde e-postana gönderilecek.'
-          : 'Hesap silme talebin alındı. 30 günlük bekleme süresinden sonra hesabın kalıcı olarak silinecek. Bu süre içinde tekrar giriş yaparak talebi iptal edebilirsin.'
+        type === 'export' ? t('privacy.exportTitle') : t('privacy.deleteTitle'),
+        type === 'export' ? t('privacy.exportSubmitted') : t('privacy.deleteDesc')
       );
     } catch (err) {
-      Alert.alert('Hata', err.message || 'Talep gönderilemedi');
+      Alert.alert(t('common.error'), err.message || t('common.error'));
     } finally {
       setSubmitting(false);
     }
   };
 
   const confirmDelete = () => {
-    Alert.alert(
-      'Hesabını silmek istediğine emin misin?',
-      'Tüm verilerin kalıcı olarak silinecek. Bu işlem geri alınamaz.',
-      [
-        { text: 'İptal', style: 'cancel' },
-        { text: 'Hesabımı Sil', style: 'destructive', onPress: () => submitRequest('delete') },
-      ]
-    );
+    Alert.alert(t('privacy.deleteConfirmTitle'), t('privacy.deleteConfirmMsg'), [
+      { text: t('common.cancel'), style: 'cancel' },
+      {
+        text: t('privacy.deleteAction'),
+        style: 'destructive',
+        onPress: () => submitRequest('delete'),
+      },
+    ]);
   };
 
   return (
@@ -62,57 +62,45 @@ export default function PrivacyScreen({ navigation }) {
               <Text style={styles.backText}>←</Text>
             </TouchableOpacity>
           )}
-          <Text style={styles.title}>Gizlilik & Veriler</Text>
+          <Text style={styles.title}>{t('privacy.title')}</Text>
         </View>
 
-        <Text style={styles.intro}>
-          KVKK ve GDPR kapsamında verileriniz üzerinde tam kontrole sahipsiniz. Verilerinizi dışa
-          aktarabilir veya hesabınızı tamamen silebilirsiniz.
-        </Text>
+        <Text style={styles.intro}>{t('privacy.intro')}</Text>
 
         <Card style={styles.section}>
-          <Text style={styles.sectionTitle}>📦 Verilerimi indir</Text>
-          <Text style={styles.sectionDesc}>
-            Profil, sağlık metrikleri, mentor seansları ve bildirimler dahil tüm verileriniz JSON
-            formatında e-posta ile gönderilir.
-          </Text>
+          <Text style={styles.sectionTitle}>📦 {t('privacy.exportTitle')}</Text>
+          <Text style={styles.sectionDesc}>{t('privacy.exportDesc')}</Text>
           <TouchableOpacity
             style={styles.action}
             onPress={() => submitRequest('export')}
             disabled={submitting}
           >
             <Text style={styles.actionText}>
-              {submitting ? 'Gönderiliyor...' : 'Veri dışa aktarma talebi'}
+              {submitting ? t('privacy.submitting') : t('privacy.exportAction')}
             </Text>
           </TouchableOpacity>
         </Card>
 
         <Card style={styles.section}>
-          <Text style={styles.sectionTitle}>🔗 Üçüncü taraf entegrasyonlar</Text>
-          <Text style={styles.sectionDesc}>
-            Apple Health, Google Fit, Garmin gibi cihaz bağlantılarını Sağlık sekmesinden
-            yönetebilirsiniz.
-          </Text>
+          <Text style={styles.sectionTitle}>🔗 {t('privacy.integrationsTitle')}</Text>
+          <Text style={styles.sectionDesc}>{t('privacy.integrationsDesc')}</Text>
         </Card>
 
         <Card style={[styles.section, styles.danger]}>
-          <Text style={[styles.sectionTitle, { color: colors.error }]}>⚠️ Hesabımı sil</Text>
-          <Text style={styles.sectionDesc}>
-            Tüm verileriniz 30 günlük bekleme süresinden sonra kalıcı olarak silinir. Bekleme süresi
-            içinde tekrar giriş yaparak vazgeçebilirsiniz.
+          <Text style={[styles.sectionTitle, { color: colors.error }]}>
+            ⚠️ {t('privacy.deleteTitle')}
           </Text>
+          <Text style={styles.sectionDesc}>{t('privacy.deleteDesc')}</Text>
           <TouchableOpacity
             style={styles.dangerAction}
             onPress={confirmDelete}
             disabled={submitting}
           >
-            <Text style={styles.dangerActionText}>Hesabımı sil</Text>
+            <Text style={styles.dangerActionText}>{t('privacy.deleteAction')}</Text>
           </TouchableOpacity>
         </Card>
 
-        <Text style={styles.legal}>
-          Sorularınız için: privacy@breakfree.tr · Aydınlatma metni: breakfree.tr/legal/kvkk
-        </Text>
+        <Text style={styles.legal}>{t('privacy.contact')}</Text>
       </ScrollView>
     </SafeAreaView>
   );

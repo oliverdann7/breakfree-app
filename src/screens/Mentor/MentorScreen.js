@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   View,
   Text,
@@ -24,6 +25,7 @@ import Card from '../../components/common/Card';
 import { colors } from '../../constants/designTokens';
 
 export default function MentorScreen({ navigation }) {
+  const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state.auth);
   const { assignment, mentorProfile, latestMessage, goals, focusTitle, nextSession } =
@@ -61,7 +63,7 @@ export default function MentorScreen({ navigation }) {
   };
 
   const handleAction = (label) => {
-    if (label === 'Sohbet') {
+    if (label === t('mentor.chat')) {
       setChatVisible(true);
       return;
     }
@@ -92,7 +94,7 @@ export default function MentorScreen({ navigation }) {
               <View style={styles.onlineBadge} />
             </View>
             <View style={styles.mentorInfo}>
-              <Text style={styles.mentorLabel}>Mentörün</Text>
+              <Text style={styles.mentorLabel}>{t('mentor.yourMentor')}</Text>
               <Text style={styles.mentorName}>{profile.name}</Text>
               <Text style={styles.mentorRole}>{profile.role}</Text>
             </View>
@@ -102,9 +104,9 @@ export default function MentorScreen({ navigation }) {
         {/* Quick Actions */}
         <View style={styles.quickActions}>
           {[
-            { label: 'Sohbet', icon: '💬' },
-            { label: 'Görüşme', icon: '📹' },
-            { label: 'Planla', icon: '📅' },
+            { label: t('mentor.chat'), icon: '💬' },
+            { label: t('mentor.session'), icon: '📹' },
+            { label: t('mentor.schedule'), icon: '📅' },
           ].map((action, i) => (
             <TouchableOpacity
               key={i}
@@ -121,7 +123,7 @@ export default function MentorScreen({ navigation }) {
         <Card style={styles.focusCard}>
           <View style={styles.focusHeader}>
             <Text style={styles.focusIcon}>🎯</Text>
-            <Text style={styles.focusTitle}>Bu hafta odak</Text>
+            <Text style={styles.focusTitle}>{t('mentor.weeklyFocus')}</Text>
           </View>
           <Text style={styles.focusGoal}>
             {focusTitle || 'Akşam rutini ve '}
@@ -161,7 +163,7 @@ export default function MentorScreen({ navigation }) {
         {latestMessage && (
           <Card style={styles.messageCard}>
             <View style={styles.messageHeader}>
-              <Text style={styles.messageLabel}>Son mesaj</Text>
+              <Text style={styles.messageLabel}>{t('mentor.lastMessage')}</Text>
               <Text style={styles.messageTime}>{latestMessage.timeAgo}</Text>
             </View>
             <View style={styles.messageBubble}>
@@ -203,7 +205,7 @@ export default function MentorScreen({ navigation }) {
             style={styles.modalSheet}
           >
             <View style={styles.modalHandle} />
-            <Text style={styles.modalTitle}>{profile.name} ile Sohbet</Text>
+            <Text style={styles.modalTitle}>{t('mentor.chatWith', { name: profile.name })}</Text>
 
             <ScrollView style={styles.chatArea} showsVerticalScrollIndicator={false}>
               {latestMessage && (
@@ -224,7 +226,7 @@ export default function MentorScreen({ navigation }) {
                 style={styles.chatInput}
                 value={messageText}
                 onChangeText={setMessageText}
-                placeholder="Mesaj yaz..."
+                placeholder={t('mentor.messagePlaceholder')}
                 placeholderTextColor="rgba(255,255,255,0.3)"
                 multiline
               />
@@ -238,7 +240,7 @@ export default function MentorScreen({ navigation }) {
             </View>
 
             <TouchableOpacity style={styles.closeChatBtn} onPress={() => setChatVisible(false)}>
-              <Text style={styles.closeChatText}>Kapat</Text>
+              <Text style={styles.closeChatText}>{t('mentor.close')}</Text>
             </TouchableOpacity>
           </KeyboardAvoidingView>
         </View>

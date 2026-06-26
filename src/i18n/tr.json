@@ -58,7 +58,15 @@
     "passwordResetSendError": "Bağlantı gönderilemedi.",
     "noEmailError": "Hesap e-postası bulunamadı.",
     "or": "veya",
-    "error": "Hata"
+    "error": "Hata",
+    "forgotPasswordTitle": "Şifreni Sıfırla",
+    "forgotPasswordDesc": "E-posta adresini gir, sıfırlama bağlantısı gönderelim.",
+    "forgotPasswordBtn": "Sıfırlama Gönder",
+    "forgotPasswordSentTitle": "E-posta gönderildi!",
+    "forgotPasswordSentDesc": "{{email}} adresine sıfırlama bağlantısı gönderdik. Gelen kutunu kontrol et.",
+    "backToLogin": "Giriş Ekranına Dön",
+    "noFirebase": "Firebase yapılandırılmamış. Lütfen .env.local dosyasını ayarlayın.",
+    "sendError": "Bir hata oluştu. Tekrar deneyin."
   },
   "onboarding": {
     "welcome": "BreakFree'ye\nHoş Geldin!",
@@ -117,7 +125,24 @@
       "health": "Sağlık",
       "movement": "Hareket",
       "nutrition": "Beslenme"
-    }
+    },
+    "subtitle": "Türkiye'nin en güçlü zihinleri",
+    "empty": "Henüz palestra yok",
+    "emptySub": "İlk palestrayı ekleyerek topluluğa öncülük et!",
+    "loadSeed": "Örnek Palestraları Yükle",
+    "listenNow": "Şimdi dinle",
+    "past": "Geçmiş Palestralar",
+    "joinedTitle": "Katıldın!",
+    "joinedMsg": "{{title}} talk'ına başarıyla katıldın.",
+    "reminderTitle": "Hatırlatıcı Kuruldu",
+    "reminderMsg": "{{title}} başladığında sana haber vereceğiz.",
+    "recordingTitle": "Kayıt",
+    "recordingMsg": "Bu talk kaydı yakında eklenecek.",
+    "savedTitle": "Kaydedildi",
+    "savedMsg": "Talk kaydedildi.",
+    "sharedMsg": "Paylaşma bağlantısı kopyalandı.",
+    "liveBadge": "Canlı",
+    "listenersLabel": "{{count}} dinleyici"
   },
   "health": {
     "title": "Sağlık Metrikleri",
@@ -141,7 +166,48 @@
       "bpm": "bpm",
       "steps": "adım",
       "kcal": "kcal"
-    }
+    },
+    "addRecord": "+ Kaydet",
+    "wellnessScore": "Wellness skoru",
+    "weeklyAvg": "Haftalık ort.",
+    "noData": "Veri yok — bugün kayıt yap",
+    "noRecord": "Henüz kayıt yok",
+    "sleepQuality": "Uyku kalitesi",
+    "movement": "Hareket",
+    "heartRate": "Nabız",
+    "water": "Su",
+    "mood": "Ruh hali",
+    "detailedAnalysis": "Detaylı analiz",
+    "myHealthData": "Sağlık verilerin",
+    "stepsK": "{{count}}k adım",
+    "bpmResting": "{{bpm}} bpm dinlenme",
+    "cups": "{{count}} bardak",
+    "kcalLabel": "{{count}} kal",
+    "sleepGoodHours": "İyi · {{hours}}s",
+    "recordFailed": "Kayıt başarısız.",
+    "enterAtLeastOne": "En az bir değer girin.",
+    "loginRequired": "Giriş yapman gerekiyor.",
+    "saving": "Kaydediliyor...",
+    "saveToday": "Bugünü Kaydet",
+    "moodQuestion": "🧠 Ruh halin nasıl?",
+    "sleepHoursLabel": "😴 Uyku (saat)",
+    "stepsLabel": "👟 Adım sayısı",
+    "heartRateLabel": "❤️ Nabız (bpm)",
+    "caloriesLabel": "🔥 Kalori",
+    "waterLabel": "💧 Su (bardak)",
+    "sleepGood": "İyi",
+    "sleepFair": "Orta",
+    "sleepPoor": "Kötü",
+    "moodVeryBad": "Çok kötü",
+    "moodBad": "Kötü",
+    "moodOk": "İdare eder",
+    "moodGood": "İyi",
+    "moodGreat": "Harika",
+    "phSleep": "ör. 7.5",
+    "phSteps": "ör. 8500",
+    "phHr": "ör. 65",
+    "phCal": "ör. 1800",
+    "phWater": "ör. 8"
   },
   "community": {
     "title": "Topluluk",
@@ -207,7 +273,9 @@
     "statRecord": "Rekor",
     "statPoints": "Puan",
     "version": "BreakFree v1.0.0",
-    "logoutTitle": "Çıkış Yap"
+    "logoutTitle": "Çıkış Yap",
+    "nameRequired": "Ad Soyad zorunlu",
+    "saveError": "Profil kaydedilemedi, tekrar deneyin."
   },
   "goals": {
     "sleep": "Uyku",
@@ -222,14 +290,18 @@
     "headline": "Wellness yolculuğunu hızlandır",
     "subhead": "Gelişmiş analiz, mentor seansları ve reklamsız deneyim.",
     "trial": "7 gün ücretsiz dene · İstediğin zaman iptal et",
-    "subscribe": "ile başla",
+    "subscribe": "{{plan}} ile başla",
     "submitting": "İşleniyor...",
     "fineprint": "Ödeme Apple/Google hesabınızdan tahsil edilir. Abonelik otomatik yenilenir; istediğin zaman ayarlardan iptal edebilirsin.",
     "active": "Pro aboneliğin aktif",
     "renewal": "Yenileme",
     "cancel": "İptal et",
     "monthly": "Aylık",
-    "annual": "Yıllık"
+    "annual": "Yıllık",
+    "subscriptionAlert": "Abonelik",
+    "bestValue": "EN İYİ DEĞERİ",
+    "activeEmoji": "✨ Pro aboneliğin aktif",
+    "renewalLabel": "Yenileme:"
   },
   "challenges": {
     "title": "Meydan Okumalar",
@@ -242,12 +314,22 @@
     "join": "Katıl",
     "completed": "tamamlandı",
     "badges": "Rozetlerin",
-    "participants": "katılımcı"
+    "participants": "katılımcı",
+    "default": "Meydan Okuma",
+    "progress": "%{{percent}} tamamlandı",
+    "participantCount": "{{count}} katılımcı",
+    "activeCount": "{{count}} aktif",
+    "goalComplete": "Hedefini tamamla.",
+    "joinBtn": "Katıl →"
   },
   "leaderboard": {
     "title": "Lider Tablosu",
     "rank": "Sıralama",
-    "you": "Sen"
+    "you": "Sen",
+    "error": "Lider tablosu yüklenemedi.",
+    "titleLabel": "LİDER TABLOSU",
+    "noRanking": "Henüz sıralama yok. Meydan okumaya katıl ve ilk sen ol!",
+    "challenge": "Meydan Okuma"
   },
   "mentor": {
     "directory": "Mentörler",
@@ -264,7 +346,17 @@
     "booking": "Rezerve ediliyor...",
     "bookedTitle": "Seans rezerve edildi",
     "noSlots": "Şu anda müsait zaman yok.",
-    "yearsExperience": "deneyim"
+    "yearsExperience": "deneyim",
+    "yourMentor": "Mentörün",
+    "weeklyFocus": "Bu hafta odak",
+    "chat": "Sohbet",
+    "session": "Görüşme",
+    "schedule": "Planla",
+    "lastMessage": "Son mesaj",
+    "chatWith": "{{name}} ile Sohbet",
+    "messagePlaceholder": "Mesaj yaz...",
+    "close": "Kapat",
+    "hostLabel": "Konuşmacı"
   },
   "privacy": {
     "title": "Gizlilik & Veriler",
@@ -285,13 +377,16 @@
   },
   "notifications": {
     "title": "Bildirimler",
-    "unread": "okunmamış",
+    "unread": "{{count}} okunmamış",
     "allRead": "Tümü okundu",
     "markAll": "Tümünü okundu",
     "empty": "Bildirim yok",
     "emptyDesc": "Yeni talk'lar, meydan okumalar ve mentor güncellemeleri burada görünür.",
     "now": "şimdi",
-    "ago": "önce"
+    "ago": "önce",
+    "mins": "{{count}}dk",
+    "hours": "{{count}}sa",
+    "days": "{{count}}g"
   },
   "landing": {
     "heroSubtitle": "Türkiye'nin en dinamik wellness topluluğuyla birleşin",
@@ -340,5 +435,28 @@
     "goalsLabel": "Hedef Başarısı",
     "ratingNumber": "4.8★",
     "ratingLabel": "Kullanıcı Puanı"
+  },
+  "video": {
+    "proTitle": "Pro içerik",
+    "proDesc": "Bu videoyu izlemek için BreakFree Pro gerekli.",
+    "proUpgrade": "Pro'ya geç",
+    "notLoaded": "Video henüz yüklenmedi",
+    "relatedVideos": "İlgili videolar"
+  },
+  "devices": {
+    "title": "Cihazları Yönet",
+    "subtitleSome": "{{count}} cihaz bağlı",
+    "subtitleNone": "Bağlı cihaz yok",
+    "desc": "Sağlık verilerini otomatik senkronize etmek için bir kaynak bağla. Uyku, adım, kalp atışı ve daha fazlası wellness skorunu besler.",
+    "syncing": "Senkronize ediliyor…",
+    "connected": "Bağlı",
+    "disconnected": "Bağlı değil",
+    "remove": "Kaldır",
+    "connect": "Bağla",
+    "syncNow": "şimdi senkronize edildi",
+    "syncMins": "{{count}}dk önce senkronize edildi",
+    "syncHours": "{{count}}sa önce senkronize edildi",
+    "syncDays": "{{count}}g önce senkronize edildi",
+    "privacyNote": "Verilerin cihazından güvenli şekilde alınır ve yalnızca senin wellness skorun için kullanılır. İstediğin zaman bağlantıyı kaldırabilirsin."
   }
 }

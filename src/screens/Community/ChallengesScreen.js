@@ -8,6 +8,7 @@ import {
   SafeAreaView,
   ActivityIndicator,
 } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { fetchActiveChallenges, joinChallenge } from '../../store/slices/challengesSlice';
 import { BADGES, evaluateBadges } from '../../utils/badges';
@@ -15,6 +16,7 @@ import Card from '../../components/common/Card';
 import { colors } from '../../constants/designTokens';
 
 function ChallengeCard({ challenge, joined, progress, onJoin, onOpen }) {
+  const { t } = useTranslation();
   const daysLeft = Math.ceil((challenge.endDate - Date.now()) / 86_400_000);
   return (
     <Card style={styles.card}>
@@ -22,25 +24,29 @@ function ChallengeCard({ challenge, joined, progress, onJoin, onOpen }) {
         <View style={styles.cardHead}>
           <Text style={styles.cardIcon}>{challenge.icon || '🏆'}</Text>
           <View style={{ flex: 1 }}>
-            <Text style={styles.cardTitle}>{challenge.title || 'Meydan Okuma'}</Text>
+            <Text style={styles.cardTitle}>{challenge.title || t('challenges.default')}</Text>
             <Text style={styles.cardMeta}>
-              {challenge.participantCount || 0} katılımcı ·{' '}
-              {daysLeft > 0 ? `${daysLeft}g kaldı` : 'Son gün'}
+              {t('challenges.participantCount', { count: challenge.participantCount || 0 })} ·{' '}
+              {daysLeft > 0
+                ? t('challenges.daysLeft', { count: daysLeft })
+                : t('challenges.lastDay')}
             </Text>
           </View>
         </View>
-        <Text style={styles.cardDesc}>{challenge.description || 'Hedefini tamamla.'}</Text>
+        <Text style={styles.cardDesc}>{challenge.description || t('challenges.goalComplete')}</Text>
 
         {joined ? (
           <>
             <View style={styles.bar}>
               <View style={[styles.barFill, { width: `${Math.min(100, progress)}%` }]} />
             </View>
-            <Text style={styles.progressText}>%{Math.round(progress)} tamamlandı</Text>
+            <Text style={styles.progressText}>
+              {t('challenges.progress', { percent: Math.round(progress) })}
+            </Text>
           </>
         ) : (
           <TouchableOpacity onPress={onJoin} style={styles.joinBtn}>
-            <Text style={styles.joinBtnText}>Katıl →</Text>
+            <Text style={styles.joinBtnText}>{t('challenges.joinBtn')}</Text>
           </TouchableOpacity>
         )}
       </TouchableOpacity>
@@ -58,6 +64,7 @@ function BadgeChip({ badge, owned }) {
 }
 
 export default function ChallengesScreen({ navigation }) {
+  const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((s) => s.auth);
   const { challenges, userParticipation, loading } = useAppSelector((s) => s.challenges);
@@ -85,8 +92,10 @@ export default function ChallengesScreen({ navigation }) {
             </TouchableOpacity>
           )}
           <View style={{ flex: 1 }}>
-            <Text style={styles.title}>Meydan Okumalar</Text>
-            <Text style={styles.subtitle}>Topluluk · {challenges.length} aktif</Text>
+            <Text style={styles.title}>{t('challenges.title')}</Text>
+            <Text style={styles.subtitle}>
+              {t('community.title')} · {t('challenges.activeCount', { count: challenges.length })}
+            </Text>
           </View>
         </View>
 
@@ -94,8 +103,8 @@ export default function ChallengesScreen({ navigation }) {
           <ActivityIndicator color={colors.cyan} style={{ marginTop: 40 }} />
         ) : challenges.length === 0 ? (
           <Card style={styles.empty}>
-            <Text style={styles.emptyText}>Şu anda aktif bir meydan okuma yok.</Text>
-            <Text style={styles.emptySub}>Yeni meydan okumalar yakında geliyor.</Text>
+            <Text style={styles.emptyText}>{t('challenges.empty')}</Text>
+            <Text style={styles.emptySub}>{t('challenges.emptySub')}</Text>
           </Card>
         ) : (
           challenges.map((c) => {
@@ -116,7 +125,7 @@ export default function ChallengesScreen({ navigation }) {
           })
         )}
 
-        <Text style={styles.sectionTitle}>Rozetlerin</Text>
+        <Text style={styles.sectionTitle}>{t('challenges.badges')}</Text>
         <View style={styles.badgeGrid}>
           {BADGES.map((b) => (
             <BadgeChip key={b.id} badge={b} owned={ownedBadgeIds.includes(b.id)} />

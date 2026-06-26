@@ -12,6 +12,7 @@ import {
   Platform,
   Alert,
 } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { fetchMetrics, logMetric } from '../../store/slices/metricsSlice';
 import Card from '../../components/common/Card';
@@ -19,17 +20,18 @@ import MetricCard from '../../components/features/MetricCard';
 import { colors } from '../../constants/designTokens';
 import { scoreDailyEntry } from '../../utils/wellnessScore';
 
-// 1-10 mood self-report mapped to five faces (per wellness algorithm §2.1)
+// Mood ratings are fixed numeric values; labels are resolved via t() at render time.
 const MOOD_OPTIONS = [
-  { emoji: '😞', rating: 2, label: 'Çok kötü' },
-  { emoji: '🙁', rating: 4, label: 'Kötü' },
-  { emoji: '😐', rating: 6, label: 'İdare eder' },
-  { emoji: '🙂', rating: 8, label: 'İyi' },
-  { emoji: '😄', rating: 10, label: 'Harika' },
+  { emoji: '😞', rating: 2, labelKey: 'health.moodVeryBad' },
+  { emoji: '🙁', rating: 4, labelKey: 'health.moodBad' },
+  { emoji: '😐', rating: 6, labelKey: 'health.moodOk' },
+  { emoji: '🙂', rating: 8, labelKey: 'health.moodGood' },
+  { emoji: '😄', rating: 10, labelKey: 'health.moodGreat' },
 ];
 const ML_PER_CUP = 250;
 
 export default function HealthMetricsScreen() {
+  const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const { dailyMetrics, weeklyData, wellnessScore } = useAppSelector((state) => state.metrics);
   const { user } = useAppSelector((state) => state.auth);
@@ -49,7 +51,7 @@ export default function HealthMetricsScreen() {
 
   const handleLog = async () => {
     if (!user?.uid) {
-      Alert.alert('Hata', 'Giriş yapman gerekiyor.');
+      Alert.alert(t('common.error'), t('health.loginRequired'));
       return;
     }
     setSaving(true);
@@ -61,14 +63,22 @@ export default function HealthMetricsScreen() {
       const cups = parseFloat(hydrationCups);
       const data = {};
       if (!isNaN(sh) && sh > 0)
-        data.sleep = { hours: sh, quality: sh >= 7 ? 'İyi' : sh >= 5 ? 'Orta' : 'Kötü' };
+        data.sleep = {
+          hours: sh,
+          quality:
+            sh >= 7
+              ? t('health.sleepGood')
+              : sh >= 5
+                ? t('health.sleepFair')
+                : t('health.sleepPoor'),
+        };
       if (!isNaN(st) && st > 0) data.steps = st;
       if (!isNaN(hr) && hr > 0) data.heartRate = hr;
       if (!isNaN(cal) && cal > 0) data.calories = cal;
       if (!isNaN(cups) && cups > 0) data.hydration = Math.round(cups * ML_PER_CUP);
       if (mood != null) data.mood = mood;
       if (Object.keys(data).length === 0) {
-        Alert.alert('Hata', 'En az bir değer girin.');
+        Alert.alert(t('common.error'), t('health.enterAtLeastOne'));
         return;
       }
 
@@ -85,7 +95,7 @@ export default function HealthMetricsScreen() {
       setMood(null);
       setLogVisible(false);
     } catch (e) {
-      Alert.alert('Hata', e.message || 'Kayıt başarısız.');
+      Alert.alert(t('common.error'), e.message || t('health.recordFailed'));
     } finally {
       setSaving(false);
     }
@@ -99,48 +109,53 @@ export default function HealthMetricsScreen() {
       : 0;
 
   const moodFace = dm?.mood != null ? MOOD_OPTIONS.find((m) => m.rating >= dm.mood) : null;
+  const noRecord = t('health.noRecord');
   const breakdown = [
     {
       emoji: '😴',
-      label: 'Uyku kalitesi',
+      label: t('health.sleepQuality'),
       value: dm?.sleep?.hours ? Math.min(100, Math.round((dm.sleep.hours / 8) * 100)) : null,
       color: colors.cyan,
-      sub: dm?.sleep ? `${dm.sleep.quality} · ${dm.sleep.hours}s` : 'Henüz kayıt yok',
+      sub: dm?.sleep
+        ? `${dm.sleep.quality} · ${dm.sleep.hours}${t('health.sleepGoodHours')}`
+        : noRecord,
     },
     {
       emoji: '👟',
-      label: 'Hareket',
+      label: t('health.movement'),
       value: dm?.steps ? Math.min(100, Math.round((dm.steps / 10000) * 100)) : null,
       color: colors.gold,
-      sub: dm?.steps ? `${(dm.steps / 1000).toFixed(1)}k adım` : 'Henüz kayıt yok',
+      sub: dm?.steps ? `${(dm.steps / 1000).toFixed(1)}${t('health.stepsK')}` : noRecord,
     },
     {
       emoji: '❤️',
-      label: 'Nabız',
+      label: t('health.heartRate'),
       value: dm?.heartRate ? Math.min(100, Math.round(((200 - dm.heartRate) / 120) * 100)) : null,
       color: colors.royal,
-      sub: dm?.heartRate ? `${dm.heartRate} bpm dinlenme` : 'Henüz kayıt yok',
+      sub: dm?.heartRate ? `${dm.heartRate} ${t('health.bpmResting')}` : noRecord,
     },
     {
       emoji: '💧',
-      label: 'Su',
+      label: t('health.water'),
       value: dm?.hydration ? Math.min(100, Math.round((dm.hydration / 2000) * 100)) : null,
       color: colors.cyan,
-      sub: dm?.hydration ? `${(dm.hydration / ML_PER_CUP).toFixed(0)} bardak` : 'Henüz kayıt yok',
+      sub: dm?.hydration
+        ? `${(dm.hydration / ML_PER_CUP).toFixed(0)} ${t('health.cups')}`
+        : noRecord,
     },
     {
       emoji: moodFace?.emoji || '🙂',
-      label: 'Ruh hali',
+      label: t('health.mood'),
       value: dm?.mood != null ? Math.min(100, dm.mood * 10) : null,
       color: colors.gold,
-      sub: moodFace ? moodFace.label : 'Henüz kayıt yok',
+      sub: moodFace ? t(moodFace.labelKey) : noRecord,
     },
     {
       emoji: '🔥',
-      label: 'Kalori',
+      label: t('health.kcalLabel'),
       value: dm?.calories ? Math.min(100, Math.round((dm.calories / 2500) * 100)) : null,
       color: colors.gold,
-      sub: dm?.calories ? `${dm.calories.toLocaleString()} kal` : 'Henüz kayıt yok',
+      sub: dm?.calories ? `${dm.calories.toLocaleString()} ${t('health.kcalLabel')}` : noRecord,
     },
   ];
 
@@ -150,13 +165,11 @@ export default function HealthMetricsScreen() {
         {/* Header */}
         <View style={styles.header}>
           <View>
-            <Text style={styles.headerLabel}>Detaylı analiz</Text>
-            <Text style={styles.headerTitle}>
-              Sağlık <Text style={styles.headerAccent}>verilerin</Text>
-            </Text>
+            <Text style={styles.headerLabel}>{t('health.detailedAnalysis')}</Text>
+            <Text style={styles.headerTitle}>{t('health.myHealthData')}</Text>
           </View>
           <TouchableOpacity style={styles.logBtn} onPress={() => setLogVisible(true)}>
-            <Text style={styles.logBtnText}>+ Kaydet</Text>
+            <Text style={styles.logBtnText}>{t('health.addRecord')}</Text>
           </TouchableOpacity>
         </View>
 
@@ -164,7 +177,7 @@ export default function HealthMetricsScreen() {
         <Card style={styles.chartCard}>
           <View style={styles.chartHeader}>
             <View>
-              <Text style={styles.chartLabel}>Wellness skoru</Text>
+              <Text style={styles.chartLabel}>{t('health.wellnessScore')}</Text>
               <View style={styles.chartValue}>
                 <Text style={styles.chartBigValue}>{score || '—'}</Text>
                 {weekAvg > 0 && score > 0 && (
@@ -176,7 +189,7 @@ export default function HealthMetricsScreen() {
             </View>
             {weekAvg > 0 && (
               <View style={styles.chartAverage}>
-                <Text style={styles.chartAvgLabel}>Haftalık ort.</Text>
+                <Text style={styles.chartAvgLabel}>{t('health.weeklyAvg')}</Text>
                 <Text style={styles.chartAvgValue}>{weekAvg}</Text>
               </View>
             )}
@@ -201,7 +214,7 @@ export default function HealthMetricsScreen() {
             </View>
           ) : (
             <View style={styles.emptyChart}>
-              <Text style={styles.emptyChartText}>Veri yok — bugün kayıt yap</Text>
+              <Text style={styles.emptyChartText}>{t('health.noData')}</Text>
             </View>
           )}
         </Card>
@@ -233,10 +246,10 @@ export default function HealthMetricsScreen() {
             style={styles.modalSheet}
           >
             <View style={styles.modalHandle} />
-            <Text style={styles.modalTitle}>Bugünü Kaydet</Text>
+            <Text style={styles.modalTitle}>{t('health.saveToday')}</Text>
 
             <View style={styles.logField}>
-              <Text style={styles.logFieldLabel}>🧠 Ruh halin nasıl?</Text>
+              <Text style={styles.logFieldLabel}>{t('health.moodQuestion')}</Text>
               <View style={styles.moodRow}>
                 {MOOD_OPTIONS.map((m) => {
                   const active = mood === m.rating;
@@ -246,7 +259,7 @@ export default function HealthMetricsScreen() {
                       style={[styles.moodOption, active && styles.moodOptionActive]}
                       onPress={() => setMood(active ? null : m.rating)}
                       accessibilityRole="button"
-                      accessibilityLabel={m.label}
+                      accessibilityLabel={t(m.labelKey)}
                       accessibilityState={{ selected: active }}
                     >
                       <Text style={styles.moodEmoji}>{m.emoji}</Text>
@@ -258,24 +271,34 @@ export default function HealthMetricsScreen() {
 
             {[
               {
-                label: '😴 Uyku (saat)',
+                label: t('health.sleepHoursLabel'),
                 value: sleepHours,
                 set: setSleepHours,
-                placeholder: 'ör. 7.5',
+                placeholder: t('health.phSleep'),
               },
-              { label: '👟 Adım sayısı', value: steps, set: setSteps, placeholder: 'ör. 8500' },
               {
-                label: '❤️ Nabız (bpm)',
+                label: t('health.stepsLabel'),
+                value: steps,
+                set: setSteps,
+                placeholder: t('health.phSteps'),
+              },
+              {
+                label: t('health.heartRateLabel'),
                 value: heartRate,
                 set: setHeartRate,
-                placeholder: 'ör. 65',
+                placeholder: t('health.phHr'),
               },
-              { label: '🔥 Kalori', value: calories, set: setCalories, placeholder: 'ör. 1800' },
               {
-                label: '💧 Su (bardak)',
+                label: t('health.caloriesLabel'),
+                value: calories,
+                set: setCalories,
+                placeholder: t('health.phCal'),
+              },
+              {
+                label: t('health.waterLabel'),
                 value: hydrationCups,
                 set: setHydrationCups,
-                placeholder: 'ör. 8',
+                placeholder: t('health.phWater'),
               },
             ].map(({ label, value, set, placeholder }) => (
               <View key={label} style={styles.logField}>
@@ -297,10 +320,12 @@ export default function HealthMetricsScreen() {
                 onPress={handleLog}
                 disabled={saving}
               >
-                <Text style={styles.saveBtnText}>{saving ? 'Kaydediliyor...' : 'Kaydet'}</Text>
+                <Text style={styles.saveBtnText}>
+                  {saving ? t('health.saving') : t('common.save')}
+                </Text>
               </TouchableOpacity>
               <TouchableOpacity style={styles.cancelBtn} onPress={() => setLogVisible(false)}>
-                <Text style={styles.cancelBtnText}>İptal</Text>
+                <Text style={styles.cancelBtnText}>{t('common.cancel')}</Text>
               </TouchableOpacity>
             </View>
             <View style={{ height: 24 }} />

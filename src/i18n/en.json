@@ -58,7 +58,15 @@
     "passwordResetSendError": "Failed to send link.",
     "noEmailError": "Account email not found.",
     "or": "or",
-    "error": "Error"
+    "error": "Error",
+    "forgotPasswordTitle": "Reset Password",
+    "forgotPasswordDesc": "Enter your email and we will send a reset link.",
+    "forgotPasswordBtn": "Send Reset Link",
+    "forgotPasswordSentTitle": "Email Sent!",
+    "forgotPasswordSentDesc": "We sent a reset link to {{email}}. Check your inbox.",
+    "backToLogin": "Back to Login",
+    "noFirebase": "Firebase not configured. Please set up .env.local.",
+    "sendError": "An error occurred. Please try again."
   },
   "onboarding": {
     "welcome": "Welcome to\nBreakFree!",
@@ -117,7 +125,24 @@
       "health": "Health",
       "movement": "Movement",
       "nutrition": "Nutrition"
-    }
+    },
+    "subtitle": "Turkey's most powerful minds",
+    "empty": "No talks yet",
+    "emptySub": "Be the first to seed a talk and lead the community!",
+    "loadSeed": "Load Sample Talks",
+    "listenNow": "Listen Now",
+    "past": "Past Talks",
+    "joinedTitle": "Joined!",
+    "joinedMsg": "You have successfully joined {{title}}.",
+    "reminderTitle": "Reminder Set",
+    "reminderMsg": "We'll notify you when {{title}} starts.",
+    "recordingTitle": "Recording",
+    "recordingMsg": "The recording for this talk will be added soon.",
+    "savedTitle": "Saved",
+    "savedMsg": "Talk saved.",
+    "sharedMsg": "Share link copied.",
+    "liveBadge": "Live",
+    "listenersLabel": "{{count}} listeners"
   },
   "health": {
     "title": "Health Metrics",
@@ -141,7 +166,48 @@
       "bpm": "bpm",
       "steps": "steps",
       "kcal": "kcal"
-    }
+    },
+    "addRecord": "+ Log",
+    "wellnessScore": "Wellness score",
+    "weeklyAvg": "Weekly avg.",
+    "noData": "No data — log today",
+    "noRecord": "No record yet",
+    "sleepQuality": "Sleep quality",
+    "movement": "Movement",
+    "heartRate": "Heart Rate",
+    "water": "Water",
+    "mood": "Mood",
+    "detailedAnalysis": "Detailed analysis",
+    "myHealthData": "My health data",
+    "stepsK": "{{count}}k steps",
+    "bpmResting": "{{bpm}} bpm resting",
+    "cups": "{{count}} cups",
+    "kcalLabel": "{{count}} kcal",
+    "sleepGoodHours": "Good · {{hours}}h",
+    "recordFailed": "Save failed.",
+    "enterAtLeastOne": "Enter at least one value.",
+    "loginRequired": "You need to be logged in.",
+    "saving": "Saving...",
+    "saveToday": "Save Today",
+    "moodQuestion": "🧠 How is your mood?",
+    "sleepHoursLabel": "😴 Sleep (hours)",
+    "stepsLabel": "👟 Step count",
+    "heartRateLabel": "❤️ Heart rate (bpm)",
+    "caloriesLabel": "🔥 Calories",
+    "waterLabel": "💧 Water (cups)",
+    "sleepGood": "Good",
+    "sleepFair": "Fair",
+    "sleepPoor": "Poor",
+    "moodVeryBad": "Very bad",
+    "moodBad": "Bad",
+    "moodOk": "Okay",
+    "moodGood": "Good",
+    "moodGreat": "Great",
+    "phSleep": "e.g. 7.5",
+    "phSteps": "e.g. 8500",
+    "phHr": "e.g. 65",
+    "phCal": "e.g. 1800",
+    "phWater": "e.g. 8"
   },
   "community": {
     "title": "Community",
@@ -207,7 +273,9 @@
     "statRecord": "Record",
     "statPoints": "Points",
     "version": "BreakFree v1.0.0",
-    "logoutTitle": "Log Out"
+    "logoutTitle": "Log Out",
+    "nameRequired": "Full name is required",
+    "saveError": "Could not save profile, please try again."
   },
   "goals": {
     "sleep": "Sleep",
@@ -222,14 +290,18 @@
     "headline": "Accelerate your wellness journey",
     "subhead": "Advanced analytics, mentor sessions, and ad-free experience.",
     "trial": "7-day free trial · Cancel anytime",
-    "subscribe": "Start with",
+    "subscribe": "Start with {{plan}}",
     "submitting": "Processing...",
     "fineprint": "Payment is charged via your Apple/Google account. Subscription auto-renews; cancel anytime in settings.",
     "active": "Your Pro subscription is active",
     "renewal": "Renews",
     "cancel": "Cancel",
     "monthly": "Monthly",
-    "annual": "Annual"
+    "annual": "Annual",
+    "subscriptionAlert": "Subscription",
+    "bestValue": "BEST VALUE",
+    "activeEmoji": "✨ Your Pro subscription is active",
+    "renewalLabel": "Renewal:"
   },
   "challenges": {
     "title": "Challenges",
@@ -242,12 +314,22 @@
     "join": "Join",
     "completed": "complete",
     "badges": "Your badges",
-    "participants": "participants"
+    "participants": "participants",
+    "default": "Challenge",
+    "progress": "{{percent}}% completed",
+    "participantCount": "{{count}} participants",
+    "activeCount": "{{count}} active",
+    "goalComplete": "Complete your goal.",
+    "joinBtn": "Join →"
   },
   "leaderboard": {
     "title": "Leaderboard",
     "rank": "Rank",
-    "you": "You"
+    "you": "You",
+    "error": "Could not load leaderboard.",
+    "titleLabel": "LEADERBOARD",
+    "noRanking": "No ranking yet. Join a challenge and be the first!",
+    "challenge": "Challenge"
   },
   "mentor": {
     "directory": "Mentors",
@@ -264,7 +346,17 @@
     "booking": "Booking...",
     "bookedTitle": "Session booked",
     "noSlots": "No availability right now.",
-    "yearsExperience": "experience"
+    "yearsExperience": "experience",
+    "yourMentor": "Your Mentor",
+    "weeklyFocus": "This week focus",
+    "chat": "Chat",
+    "session": "Session",
+    "schedule": "Schedule",
+    "lastMessage": "Last message",
+    "chatWith": "Chat with {{name}}",
+    "messagePlaceholder": "Write a message...",
+    "close": "Close",
+    "hostLabel": "Host"
   },
   "privacy": {
     "title": "Privacy & Data",
@@ -285,13 +377,16 @@
   },
   "notifications": {
     "title": "Notifications",
-    "unread": "unread",
+    "unread": "{{count}} unread",
     "allRead": "All read",
     "markAll": "Mark all read",
     "empty": "No notifications",
     "emptyDesc": "New talks, challenges, and mentor updates appear here.",
     "now": "now",
-    "ago": "ago"
+    "ago": "ago",
+    "mins": "{{count}}m",
+    "hours": "{{count}}h",
+    "days": "{{count}}d"
   },
   "landing": {
     "heroSubtitle": "Join Turkey's most dynamic wellness community",
@@ -340,5 +435,28 @@
     "goalsLabel": "Goals Achieved",
     "ratingNumber": "4.8★",
     "ratingLabel": "User Rating"
+  },
+  "video": {
+    "proTitle": "Pro Content",
+    "proDesc": "BreakFree Pro is required to watch this video.",
+    "proUpgrade": "Upgrade to Pro",
+    "notLoaded": "Video not yet loaded",
+    "relatedVideos": "Related videos"
+  },
+  "devices": {
+    "title": "Manage Devices",
+    "subtitleSome": "{{count}} device connected",
+    "subtitleNone": "No connected devices",
+    "desc": "Connect a source to automatically sync health data. Sleep, steps, heart rate and more feed your wellness score.",
+    "syncing": "Syncing…",
+    "connected": "Connected",
+    "disconnected": "Disconnected",
+    "remove": "Remove",
+    "connect": "Connect",
+    "syncNow": "synced just now",
+    "syncMins": "synced {{count}}m ago",
+    "syncHours": "synced {{count}}h ago",
+    "syncDays": "synced {{count}}d ago",
+    "privacyNote": "Your data is securely retrieved from the device and used only for your wellness score. You can disconnect at any time."
   }
 }

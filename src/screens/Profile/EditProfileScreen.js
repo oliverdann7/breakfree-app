@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   View,
   Text,
@@ -28,16 +29,18 @@ const AVATAR_COLORS = [
   '#06B6D4',
 ];
 
-const GOALS_LIST = [
-  { id: 'sleep', label: 'Uyku', emoji: '😴' },
-  { id: 'fitness', label: 'Fitness', emoji: '💪' },
-  { id: 'mindfulness', label: 'Zihin', emoji: '🧘' },
-  { id: 'nutrition', label: 'Beslenme', emoji: '🥗' },
-  { id: 'community', label: 'Topluluk', emoji: '🤝' },
-  { id: 'stress', label: 'Stres', emoji: '🌿' },
-];
+const GOAL_IDS = ['sleep', 'fitness', 'mindfulness', 'nutrition', 'community', 'stress'];
+const GOAL_EMOJIS = {
+  sleep: '😴',
+  fitness: '💪',
+  mindfulness: '🧘',
+  nutrition: '🥗',
+  community: '🤝',
+  stress: '🌿',
+};
 
 export default function EditProfileScreen({ navigation }) {
+  const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const { profile } = useAppSelector((state) => state.user);
   const { user } = useAppSelector((state) => state.auth);
@@ -65,7 +68,7 @@ export default function EditProfileScreen({ navigation }) {
 
   const validate = () => {
     const e = {};
-    if (!displayName.trim()) e.displayName = 'Ad Soyad zorunlu';
+    if (!displayName.trim()) e.displayName = t('profile.nameRequired');
     setErrors(e);
     return Object.keys(e).length === 0;
   };
@@ -87,7 +90,7 @@ export default function EditProfileScreen({ navigation }) {
       }
       navigation.goBack();
     } catch {
-      Alert.alert('Hata', 'Profil kaydedilemedi, tekrar deneyin.');
+      Alert.alert(t('common.error'), t('profile.saveError'));
     } finally {
       setSaving(false);
     }
@@ -102,11 +105,11 @@ export default function EditProfileScreen({ navigation }) {
         {/* Header */}
         <View style={styles.header}>
           <TouchableOpacity onPress={() => navigation.goBack()}>
-            <Text style={styles.cancelText}>İptal</Text>
+            <Text style={styles.cancelText}>{t('common.cancel')}</Text>
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Profili Düzenle</Text>
+          <Text style={styles.headerTitle}>{t('profile.editProfile')}</Text>
           <TouchableOpacity onPress={handleSave} disabled={saving}>
-            <Text style={[styles.saveText, saving && { opacity: 0.5 }]}>Kaydet</Text>
+            <Text style={[styles.saveText, saving && { opacity: 0.5 }]}>{t('common.save')}</Text>
           </TouchableOpacity>
         </View>
 
@@ -116,7 +119,7 @@ export default function EditProfileScreen({ navigation }) {
             <View style={[styles.avatar, { backgroundColor: avatarColor }]}>
               <Text style={styles.avatarInitials}>{initials}</Text>
             </View>
-            <Text style={styles.avatarLabel}>Renk Seç</Text>
+            <Text style={styles.avatarLabel}>{t('profile.avatarColor')}</Text>
             <View style={styles.colorRow}>
               {AVATAR_COLORS.map((c) => (
                 <TouchableOpacity
@@ -135,18 +138,18 @@ export default function EditProfileScreen({ navigation }) {
           {/* Fields */}
           <Card style={styles.fieldsCard}>
             <Input
-              label="Ad Soyad"
+              label={t('auth.displayName')}
               value={displayName}
               onChangeText={setDisplayName}
-              placeholder="Adın Soyadın"
+              placeholder={t('auth.namePlaceholder')}
               autoCapitalize="words"
               error={errors.displayName}
             />
             <Input
-              label="Biyografi"
+              label={t('profile.bio')}
               value={bio}
               onChangeText={setBio}
-              placeholder="Kendini kısaca tanıt..."
+              placeholder={t('community.bioPlaceholder')}
               autoCapitalize="sentences"
               multiline
               numberOfLines={3}
@@ -155,27 +158,32 @@ export default function EditProfileScreen({ navigation }) {
           </Card>
 
           {/* Goals */}
-          <Text style={styles.sectionTitle}>Hedeflerim</Text>
+          <Text style={styles.sectionTitle}>{t('profile.myGoals')}</Text>
           <View style={styles.goalsGrid}>
-            {GOALS_LIST.map((goal) => {
-              const selected = selectedGoals.includes(goal.id);
+            {GOAL_IDS.map((id) => {
+              const selected = selectedGoals.includes(id);
               return (
                 <TouchableOpacity
-                  key={goal.id}
+                  key={id}
                   style={[styles.goalChip, selected && styles.goalChipSelected]}
-                  onPress={() => toggleGoal(goal.id)}
+                  onPress={() => toggleGoal(id)}
                   activeOpacity={0.7}
                 >
-                  <Text style={styles.goalEmoji}>{goal.emoji}</Text>
+                  <Text style={styles.goalEmoji}>{GOAL_EMOJIS[id]}</Text>
                   <Text style={[styles.goalLabel, selected && { color: colors.cyan }]}>
-                    {goal.label}
+                    {t(`goals.${id}`)}
                   </Text>
                 </TouchableOpacity>
               );
             })}
           </View>
 
-          <Button title="Kaydet" onPress={handleSave} loading={saving} style={styles.saveBtn} />
+          <Button
+            title={t('common.save')}
+            onPress={handleSave}
+            loading={saving}
+            style={styles.saveBtn}
+          />
 
           <View style={{ height: 32 }} />
         </ScrollView>
