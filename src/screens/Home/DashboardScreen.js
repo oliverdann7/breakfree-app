@@ -9,6 +9,7 @@ import {
   Dimensions,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { useTranslation } from 'react-i18next';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { fetchMetrics } from '../../store/slices/metricsSlice';
 import { fetchUserProfile, fetchDailyPlan, completeTask } from '../../store/slices/userSlice';
@@ -20,36 +21,26 @@ import { topInsight } from '../../utils/wellnessInsights';
 
 const { width } = Dimensions.get('window');
 
-function greeting() {
+function greetingKey() {
   const h = new Date().getHours();
-  if (h < 12) return 'Günaydın';
-  if (h < 18) return 'İyi günler';
-  return 'İyi akşamlar';
+  if (h < 12) return 'greeting.morning';
+  if (h < 18) return 'greeting.afternoon';
+  return 'greeting.evening';
 }
 
-function todayLabel() {
-  const d = new Date();
-  const days = ['Pazar', 'Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi'];
-  const months = [
-    'Ocak',
-    'Şubat',
-    'Mart',
-    'Nisan',
-    'Mayıs',
-    'Haziran',
-    'Temmuz',
-    'Ağustos',
-    'Eylül',
-    'Ekim',
-    'Kasım',
-    'Aralık',
-  ];
-  return `${days[d.getDay()]}, ${d.getDate()} ${months[d.getMonth()]}`;
+function todayLabel(locale) {
+  return new Date().toLocaleDateString(locale, {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+  });
 }
 
 export default function DashboardScreen() {
   const dispatch = useAppDispatch();
   const navigation = useNavigation();
+  const { t, i18n } = useTranslation();
+  const locale = i18n.language === 'en' ? 'en-US' : 'tr-TR';
   const { wellnessScore, dailyMetrics } = useAppSelector((state) => state.metrics);
   const { user } = useAppSelector((state) => state.auth);
   const { profile, dailyPlan } = useAppSelector((state) => state.user);
@@ -79,32 +70,32 @@ export default function DashboardScreen() {
   const metrics = [
     {
       emoji: '😴',
-      label: 'Uyku',
-      value: dm?.sleep?.hours ? `${dm.sleep.hours}s` : '—',
-      sub: dm?.sleep?.quality || 'Kayıt yok',
+      label: t('health.metrics.sleep'),
+      value: dm?.sleep?.hours ? `${dm.sleep.hours}${t('home.hoursSuffix')}` : '—',
+      sub: dm?.sleep?.quality || t('home.noRecord'),
       color: colors.cyan,
     },
     {
       emoji: '❤️',
-      label: 'Nabız',
+      label: t('health.metrics.heartRate'),
       value: dm?.heartRate ? String(dm.heartRate) : '—',
-      sub: 'Dinlenme',
+      sub: t('home.resting'),
       color: colors.gold,
     },
     {
       emoji: '👟',
-      label: 'Adım',
+      label: t('health.metrics.steps'),
       value: dm?.steps ? `${(dm.steps / 1000).toFixed(1)}k` : '—',
       sub: dm?.steps
-        ? `Hedef %${Math.min(100, Math.round((dm.steps / 10000) * 100))}`
-        : 'Kayıt yok',
+        ? t('home.goalPercent', { pct: Math.min(100, Math.round((dm.steps / 10000) * 100)) })
+        : t('home.noRecord'),
       color: colors.cyan,
     },
     {
       emoji: '🔥',
-      label: 'Kalori',
-      value: dm?.calories ? dm.calories.toLocaleString() : '—',
-      sub: 'Aktif',
+      label: t('health.metrics.calories'),
+      value: dm?.calories ? dm.calories.toLocaleString(locale) : '—',
+      sub: t('home.active'),
       color: colors.gold,
     },
   ];
@@ -115,9 +106,9 @@ export default function DashboardScreen() {
         {/* Header */}
         <View style={styles.header}>
           <View>
-            <Text style={styles.date}>{todayLabel()}</Text>
+            <Text style={styles.date}>{todayLabel(locale)}</Text>
             <Text style={styles.greeting}>
-              {greeting()}, <Text style={styles.name}>{user?.displayName || 'Elif'}</Text>
+              {t(greetingKey())}, <Text style={styles.name}>{user?.displayName || 'Elif'}</Text>
             </Text>
           </View>
           <TouchableOpacity style={styles.notifBtn}>
@@ -133,9 +124,10 @@ export default function DashboardScreen() {
               <WellnessRing score={wellnessScore || 76} size={70} />
             </View>
             <View style={styles.wellnessSide}>
-              <Text style={styles.wellnessSideLabel}>Wellness skorun</Text>
+              <Text style={styles.wellnessSideLabel}>{t('home.wellnessYours')}</Text>
               <Text style={styles.wellnessSideTitle}>
-                Bugün <Text style={styles.wellnessSideAccent}>hazırsın.</Text>
+                {t('home.readyPrefix')}{' '}
+                <Text style={styles.wellnessSideAccent}>{t('home.readyAccent')}</Text>
               </Text>
               {scoreLabel && (
                 <View style={styles.wellnessBadge}>
@@ -159,7 +151,7 @@ export default function DashboardScreen() {
               <View style={styles.insightRow}>
                 <Text style={styles.insightEmoji}>{insight.emoji}</Text>
                 <View style={styles.insightBody}>
-                  <Text style={styles.insightLabel}>Senin için</Text>
+                  <Text style={styles.insightLabel}>{t('home.insightKicker')}</Text>
                   <Text style={styles.insightTitle}>{insight.title}</Text>
                   <Text style={styles.insightMessage}>{insight.message}</Text>
                   <View style={styles.insightCta}>
@@ -199,7 +191,7 @@ export default function DashboardScreen() {
         <View style={styles.planSectionWrapper}>
           <View style={styles.planSection}>
             <View style={styles.planHeader}>
-              <Text style={styles.sectionTitle}>Bugünkü plan</Text>
+              <Text style={styles.sectionTitle}>{t('home.todaysPlan')}</Text>
               <Text style={styles.planArrow}>→</Text>
             </View>
             <View style={styles.planList}>
@@ -227,7 +219,7 @@ export default function DashboardScreen() {
                       </Text>
                       <Text style={styles.planTime}>
                         {item.time
-                          ? new Date(item.time).toLocaleTimeString('tr-TR', {
+                          ? new Date(item.time).toLocaleTimeString(locale, {
                               hour: '2-digit',
                               minute: '2-digit',
                             })
@@ -237,7 +229,7 @@ export default function DashboardScreen() {
                     </View>
                     {item.accent && (
                       <View style={styles.planLiveTag}>
-                        <Text style={styles.planLiveText}>Canlı</Text>
+                        <Text style={styles.planLiveText}>{t('home.live')}</Text>
                       </View>
                     )}
                   </View>
