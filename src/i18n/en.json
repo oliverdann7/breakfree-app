@@ -75,7 +75,9 @@
     "talks": "Talks",
     "health": "Health",
     "community": "Community",
-    "profile": "Profile"
+    "profile": "Profile",
+    "videos": "Videos",
+    "mentor": "Mentor"
   },
   "home": {
     "todaysPlan": "Today's Plan",

@@ -75,7 +75,9 @@
     "talks": "Palestralar",
     "health": "Sağlık",
     "community": "Topluluk",
-    "profile": "Profil"
+    "profile": "Profil",
+    "videos": "Videolar",
+    "mentor": "Mentör"
   },
   "home": {
     "todaysPlan": "Bugünkü Plan",
