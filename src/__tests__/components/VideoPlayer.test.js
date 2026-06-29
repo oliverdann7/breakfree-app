@@ -4,11 +4,15 @@ import VideoPlayer from '../../components/features/players/VideoPlayer';
 import VideoCard from '../../components/features/VideoCard';
 
 // The native player libs need stubs under jsdom.
-jest.mock('expo-av', () => ({
-  Video: 'Video',
-  ResizeMode: { CONTAIN: 'contain' },
-}));
-jest.mock('react-native-youtube-iframe', () => 'YoutubeIframe');
+jest.mock(
+  'expo-av',
+  () => ({
+    Video: 'Video',
+    ResizeMode: { CONTAIN: 'contain' },
+  }),
+  { virtual: true }
+);
+jest.mock('react-native-youtube-iframe', () => 'YoutubeIframe', { virtual: true });
 
 describe('VideoPlayer dispatcher', () => {
   it('renders the YouTube iframe for source=youtube', () => {
@@ -43,7 +47,15 @@ describe('VideoPlayer dispatcher', () => {
 });
 
 describe('VideoCard lock state', () => {
-  const video = { videoId: 'v1', title: 'T', hostName: 'H', category: 'Zihin', source: 'youtube', sourceId: 'abc', durationSeconds: 60 };
+  const video = {
+    videoId: 'v1',
+    title: 'T',
+    hostName: 'H',
+    category: 'Zihin',
+    source: 'youtube',
+    sourceId: 'abc',
+    durationSeconds: 60,
+  };
 
   it('shows the Pro badge when locked', () => {
     let renderer;

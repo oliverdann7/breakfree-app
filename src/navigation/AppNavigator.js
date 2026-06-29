@@ -2,6 +2,7 @@ import React from 'react';
 import { Text, StyleSheet } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
+import { useTranslation } from 'react-i18next';
 import DashboardScreen from '../screens/Home/DashboardScreen';
 import TalksListScreen from '../screens/Talks/TalksListScreen';
 import TalkDetailScreen from '../screens/Talks/TalkDetailScreen';
@@ -29,17 +30,20 @@ const VideoStack = createStackNavigator();
 const CommunityStack = createStackNavigator();
 const MentorStack = createStackNavigator();
 
-function TabIcon({ label, focused }) {
-  const icons = {
-    'Ana Sayfa': '⬡',
-    Palestralar: '🎙',
-    Videolar: '🎬',
-    Sağlık: '💚',
-    Topluluk: '👥',
-    Mentör: '🤝',
-    Profil: '👤',
-  };
-  return <Text style={{ fontSize: 20, opacity: focused ? 1 : 0.45 }}>{icons[label] || '●'}</Text>;
+const TAB_ICONS = {
+  Home: '⬡',
+  Talks: '🎙',
+  Videos: '🎬',
+  Health: '💚',
+  Community: '👥',
+  Mentor: '🤝',
+  Profile: '👤',
+};
+
+function TabIcon({ routeName, focused }) {
+  return (
+    <Text style={{ fontSize: 20, opacity: focused ? 1 : 0.45 }}>{TAB_ICONS[routeName] || '●'}</Text>
+  );
 }
 
 function VideoStackNavigator() {
@@ -95,6 +99,7 @@ function CommunityStackNavigator() {
 }
 
 export default function AppNavigator() {
+  const { t } = useTranslation();
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -103,16 +108,44 @@ export default function AppNavigator() {
         tabBarActiveTintColor: colors.cyan,
         tabBarInactiveTintColor: colors.textSecondary,
         tabBarLabelStyle: styles.tabLabel,
-        tabBarIcon: ({ focused }) => <TabIcon label={route.name} focused={focused} />,
+        tabBarIcon: ({ focused }) => <TabIcon routeName={route.name} focused={focused} />,
       })}
     >
-      <Tab.Screen name="Ana Sayfa" component={DashboardScreen} />
-      <Tab.Screen name="Palestralar" component={TalksStackNavigator} />
-      <Tab.Screen name="Videolar" component={VideoStackNavigator} />
-      <Tab.Screen name="Sağlık" component={HealthMetricsScreen} />
-      <Tab.Screen name="Topluluk" component={CommunityStackNavigator} />
-      <Tab.Screen name="Mentör" component={MentorStackNavigator} />
-      <Tab.Screen name="Profil" component={ProfileStackNavigator} />
+      <Tab.Screen
+        name="Home"
+        component={DashboardScreen}
+        options={{ tabBarLabel: t('tabs.home') }}
+      />
+      <Tab.Screen
+        name="Talks"
+        component={TalksStackNavigator}
+        options={{ tabBarLabel: t('tabs.talks') }}
+      />
+      <Tab.Screen
+        name="Videos"
+        component={VideoStackNavigator}
+        options={{ tabBarLabel: t('tabs.videos') }}
+      />
+      <Tab.Screen
+        name="Health"
+        component={HealthMetricsScreen}
+        options={{ tabBarLabel: t('tabs.health') }}
+      />
+      <Tab.Screen
+        name="Community"
+        component={CommunityStackNavigator}
+        options={{ tabBarLabel: t('tabs.community') }}
+      />
+      <Tab.Screen
+        name="Mentor"
+        component={MentorStackNavigator}
+        options={{ tabBarLabel: t('tabs.mentor') }}
+      />
+      <Tab.Screen
+        name="Profile"
+        component={ProfileStackNavigator}
+        options={{ tabBarLabel: t('tabs.profile') }}
+      />
     </Tab.Navigator>
   );
 }
