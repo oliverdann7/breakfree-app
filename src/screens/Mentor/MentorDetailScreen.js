@@ -105,7 +105,12 @@ export default function MentorDetailScreen({ navigation, route }) {
       <ScrollView contentContainerStyle={{ paddingBottom: 40 }}>
         <View style={styles.header}>
           {navigation && (
-            <TouchableOpacity onPress={() => navigation.goBack()} style={styles.back}>
+            <TouchableOpacity
+              onPress={() => navigation.goBack()}
+              style={styles.back}
+              accessibilityRole="button"
+              accessibilityLabel="Geri"
+            >
               <Text style={styles.backText}>←</Text>
             </TouchableOpacity>
           )}
@@ -163,6 +168,8 @@ export default function MentorDetailScreen({ navigation, route }) {
                         setSelectedHour(null);
                       }}
                       style={[styles.dayPill, selectedDay === s.iso && styles.dayPillActive]}
+                      accessibilityRole="button"
+                      accessibilityState={{ selected: selectedDay === s.iso }}
                     >
                       <Text style={styles.dayLabel}>{s.label}</Text>
                       <Text style={styles.dayDate}>{s.date}</Text>
@@ -178,6 +185,8 @@ export default function MentorDetailScreen({ navigation, route }) {
                           key={h}
                           onPress={() => setSelectedHour(h)}
                           style={[styles.hourBtn, selectedHour === h && styles.hourBtnActive]}
+                          accessibilityRole="button"
+                          accessibilityState={{ selected: selectedHour === h }}
                         >
                           <Text
                             style={[styles.hourText, selectedHour === h && styles.hourTextActive]}
@@ -196,6 +205,11 @@ export default function MentorDetailScreen({ navigation, route }) {
             onPress={handleBook}
             disabled={!selectedDay || !selectedHour || booking}
             style={[styles.cta, (!selectedDay || !selectedHour || booking) && { opacity: 0.4 }]}
+            accessibilityRole="button"
+            accessibilityState={{
+              disabled: !selectedDay || !selectedHour || booking,
+              busy: booking,
+            }}
           >
             <Text style={styles.ctaText}>
               {booking

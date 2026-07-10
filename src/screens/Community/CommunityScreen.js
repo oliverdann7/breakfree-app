@@ -117,13 +117,24 @@ function PostCard({ post, onLike, onAddComment, onFetchComments, comments = [], 
       {post.sharedStats && <StatsRow stats={post.sharedStats} />}
 
       <View style={styles.postActions}>
-        <TouchableOpacity style={styles.actionBtn} onPress={onLike}>
+        <TouchableOpacity
+          style={styles.actionBtn}
+          onPress={onLike}
+          accessibilityRole="button"
+          accessibilityLabel={post.liked ? t('a11y.unlike') : t('a11y.like')}
+        >
           <Text style={styles.actionIcon}>{post.liked ? '❤️' : '🤍'}</Text>
           <Text style={[styles.actionCount, post.liked && { color: colors.gold }]}>
             {post.likes}
           </Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.actionBtn} onPress={handleExpand}>
+        <TouchableOpacity
+          style={styles.actionBtn}
+          onPress={handleExpand}
+          accessibilityRole="button"
+          accessibilityLabel={t('a11y.comments', { count: comments.length })}
+          accessibilityState={{ expanded }}
+        >
           <Text style={styles.actionIcon}>💬</Text>
           <Text style={[styles.actionCount, expanded && { color: colors.cyan }]}>
             {comments.length} {expanded ? '▲' : '▼'}
@@ -164,6 +175,7 @@ function PostCard({ post, onLike, onAddComment, onFetchComments, comments = [], 
             />
             <TextInput
               style={styles.commentField}
+              accessibilityLabel={t('community.commentPlaceholder')}
               placeholder={t('community.commentPlaceholder')}
               placeholderTextColor="rgba(255,255,255,0.3)"
               value={commentText}
@@ -171,7 +183,12 @@ function PostCard({ post, onLike, onAddComment, onFetchComments, comments = [], 
               onSubmitEditing={submitComment}
               returnKeyType="send"
             />
-            <TouchableOpacity onPress={submitComment} style={styles.commentSend}>
+            <TouchableOpacity
+              onPress={submitComment}
+              style={styles.commentSend}
+              accessibilityRole="button"
+              accessibilityLabel={t('a11y.send')}
+            >
               <Text style={styles.commentSendText}>→</Text>
             </TouchableOpacity>
           </View>
@@ -330,7 +347,13 @@ export default function CommunityScreen() {
   const ListHeader = () => (
     <>
       {/* My profile banner */}
-      <TouchableOpacity style={styles.profileBanner} onPress={openProfileEdit} activeOpacity={0.85}>
+      <TouchableOpacity
+        style={styles.profileBanner}
+        onPress={openProfileEdit}
+        activeOpacity={0.85}
+        accessibilityRole="button"
+        accessibilityLabel={t('profile.editProfile')}
+      >
         <View
           style={[
             styles.profileAvatarLg,
@@ -383,7 +406,11 @@ export default function CommunityScreen() {
               : t('community.loadingPosts')}
           </Text>
         </View>
-        <TouchableOpacity style={styles.createBtn} onPress={() => setPostVisible(true)}>
+        <TouchableOpacity
+          style={styles.createBtn}
+          onPress={() => setPostVisible(true)}
+          accessibilityRole="button"
+        >
           <Text style={styles.createBtnText}>{t('community.share')}</Text>
         </TouchableOpacity>
       </View>
@@ -429,6 +456,7 @@ export default function CommunityScreen() {
                   onPress={() =>
                     dispatch(joinChallenge({ challengeId: challenge.id, uid: user?.uid }))
                   }
+                  accessibilityRole="button"
                 >
                   <Text style={styles.joinBtnText}>{t('community.joinBtn')}</Text>
                 </TouchableOpacity>
@@ -539,6 +567,9 @@ export default function CommunityScreen() {
                       },
                     ]}
                     onPress={() => setDraft((d) => ({ ...d, emoji: em }))}
+                    accessibilityRole="button"
+                    accessibilityLabel={`${t('a11y.avatarEmoji')} ${em}`}
+                    accessibilityState={{ selected: draft.emoji === em }}
                   >
                     <Text style={styles.emojiBtnText}>{em}</Text>
                   </TouchableOpacity>
@@ -557,6 +588,9 @@ export default function CommunityScreen() {
                       draft.bg === color && styles.colorDotSelected,
                     ]}
                     onPress={() => setDraft((d) => ({ ...d, bg: color }))}
+                    accessibilityRole="button"
+                    accessibilityLabel={t('a11y.avatarColor')}
+                    accessibilityState={{ selected: draft.bg === color }}
                   />
                 ))}
               </View>
@@ -565,6 +599,7 @@ export default function CommunityScreen() {
               <Text style={styles.pickerLabel}>{t('community.usernameLabel')}</Text>
               <TextInput
                 style={styles.textField}
+                accessibilityLabel={t('community.usernameLabel')}
                 value={draft.nickname}
                 onChangeText={(v) => setDraft((d) => ({ ...d, nickname: v }))}
                 placeholder={t('community.usernamePlaceholder')}
@@ -575,6 +610,7 @@ export default function CommunityScreen() {
               <Text style={styles.pickerLabel}>{t('community.bioLabel')}</Text>
               <TextInput
                 style={[styles.textField, { height: 80 }]}
+                accessibilityLabel={t('community.bioLabel')}
                 value={draft.bio}
                 onChangeText={(v) => setDraft((d) => ({ ...d, bio: v }))}
                 placeholder={t('community.bioPlaceholder')}
@@ -584,10 +620,18 @@ export default function CommunityScreen() {
               />
 
               <View style={styles.modalActions}>
-                <TouchableOpacity style={styles.saveBtn} onPress={saveProfile}>
+                <TouchableOpacity
+                  style={styles.saveBtn}
+                  onPress={saveProfile}
+                  accessibilityRole="button"
+                >
                   <Text style={styles.saveBtnText}>{t('common.save')}</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.cancelBtn} onPress={() => setProfileVisible(false)}>
+                <TouchableOpacity
+                  style={styles.cancelBtn}
+                  onPress={() => setProfileVisible(false)}
+                  accessibilityRole="button"
+                >
                   <Text style={styles.cancelBtnText}>{t('common.cancel')}</Text>
                 </TouchableOpacity>
               </View>
@@ -616,6 +660,7 @@ export default function CommunityScreen() {
               />
               <TextInput
                 style={[styles.textField, { flex: 1, marginBottom: 0 }]}
+                accessibilityLabel={t('community.postPlaceholder')}
                 value={postText}
                 onChangeText={setPostText}
                 placeholder={t('community.postPlaceholder')}
@@ -629,6 +674,8 @@ export default function CommunityScreen() {
             <TouchableOpacity
               style={[styles.statsToggle, shareStats && styles.statsToggleOn]}
               onPress={() => setShareStats((s) => !s)}
+              accessibilityRole="checkbox"
+              accessibilityState={{ checked: shareStats }}
             >
               <View style={[styles.toggleCheck, shareStats && styles.toggleCheckOn]}>
                 {shareStats && <Text style={styles.toggleCheckMark}>✓</Text>}
@@ -653,6 +700,8 @@ export default function CommunityScreen() {
                 style={[styles.saveBtn, !postText.trim() && { opacity: 0.4 }]}
                 onPress={submitPost}
                 disabled={!postText.trim()}
+                accessibilityRole="button"
+                accessibilityState={{ disabled: !postText.trim() }}
               >
                 <Text style={styles.saveBtnText}>{t('community.postBtn')}</Text>
               </TouchableOpacity>
@@ -663,6 +712,7 @@ export default function CommunityScreen() {
                   setPostText('');
                   setShareStats(false);
                 }}
+                accessibilityRole="button"
               >
                 <Text style={styles.cancelBtnText}>{t('common.cancel')}</Text>
               </TouchableOpacity>

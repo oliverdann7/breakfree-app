@@ -17,7 +17,12 @@ export default function VideoCard({ video, progress, locked = false, onPress }) 
     progress && video.durationSeconds ? Math.min(1, progress / video.durationSeconds) : 0;
 
   return (
-    <TouchableOpacity style={styles.card} onPress={onPress} activeOpacity={0.85}>
+    <TouchableOpacity
+      style={styles.card}
+      onPress={onPress}
+      activeOpacity={0.85}
+      accessibilityRole="button"
+    >
       {/* Thumbnail */}
       <View style={styles.thumbnail}>
         {thumbnailUrl ? (

@@ -125,6 +125,7 @@ export default function VideoPlayerScreen({ route, navigation }) {
           <TouchableOpacity
             style={styles.upgradeBtn}
             onPress={() => navigation.navigate('Premium')}
+            accessibilityRole="button"
           >
             <Text style={styles.upgradeText}>{t('video.proUpgrade')}</Text>
           </TouchableOpacity>
@@ -199,21 +200,41 @@ export default function VideoPlayerScreen({ route, navigation }) {
 
             {/* Playback buttons */}
             <View style={styles.btnRow}>
-              <TouchableOpacity style={styles.skipBtn} onPress={() => seekBy(-10)}>
+              <TouchableOpacity
+                style={styles.skipBtn}
+                onPress={() => seekBy(-10)}
+                accessibilityRole="button"
+                accessibilityLabel={t('a11y.seekBack')}
+              >
                 <Text style={styles.skipText}>−10s</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity style={styles.playBtn} onPress={() => setPlaying((p) => !p)}>
+              <TouchableOpacity
+                style={styles.playBtn}
+                onPress={() => setPlaying((p) => !p)}
+                accessibilityRole="button"
+                accessibilityLabel={playing ? t('a11y.pause') : t('a11y.play')}
+              >
                 <Text style={styles.playIcon}>{playing ? '⏸' : '▶'}</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity style={styles.skipBtn} onPress={() => seekBy(10)}>
+              <TouchableOpacity
+                style={styles.skipBtn}
+                onPress={() => seekBy(10)}
+                accessibilityRole="button"
+                accessibilityLabel={t('a11y.seekForward')}
+              >
                 <Text style={styles.skipText}>+10s</Text>
               </TouchableOpacity>
             </View>
 
             {/* Speed */}
-            <TouchableOpacity style={styles.speedBtn} onPress={() => setShowSpeedMenu((v) => !v)}>
+            <TouchableOpacity
+              style={styles.speedBtn}
+              onPress={() => setShowSpeedMenu((v) => !v)}
+              accessibilityRole="button"
+              accessibilityLabel={t('a11y.playbackSpeed')}
+            >
               <Text style={styles.speedText}>{SPEEDS[speedIndex]}×</Text>
             </TouchableOpacity>
             {showSpeedMenu && (
@@ -226,6 +247,8 @@ export default function VideoPlayerScreen({ route, navigation }) {
                       setSpeedIndex(i);
                       setShowSpeedMenu(false);
                     }}
+                    accessibilityRole="button"
+                    accessibilityState={{ selected: i === speedIndex }}
                   >
                     <Text
                       style={[styles.speedOptionText, i === speedIndex && { color: colors.cyan }]}
@@ -241,7 +264,11 @@ export default function VideoPlayerScreen({ route, navigation }) {
 
         {/* Video info */}
         <View style={styles.infoSection}>
-          <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
+          <TouchableOpacity
+            style={styles.backBtn}
+            onPress={() => navigation.goBack()}
+            accessibilityRole="button"
+          >
             <Text style={styles.backText}>{t('auth.backBtn')}</Text>
           </TouchableOpacity>
           {video && (

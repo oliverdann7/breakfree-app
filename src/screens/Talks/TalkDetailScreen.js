@@ -51,7 +51,11 @@ export default function TalkDetailScreen({ route, navigation }) {
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* Hero */}
         <View style={styles.hero}>
-          <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
+          <TouchableOpacity
+            style={styles.backBtn}
+            onPress={() => navigation.goBack()}
+            accessibilityRole="button"
+          >
             <Text style={styles.backText}>{t('auth.backBtn')}</Text>
           </TouchableOpacity>
           <View style={styles.heroImage}>
@@ -134,12 +138,16 @@ export default function TalkDetailScreen({ route, navigation }) {
               <TouchableOpacity
                 style={styles.iconBtn}
                 onPress={() => Alert.alert(t('talks.savedTitle'), t('talks.savedMsg'))}
+                accessibilityRole="button"
+                accessibilityLabel={t('talks.save')}
               >
                 <Text style={styles.iconBtnText}>🔖 {t('talks.save')}</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.iconBtn}
                 onPress={() => Alert.alert(t('community.shareTitle'), t('talks.sharedMsg'))}
+                accessibilityRole="button"
+                accessibilityLabel={t('talks.share')}
               >
                 <Text style={styles.iconBtnText}>📤 {t('talks.share')}</Text>
               </TouchableOpacity>

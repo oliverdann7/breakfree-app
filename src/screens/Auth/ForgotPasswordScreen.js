@@ -49,7 +49,11 @@ export default function ForgotPasswordScreen({ navigation }) {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <View style={styles.container}>
-        <TouchableOpacity style={styles.back} onPress={() => navigation.goBack()}>
+        <TouchableOpacity
+          style={styles.back}
+          onPress={() => navigation.goBack()}
+          accessibilityRole="button"
+        >
           <Text style={styles.backText}>{t('auth.backBtn')}</Text>
         </TouchableOpacity>
 
@@ -63,7 +67,11 @@ export default function ForgotPasswordScreen({ navigation }) {
             <Text style={styles.successIcon}>✉️</Text>
             <Text style={styles.successTitle}>{t('auth.forgotPasswordSentTitle')}</Text>
             <Text style={styles.successText}>{t('auth.forgotPasswordSentDesc', { email })}</Text>
-            <TouchableOpacity style={styles.doneBtn} onPress={() => navigation.goBack()}>
+            <TouchableOpacity
+              style={styles.doneBtn}
+              onPress={() => navigation.goBack()}
+              accessibilityRole="button"
+            >
               <Text style={styles.doneBtnText}>{t('auth.backToLogin')}</Text>
             </TouchableOpacity>
           </View>
@@ -74,6 +82,7 @@ export default function ForgotPasswordScreen({ navigation }) {
               <View style={[styles.inputBox, error && styles.inputBoxError]}>
                 <TextInput
                   style={styles.textInput}
+                  accessibilityLabel={t('auth.email')}
                   value={email}
                   onChangeText={(txt) => {
                     setEmail(txt);
@@ -94,6 +103,8 @@ export default function ForgotPasswordScreen({ navigation }) {
               onPress={handleSend}
               disabled={loading}
               activeOpacity={0.85}
+              accessibilityRole="button"
+              accessibilityState={{ disabled: loading, busy: loading }}
             >
               {loading ? (
                 <ActivityIndicator color={colors.navyDeep} size="small" />

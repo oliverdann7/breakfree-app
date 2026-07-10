@@ -104,11 +104,16 @@ export default function EditProfileScreen({ navigation }) {
       >
         {/* Header */}
         <View style={styles.header}>
-          <TouchableOpacity onPress={() => navigation.goBack()}>
+          <TouchableOpacity onPress={() => navigation.goBack()} accessibilityRole="button">
             <Text style={styles.cancelText}>{t('common.cancel')}</Text>
           </TouchableOpacity>
           <Text style={styles.headerTitle}>{t('profile.editProfile')}</Text>
-          <TouchableOpacity onPress={handleSave} disabled={saving}>
+          <TouchableOpacity
+            onPress={handleSave}
+            disabled={saving}
+            accessibilityRole="button"
+            accessibilityState={{ disabled: saving, busy: saving }}
+          >
             <Text style={[styles.saveText, saving && { opacity: 0.5 }]}>{t('common.save')}</Text>
           </TouchableOpacity>
         </View>
@@ -130,6 +135,9 @@ export default function EditProfileScreen({ navigation }) {
                     avatarColor === c && styles.colorDotSelected,
                   ]}
                   onPress={() => setAvatarColor(c)}
+                  accessibilityRole="button"
+                  accessibilityLabel={t('a11y.avatarColor')}
+                  accessibilityState={{ selected: avatarColor === c }}
                 />
               ))}
             </View>
@@ -168,6 +176,8 @@ export default function EditProfileScreen({ navigation }) {
                   style={[styles.goalChip, selected && styles.goalChipSelected]}
                   onPress={() => toggleGoal(id)}
                   activeOpacity={0.7}
+                  accessibilityRole="button"
+                  accessibilityState={{ selected }}
                 >
                   <Text style={styles.goalEmoji}>{GOAL_EMOJIS[id]}</Text>
                   <Text style={[styles.goalLabel, selected && { color: colors.cyan }]}>

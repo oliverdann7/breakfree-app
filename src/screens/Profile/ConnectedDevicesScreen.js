@@ -45,7 +45,12 @@ export default function ConnectedDevicesScreen({ navigation }) {
       <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 60 }}>
         <View style={styles.header}>
           {navigation && (
-            <TouchableOpacity onPress={() => navigation.goBack()} style={styles.back}>
+            <TouchableOpacity
+              onPress={() => navigation.goBack()}
+              style={styles.back}
+              accessibilityRole="button"
+              accessibilityLabel={t('common.back')}
+            >
               <Text style={styles.backText}>←</Text>
             </TouchableOpacity>
           )}
@@ -80,6 +85,7 @@ export default function ConnectedDevicesScreen({ navigation }) {
                 onPress={() => toggle(src.id)}
                 activeOpacity={0.8}
                 style={[styles.btn, connected ? styles.btnDisconnect : styles.btnConnect]}
+                accessibilityRole="button"
               >
                 <Text style={[styles.btnText, connected && styles.btnTextDisconnect]}>
                   {connected ? t('devices.remove') : t('devices.connect')}

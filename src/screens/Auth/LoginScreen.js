@@ -61,6 +61,7 @@ export default function LoginScreen({ navigation }) {
             <Text style={styles.inputLabel}>{t('auth.email')}</Text>
             <TextInput
               style={styles.input}
+              accessibilityLabel={t('auth.email')}
               placeholder={t('auth.emailPlaceholder')}
               placeholderTextColor="rgba(255,255,255,0.25)"
               value={email}
@@ -77,6 +78,7 @@ export default function LoginScreen({ navigation }) {
             <View style={styles.passwordRow}>
               <TextInput
                 style={[styles.input, { flex: 1, marginBottom: 0 }]}
+                accessibilityLabel={t('auth.password')}
                 placeholder="••••••••"
                 placeholderTextColor="rgba(255,255,255,0.25)"
                 value={password}
@@ -84,7 +86,12 @@ export default function LoginScreen({ navigation }) {
                 secureTextEntry={!showPassword}
                 autoCapitalize="none"
               />
-              <TouchableOpacity onPress={() => setShowPassword((s) => !s)} style={styles.eyeBtn}>
+              <TouchableOpacity
+                onPress={() => setShowPassword((s) => !s)}
+                style={styles.eyeBtn}
+                accessibilityRole="button"
+                accessibilityLabel={showPassword ? t('a11y.hidePassword') : t('a11y.showPassword')}
+              >
                 <Text style={{ fontSize: 16, color: 'rgba(255,255,255,0.4)' }}>
                   {showPassword ? '🙈' : '👁️'}
                 </Text>
@@ -104,6 +111,8 @@ export default function LoginScreen({ navigation }) {
             style={[styles.loginBtn, isLoading && { opacity: 0.6 }]}
             onPress={handleLogin}
             disabled={isLoading}
+            accessibilityRole="button"
+            accessibilityState={{ disabled: isLoading, busy: isLoading }}
           >
             {isLoading ? (
               <ActivityIndicator color={colors.navy} size="small" />
@@ -120,12 +129,20 @@ export default function LoginScreen({ navigation }) {
           </View>
 
           {/* Social buttons */}
-          <TouchableOpacity style={styles.socialBtn} onPress={handleGoogle}>
+          <TouchableOpacity
+            style={styles.socialBtn}
+            onPress={handleGoogle}
+            accessibilityRole="button"
+          >
             <Text style={{ fontSize: 16 }}>🔵</Text>
             <Text style={styles.socialBtnText}>{t('auth.googleContinue')}</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.socialBtn} onPress={handleApple}>
+          <TouchableOpacity
+            style={styles.socialBtn}
+            onPress={handleApple}
+            accessibilityRole="button"
+          >
             <Text style={{ fontSize: 16 }}>🍎</Text>
             <Text style={styles.socialBtnText}>{t('auth.appleContinue')}</Text>
           </TouchableOpacity>
@@ -134,6 +151,7 @@ export default function LoginScreen({ navigation }) {
           <TouchableOpacity
             style={styles.forgotBtn}
             onPress={() => navigation.navigate('ForgotPassword')}
+            accessibilityRole="button"
           >
             <Text style={styles.forgotText}>{t('auth.forgotPasswordLink')}</Text>
           </TouchableOpacity>
@@ -141,7 +159,10 @@ export default function LoginScreen({ navigation }) {
           {/* Signup link */}
           <View style={styles.signupRow}>
             <Text style={styles.signupText}>{t('auth.noAccount')} </Text>
-            <TouchableOpacity onPress={() => navigation.navigate('Signup')}>
+            <TouchableOpacity
+              onPress={() => navigation.navigate('Signup')}
+              accessibilityRole="button"
+            >
               <Text style={styles.signupLink}>{t('auth.signup')}</Text>
             </TouchableOpacity>
           </View>

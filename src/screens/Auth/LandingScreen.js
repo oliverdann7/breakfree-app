@@ -133,6 +133,7 @@ export default function LandingScreen({ navigation }) {
           <View style={styles.socialButtons}>
             <TouchableOpacity
               style={styles.socialButton}
+              accessibilityRole="link"
               onPress={() => {
                 const url = 'https://instagram.com/breakfreeturkiye';
                 try {
@@ -147,6 +148,7 @@ export default function LandingScreen({ navigation }) {
 
             <TouchableOpacity
               style={styles.socialButton}
+              accessibilityRole="link"
               onPress={() => {
                 const url = 'https://wa.me/905418617772';
                 try {
@@ -174,7 +176,10 @@ export default function LandingScreen({ navigation }) {
 
           <View style={styles.loginLink}>
             <Text style={styles.loginText}>{t('landing.loginHint')} </Text>
-            <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+            <TouchableOpacity
+              onPress={() => navigation.navigate('Login')}
+              accessibilityRole="button"
+            >
               <Text style={styles.loginLinkText}>{t('auth.login')}</Text>
             </TouchableOpacity>
           </View>

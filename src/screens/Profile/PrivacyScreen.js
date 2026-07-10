@@ -58,7 +58,12 @@ export default function PrivacyScreen({ navigation }) {
       <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 60 }}>
         <View style={styles.header}>
           {navigation && (
-            <TouchableOpacity onPress={() => navigation.goBack()} style={styles.back}>
+            <TouchableOpacity
+              onPress={() => navigation.goBack()}
+              style={styles.back}
+              accessibilityRole="button"
+              accessibilityLabel={t('common.back')}
+            >
               <Text style={styles.backText}>←</Text>
             </TouchableOpacity>
           )}
@@ -74,6 +79,8 @@ export default function PrivacyScreen({ navigation }) {
             style={styles.action}
             onPress={() => submitRequest('export')}
             disabled={submitting}
+            accessibilityRole="button"
+            accessibilityState={{ disabled: submitting, busy: submitting }}
           >
             <Text style={styles.actionText}>
               {submitting ? t('privacy.submitting') : t('privacy.exportAction')}
@@ -95,6 +102,8 @@ export default function PrivacyScreen({ navigation }) {
             style={styles.dangerAction}
             onPress={confirmDelete}
             disabled={submitting}
+            accessibilityRole="button"
+            accessibilityState={{ disabled: submitting }}
           >
             <Text style={styles.dangerActionText}>{t('privacy.deleteAction')}</Text>
           </TouchableOpacity>

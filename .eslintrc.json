@@ -9,7 +9,7 @@
   "globals": {
     "__DEV__": "readonly"
   },
-  "extends": ["eslint:recommended", "plugin:react/recommended"],
+  "extends": ["eslint:recommended", "plugin:react/recommended", "plugin:react-native-a11y/basic"],
   "parser": "@babel/eslint-parser",
   "parserOptions": {
     "ecmaVersion": 2020,
@@ -22,7 +22,7 @@
       "configFile": "./babel.config.js"
     }
   },
-  "plugins": ["react"],
+  "plugins": ["react", "react-native-a11y"],
   "settings": {
     "react": {
       "version": "detect"
@@ -31,6 +31,7 @@
   "rules": {
     "react/react-in-jsx-scope": "off",
     "react/prop-types": "off",
-    "no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }]
+    "no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }],
+    "react-native-a11y/has-accessibility-hint": "off"
   }
 }

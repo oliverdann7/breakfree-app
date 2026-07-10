@@ -112,6 +112,7 @@ export default function MentorScreen({ navigation }) {
               key={i}
               style={styles.actionBtn}
               onPress={() => handleAction(action.label)}
+              accessibilityRole="button"
             >
               <Text style={styles.actionIcon}>{action.icon}</Text>
               <Text style={styles.actionLabel}>{action.label}</Text>
@@ -142,6 +143,8 @@ export default function MentorScreen({ navigation }) {
                 onPress={() => {
                   if (user?.uid) dispatch(toggleGoal({ uid: user.uid, goalIndex: i }));
                 }}
+                accessibilityRole="checkbox"
+                accessibilityState={{ checked: goal.done }}
               >
                 <Text style={styles.goalCheckbox}>{goal.done ? '✓' : '○'}</Text>
                 <Text style={[styles.goalText, goal.done && styles.goalTextDone]}>{goal.text}</Text>
@@ -179,7 +182,7 @@ export default function MentorScreen({ navigation }) {
 
         {/* Next Session */}
         {nextSession && (
-          <TouchableOpacity style={styles.sessionCard}>
+          <TouchableOpacity style={styles.sessionCard} accessibilityRole="button">
             <View style={styles.dateBox}>
               <Text style={styles.dayLabel}>{nextSession.day}</Text>
               <Text style={styles.dayNumber}>{nextSession.date}</Text>
@@ -224,6 +227,7 @@ export default function MentorScreen({ navigation }) {
             <View style={styles.chatInputRow}>
               <TextInput
                 style={styles.chatInput}
+                accessibilityLabel={t('mentor.messagePlaceholder')}
                 value={messageText}
                 onChangeText={setMessageText}
                 placeholder={t('mentor.messagePlaceholder')}
@@ -234,12 +238,19 @@ export default function MentorScreen({ navigation }) {
                 style={[styles.sendBtn, !messageText.trim() && { opacity: 0.4 }]}
                 onPress={handleSendMessage}
                 disabled={!messageText.trim()}
+                accessibilityRole="button"
+                accessibilityLabel={t('a11y.send')}
+                accessibilityState={{ disabled: !messageText.trim() }}
               >
                 <Text style={styles.sendBtnText}>→</Text>
               </TouchableOpacity>
             </View>
 
-            <TouchableOpacity style={styles.closeChatBtn} onPress={() => setChatVisible(false)}>
+            <TouchableOpacity
+              style={styles.closeChatBtn}
+              onPress={() => setChatVisible(false)}
+              accessibilityRole="button"
+            >
               <Text style={styles.closeChatText}>{t('mentor.close')}</Text>
             </TouchableOpacity>
           </KeyboardAvoidingView>

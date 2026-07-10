@@ -27,7 +27,12 @@ const categoryFor = (mentor) => {
 
 function MentorCard({ mentor, onOpen }) {
   return (
-    <TouchableOpacity onPress={onOpen} activeOpacity={0.85} style={{ marginBottom: 12 }}>
+    <TouchableOpacity
+      onPress={onOpen}
+      activeOpacity={0.85}
+      style={{ marginBottom: 12 }}
+      accessibilityRole="button"
+    >
       <Card style={styles.card}>
         <View style={[styles.avatar, { backgroundColor: mentor.avatarBg || colors.royal }]}>
           <Text style={styles.avatarEmoji}>{mentor.avatarEmoji || '🧘'}</Text>
@@ -90,7 +95,12 @@ export default function MentorDirectoryScreen({ navigation }) {
       <View style={{ padding: 16, gap: 12 }}>
         <View style={styles.header}>
           {navigation && (
-            <TouchableOpacity onPress={() => navigation.goBack()} style={styles.back}>
+            <TouchableOpacity
+              onPress={() => navigation.goBack()}
+              style={styles.back}
+              accessibilityRole="button"
+              accessibilityLabel="Geri"
+            >
               <Text style={styles.backText}>←</Text>
             </TouchableOpacity>
           )}
@@ -103,6 +113,7 @@ export default function MentorDirectoryScreen({ navigation }) {
         <TextInput
           value={search}
           onChangeText={setSearch}
+          accessibilityLabel="Mentör veya uzmanlık ara"
           placeholder="Mentör veya uzmanlık ara..."
           placeholderTextColor="rgba(255,255,255,0.3)"
           style={styles.search}
@@ -115,6 +126,8 @@ export default function MentorDirectoryScreen({ navigation }) {
                 key={c}
                 onPress={() => setCategory(c)}
                 style={[styles.cat, category === c && styles.catActive]}
+                accessibilityRole="button"
+                accessibilityState={{ selected: category === c }}
               >
                 <Text style={[styles.catText, category === c && styles.catTextActive]}>{c}</Text>
               </TouchableOpacity>

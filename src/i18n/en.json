@@ -9,6 +9,22 @@
     "soon": "Coming Soon",
     "edit": "Edit"
   },
+  "a11y": {
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
+    "like": "Like",
+    "unlike": "Unlike",
+    "comments": "Comments ({{count}})",
+    "send": "Send",
+    "notifications": "Notifications",
+    "play": "Play",
+    "pause": "Pause",
+    "seekBack": "Rewind 10 seconds",
+    "seekForward": "Skip forward 10 seconds",
+    "playbackSpeed": "Playback speed",
+    "avatarColor": "Avatar color",
+    "avatarEmoji": "Avatar emoji"
+  },
   "greeting": {
     "morning": "Good morning",
     "afternoon": "Good afternoon",
