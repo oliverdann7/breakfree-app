@@ -57,7 +57,11 @@ const YouTubePlayer = forwardRef(function YouTubePlayer(
       width={width}
       play={!paused}
       videoId={id}
-      initialPlayerParams={{ start: Math.floor(startSeconds), controls: false, modestbranding: true }}
+      initialPlayerParams={{
+        start: Math.floor(startSeconds),
+        controls: false,
+        modestbranding: true,
+      }}
       onReady={handleReady}
       onChangeState={handleChangeState}
     />

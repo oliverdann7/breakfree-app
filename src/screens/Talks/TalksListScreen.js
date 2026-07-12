@@ -51,6 +51,7 @@ export default function TalksListScreen({ navigation }) {
             <TouchableOpacity
               onPress={() => dispatch(seedTalks()).then(() => dispatch(fetchTalks()))}
               style={styles.seedBtn}
+              accessibilityRole="button"
             >
               <Text style={styles.seedBtnText}>{t('talks.loadSeed')}</Text>
             </TouchableOpacity>
@@ -89,6 +90,7 @@ export default function TalksListScreen({ navigation }) {
             <TouchableOpacity
               onPress={() => dispatch(seedTalks()).then(() => dispatch(fetchTalks()))}
               style={styles.seedActionBtn}
+              accessibilityRole="button"
             >
               <Text style={styles.seedActionBtnText}>{t('talks.loadSeed')}</Text>
             </TouchableOpacity>
@@ -115,6 +117,7 @@ export default function TalksListScreen({ navigation }) {
             <TouchableOpacity
               style={styles.liveButton}
               onPress={() => dispatch(joinTalk(liveTalk.talkId))}
+              accessibilityRole="button"
             >
               <Text style={styles.liveButtonIcon}>🎧</Text>
               <Text style={styles.liveButtonText}>{t('talks.listenNow')}</Text>
@@ -132,6 +135,8 @@ export default function TalksListScreen({ navigation }) {
             <TouchableOpacity
               key={cat}
               style={[styles.categoryBtn, i === 0 && styles.categoryBtnActive]}
+              accessibilityRole="button"
+              accessibilityState={{ selected: i === 0 }}
             >
               <Text style={[styles.categoryText, i === 0 && styles.categoryTextActive]}>{cat}</Text>
             </TouchableOpacity>

@@ -64,9 +64,7 @@ describe('videoSource', () => {
     });
 
     it('returns the direct url for source=url', () => {
-      expect(getStreamUrl({ source: 'url', sourceUrl: 'https://x/a.mp4' })).toBe(
-        'https://x/a.mp4'
-      );
+      expect(getStreamUrl({ source: 'url', sourceUrl: 'https://x/a.mp4' })).toBe('https://x/a.mp4');
     });
 
     it('never returns a stream url for YouTube', () => {

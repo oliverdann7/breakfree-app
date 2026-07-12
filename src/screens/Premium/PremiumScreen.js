@@ -26,6 +26,8 @@ function PlanCard({ plan, selected, onSelect }) {
       onPress={() => onSelect(plan.id)}
       activeOpacity={0.85}
       style={[styles.planCard, selected && styles.planCardSelected]}
+      accessibilityRole="radio"
+      accessibilityState={{ checked: selected }}
     >
       <View style={styles.planHeader}>
         <View style={{ flex: 1 }}>
@@ -106,7 +108,12 @@ export default function PremiumScreen({ navigation }) {
       <ScrollView contentContainerStyle={styles.scroll}>
         <View style={styles.heroRow}>
           {navigation && (
-            <TouchableOpacity onPress={() => navigation.goBack()} style={styles.back}>
+            <TouchableOpacity
+              onPress={() => navigation.goBack()}
+              style={styles.back}
+              accessibilityRole="button"
+              accessibilityLabel={t('common.back')}
+            >
               <Text style={styles.backText}>←</Text>
             </TouchableOpacity>
           )}
@@ -129,7 +136,11 @@ export default function PremiumScreen({ navigation }) {
                   : '—'}
               </Text>
             </View>
-            <TouchableOpacity onPress={handleCancel} style={styles.cancelLink}>
+            <TouchableOpacity
+              onPress={handleCancel}
+              style={styles.cancelLink}
+              accessibilityRole="button"
+            >
               <Text style={styles.cancelLinkText}>{t('premium.cancel')}</Text>
             </TouchableOpacity>
           </View>
@@ -148,6 +159,8 @@ export default function PremiumScreen({ navigation }) {
               disabled={submitting}
               style={[styles.cta, submitting && { opacity: 0.6 }]}
               activeOpacity={0.85}
+              accessibilityRole="button"
+              accessibilityState={{ disabled: submitting, busy: submitting }}
             >
               <Text style={styles.ctaText}>
                 {submitting

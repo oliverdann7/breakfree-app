@@ -81,6 +81,8 @@ export default function OnboardingScreen({ _navigation }) {
               style={[styles.goalCard, selected && styles.goalCardSelected]}
               onPress={() => toggleGoal(id)}
               activeOpacity={0.7}
+              accessibilityRole="button"
+              accessibilityState={{ selected }}
             >
               <Text style={styles.goalEmoji}>{GOAL_EMOJIS[id]}</Text>
               <Text style={[styles.goalLabel, selected && styles.goalLabelSelected]}>

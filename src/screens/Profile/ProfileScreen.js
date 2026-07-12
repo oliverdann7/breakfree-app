@@ -21,7 +21,12 @@ import { colors } from '../../constants/designTokens';
 
 function SettingRow({ icon, label, value, onPress, rightElement, isDestructive }) {
   return (
-    <TouchableOpacity style={styles.settingRow} onPress={onPress} activeOpacity={0.7}>
+    <TouchableOpacity
+      style={styles.settingRow}
+      onPress={onPress}
+      activeOpacity={0.7}
+      accessibilityRole="button"
+    >
       <Text style={styles.settingIcon}>{icon}</Text>
       <Text style={[styles.settingLabel, isDestructive && { color: colors.error }]}>{label}</Text>
       <View style={styles.settingRight}>
@@ -130,6 +135,7 @@ export default function ProfileScreen({ navigation }) {
           <TouchableOpacity
             style={styles.editBtn}
             onPress={() => navigation.navigate('EditProfile')}
+            accessibilityRole="button"
           >
             <Text style={styles.editBtnText}>{t('profile.editProfile')}</Text>
           </TouchableOpacity>

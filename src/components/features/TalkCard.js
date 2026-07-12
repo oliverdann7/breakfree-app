@@ -21,7 +21,7 @@ export default function TalkCard({ talk, onPress, style }) {
   const emoji = CATEGORY_EMOJI[talk.category] || '🎙';
 
   return (
-    <TouchableOpacity onPress={onPress} activeOpacity={0.85}>
+    <TouchableOpacity onPress={onPress} activeOpacity={0.85} accessibilityRole="button">
       <Card style={[styles.card, style]}>
         <View style={styles.thumbnail}>
           <Text style={styles.thumbnailEmoji}>{emoji}</Text>

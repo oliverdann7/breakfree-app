@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, TextInput, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { colors } from '../../constants/designTokens';
 
 export default function Input({
@@ -14,6 +15,7 @@ export default function Input({
   style,
   ...props
 }) {
+  const { t } = useTranslation();
   const [focused, setFocused] = useState(false);
   const [visible, setVisible] = useState(false);
 
@@ -36,7 +38,12 @@ export default function Input({
           {...props}
         />
         {secureTextEntry && (
-          <TouchableOpacity onPress={() => setVisible((v) => !v)} style={styles.eyeBtn}>
+          <TouchableOpacity
+            onPress={() => setVisible((v) => !v)}
+            style={styles.eyeBtn}
+            accessibilityRole="button"
+            accessibilityLabel={visible ? t('a11y.hidePassword') : t('a11y.showPassword')}
+          >
             <Text style={styles.eyeIcon}>{visible ? '👁' : '🙈'}</Text>
           </TouchableOpacity>
         )}

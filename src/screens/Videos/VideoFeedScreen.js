@@ -54,6 +54,8 @@ export default function VideoFeedScreen({ navigation }) {
               key={cat}
               style={[styles.catChip, activeCategory === cat && styles.catChipActive]}
               onPress={() => dispatch(setActiveCategory(cat))}
+              accessibilityRole="button"
+              accessibilityState={{ selected: activeCategory === cat }}
             >
               <Text style={[styles.catText, activeCategory === cat && styles.catTextActive]}>
                 {cat}

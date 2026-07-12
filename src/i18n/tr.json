@@ -9,6 +9,22 @@
     "soon": "Yakında",
     "edit": "Düzenle"
   },
+  "a11y": {
+    "showPassword": "Şifreyi göster",
+    "hidePassword": "Şifreyi gizle",
+    "like": "Beğen",
+    "unlike": "Beğenmekten vazgeç",
+    "comments": "Yorumlar ({{count}})",
+    "send": "Gönder",
+    "notifications": "Bildirimler",
+    "play": "Oynat",
+    "pause": "Duraklat",
+    "seekBack": "10 saniye geri sar",
+    "seekForward": "10 saniye ileri sar",
+    "playbackSpeed": "Oynatma hızı",
+    "avatarColor": "Avatar rengi",
+    "avatarEmoji": "Avatar emojisi"
+  },
   "greeting": {
     "morning": "Günaydın",
     "afternoon": "İyi günler",

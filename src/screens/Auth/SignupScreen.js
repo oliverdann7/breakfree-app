@@ -59,7 +59,11 @@ export default function SignupScreen({ navigation }) {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
-        <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
+        <TouchableOpacity
+          style={styles.backBtn}
+          onPress={() => navigation.goBack()}
+          accessibilityRole="button"
+        >
           <Text style={styles.backText}>{t('auth.backBtn')}</Text>
         </TouchableOpacity>
 
@@ -104,6 +108,8 @@ export default function SignupScreen({ navigation }) {
             style={styles.termsRow}
             onPress={() => setAgreed((v) => !v)}
             activeOpacity={0.7}
+            accessibilityRole="checkbox"
+            accessibilityState={{ checked: agreed }}
           >
             <View style={[styles.checkbox, agreed && styles.checkboxChecked]}>
               {agreed && <Text style={styles.checkmark}>✓</Text>}
@@ -127,7 +133,7 @@ export default function SignupScreen({ navigation }) {
 
         <View style={styles.footer}>
           <Text style={styles.footerText}>{t('auth.hasAccount')} </Text>
-          <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+          <TouchableOpacity onPress={() => navigation.navigate('Login')} accessibilityRole="button">
             <Text style={styles.footerLink}>{t('auth.login')}</Text>
           </TouchableOpacity>
         </View>

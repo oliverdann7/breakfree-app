@@ -63,7 +63,12 @@ export default function NotificationsScreen({ navigation }) {
       >
         <View style={styles.header}>
           {navigation && (
-            <TouchableOpacity onPress={() => navigation.goBack()} style={styles.back}>
+            <TouchableOpacity
+              onPress={() => navigation.goBack()}
+              style={styles.back}
+              accessibilityRole="button"
+              accessibilityLabel={t('common.back')}
+            >
               <Text style={styles.backText}>←</Text>
             </TouchableOpacity>
           )}
@@ -79,6 +84,7 @@ export default function NotificationsScreen({ navigation }) {
             <TouchableOpacity
               onPress={() => user?.uid && dispatch(markAllRead(user.uid))}
               style={styles.markAll}
+              accessibilityRole="button"
             >
               <Text style={styles.markAllText}>{t('notifications.markAll')}</Text>
             </TouchableOpacity>
@@ -98,6 +104,7 @@ export default function NotificationsScreen({ navigation }) {
               onPress={() => onItemPress(n)}
               activeOpacity={0.7}
               style={[styles.row, !n.read && styles.rowUnread]}
+              accessibilityRole="button"
             >
               <Text style={styles.icon}>{ICONS[n.type] || '🔔'}</Text>
               <View style={{ flex: 1 }}>

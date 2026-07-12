@@ -168,7 +168,11 @@ export default function HealthMetricsScreen() {
             <Text style={styles.headerLabel}>{t('health.detailedAnalysis')}</Text>
             <Text style={styles.headerTitle}>{t('health.myHealthData')}</Text>
           </View>
-          <TouchableOpacity style={styles.logBtn} onPress={() => setLogVisible(true)}>
+          <TouchableOpacity
+            style={styles.logBtn}
+            onPress={() => setLogVisible(true)}
+            accessibilityRole="button"
+          >
             <Text style={styles.logBtnText}>{t('health.addRecord')}</Text>
           </TouchableOpacity>
         </View>
@@ -305,6 +309,7 @@ export default function HealthMetricsScreen() {
                 <Text style={styles.logFieldLabel}>{label}</Text>
                 <TextInput
                   style={styles.logFieldInput}
+                  accessibilityLabel={label}
                   value={value}
                   onChangeText={set}
                   placeholder={placeholder}
@@ -319,12 +324,18 @@ export default function HealthMetricsScreen() {
                 style={[styles.saveBtn, saving && { opacity: 0.5 }]}
                 onPress={handleLog}
                 disabled={saving}
+                accessibilityRole="button"
+                accessibilityState={{ disabled: saving, busy: saving }}
               >
                 <Text style={styles.saveBtnText}>
                   {saving ? t('health.saving') : t('common.save')}
                 </Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.cancelBtn} onPress={() => setLogVisible(false)}>
+              <TouchableOpacity
+                style={styles.cancelBtn}
+                onPress={() => setLogVisible(false)}
+                accessibilityRole="button"
+              >
                 <Text style={styles.cancelBtnText}>{t('common.cancel')}</Text>
               </TouchableOpacity>
             </View>

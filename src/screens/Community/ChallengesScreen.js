@@ -20,7 +20,7 @@ function ChallengeCard({ challenge, joined, progress, onJoin, onOpen }) {
   const daysLeft = Math.ceil((challenge.endDate - Date.now()) / 86_400_000);
   return (
     <Card style={styles.card}>
-      <TouchableOpacity onPress={onOpen} activeOpacity={0.85}>
+      <TouchableOpacity onPress={onOpen} activeOpacity={0.85} accessibilityRole="button">
         <View style={styles.cardHead}>
           <Text style={styles.cardIcon}>{challenge.icon || '🏆'}</Text>
           <View style={{ flex: 1 }}>
@@ -45,7 +45,7 @@ function ChallengeCard({ challenge, joined, progress, onJoin, onOpen }) {
             </Text>
           </>
         ) : (
-          <TouchableOpacity onPress={onJoin} style={styles.joinBtn}>
+          <TouchableOpacity onPress={onJoin} style={styles.joinBtn} accessibilityRole="button">
             <Text style={styles.joinBtnText}>{t('challenges.joinBtn')}</Text>
           </TouchableOpacity>
         )}
@@ -87,7 +87,12 @@ export default function ChallengesScreen({ navigation }) {
       <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 60 }}>
         <View style={styles.header}>
           {navigation && (
-            <TouchableOpacity onPress={() => navigation.goBack()} style={styles.back}>
+            <TouchableOpacity
+              onPress={() => navigation.goBack()}
+              style={styles.back}
+              accessibilityRole="button"
+              accessibilityLabel={t('common.back')}
+            >
               <Text style={styles.backText}>←</Text>
             </TouchableOpacity>
           )}

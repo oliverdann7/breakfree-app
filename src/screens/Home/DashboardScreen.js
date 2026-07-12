@@ -111,7 +111,11 @@ export default function DashboardScreen() {
               {t(greetingKey())}, <Text style={styles.name}>{user?.displayName || 'Elif'}</Text>
             </Text>
           </View>
-          <TouchableOpacity style={styles.notifBtn}>
+          <TouchableOpacity
+            style={styles.notifBtn}
+            accessibilityRole="button"
+            accessibilityLabel={t('a11y.notifications')}
+          >
             <Text style={styles.notifIcon}>🔔</Text>
             <View style={styles.notifDot} />
           </TouchableOpacity>
@@ -204,6 +208,8 @@ export default function DashboardScreen() {
                       dispatch(completeTask({ uid: user.uid, taskIndex: i }));
                     }
                   }}
+                  accessibilityRole="checkbox"
+                  accessibilityState={{ checked: item.done }}
                 >
                   <View style={[styles.planItem, item.accent && styles.planItemAccent]}>
                     <View style={[styles.planIconBox, item.accent && styles.planIconBoxAccent]}>
