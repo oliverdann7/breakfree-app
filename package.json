@@ -21,7 +21,8 @@
     "setup:hooks": "husky install",
     "eas:build:preview": "eas build --platform all --profile preview",
     "eas:build:production": "eas build --platform all",
-    "eas:submit": "eas submit --platform all"
+    "eas:submit": "eas submit --platform all",
+    "test:rules": "firebase emulators:exec --only firestore --project breakfree-rules-test \"jest --config rules-tests/jest.config.js\""
   },
   "dependencies": {
     "@expo/metro-runtime": "~3.2.3",
@@ -70,6 +71,7 @@
     "@babel/preset-env": "^7.23.6",
     "@babel/preset-react": "^7.23.3",
     "@babel/preset-typescript": "^7.23.3",
+    "@firebase/rules-unit-testing": "^5.0.1",
     "@testing-library/react": "^14.1.2",
     "@testing-library/react-native": "^12.4.1",
     "@types/react": "^18.2.42",
@@ -94,7 +96,8 @@
     "testEnvironment": "jsdom",
     "testPathIgnorePatterns": [
       "/node_modules/",
-      "/functions/"
+      "/functions/",
+      "/rules-tests/"
     ],
     "setupFilesAfterEnv": [
       "<rootDir>/jest.setup.js"

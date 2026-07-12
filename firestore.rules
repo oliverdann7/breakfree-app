@@ -17,9 +17,30 @@ service cloud.firestore {
     function onlyChanges(keys) {
       return request.resource.data.diff(resource.data).affectedKeys().hasOnly(keys);
     }
+    function isNonEmptyString(value, max) {
+      return value is string && value.size() > 0 && value.size() <= max;
+    }
+    // Shared counters may only move by exactly 1 in either direction and can
+    // never go negative — blocks bulk inflation like likes: increment(9999).
+    function bumpedByOne(field) {
+      return request.resource.data[field] is int
+        && request.resource.data[field] >= 0
+        && (request.resource.data[field] - resource.data.get(field, 0) == 1
+            || request.resource.data[field] - resource.data.get(field, 0) == -1);
+    }
+    // The document the client writes carries its own uid and it matches the
+    // caller — the ownership claim other rules rely on can't be forged.
+    function writesOwnUid() {
+      return isSignedIn() && request.resource.data.uid == request.auth.uid;
+    }
+    function ownsResource() {
+      return isSignedIn() && resource.data.uid == request.auth.uid;
+    }
 
     match /users/{userId} {
-      allow read, write: if isOwner(userId);
+      allow read: if isOwner(userId);
+      allow write: if isOwner(userId)
+        && request.resource.data.keys().size() <= 50;
 
       match /metrics/{document} {
         allow read, write: if isOwner(userId);
@@ -38,11 +59,14 @@ service cloud.firestore {
     match /talks/{talk} {
       allow read: if isSignedIn();
       allow create: if isSignedIn()
-        && request.resource.data.title is string
-        && request.resource.data.title.size() > 0;
+        && isNonEmptyString(request.resource.data.title, 200)
+        && request.resource.data.get('status', 'scheduled') in ['scheduled', 'live', 'ended']
+        && request.resource.data.get('listeners', 0) == 0
+        && request.resource.data.keys().size() <= 30;
       // Admins may fully edit/remove a talk; any signed-in user may bump the
-      // live listener counter when they join (see talksSlice.joinTalk).
-      allow update: if isAdmin() || (isSignedIn() && onlyChanges(['listeners']));
+      // live listener counter by one when they join (see talksSlice.joinTalk).
+      allow update: if isAdmin()
+        || (isSignedIn() && onlyChanges(['listeners']) && bumpedByOne('listeners'));
       allow delete: if isAdmin();
     }
 
@@ -50,31 +74,139 @@ service cloud.firestore {
       allow read: if isSignedIn();
       allow create: if isSignedIn()
         && request.resource.data.authorUid == request.auth.uid
-        && request.resource.data.text is string
-        && request.resource.data.text.size() > 0;
-      // Author may edit/delete their own post; anyone signed in may change only
-      // the like counter (see communitySlice.toggleLike).
+        && isNonEmptyString(request.resource.data.text, 2000)
+        && request.resource.data.get('likes', 0) == 0
+        && request.resource.data.keys().size() <= 20;
+      // Author may edit their own post (text stays bounded); anyone signed in
+      // may move only the like counter by one (see communitySlice.toggleLike).
       allow update: if isSignedIn() && (
-        resource.data.authorUid == request.auth.uid
-        || onlyChanges(['likes'])
+        (resource.data.authorUid == request.auth.uid
+          && request.resource.data.authorUid == resource.data.authorUid
+          && isNonEmptyString(request.resource.data.text, 2000))
+        || (onlyChanges(['likes']) && bumpedByOne('likes'))
       );
       allow delete: if isSignedIn() && resource.data.authorUid == request.auth.uid;
 
       match /comments/{comment} {
         allow read: if isSignedIn();
         allow create: if isSignedIn()
-          && request.resource.data.authorUid == request.auth.uid;
-        allow update, delete: if isSignedIn()
-          && resource.data.authorUid == request.auth.uid;
+          && request.resource.data.authorUid == request.auth.uid
+          && isNonEmptyString(request.resource.data.text, 1000)
+          && request.resource.data.keys().size() <= 15;
+        allow update: if isSignedIn()
+          && resource.data.authorUid == request.auth.uid
+          && request.resource.data.authorUid == resource.data.authorUid
+          && isNonEmptyString(request.resource.data.text, 1000);
+        allow delete: if isSignedIn() && resource.data.authorUid == request.auth.uid;
       }
     }
 
     // Like records are keyed `${uid}_${postId}` and carry a `uid` field. A user
     // may only read or mutate their own like documents.
     match /liked_posts/{id} {
-      allow read: if isSignedIn() && resource.data.uid == request.auth.uid;
-      allow create: if isSignedIn() && request.resource.data.uid == request.auth.uid;
-      allow delete: if isSignedIn() && resource.data.uid == request.auth.uid;
+      allow read: if ownsResource();
+      allow create: if writesOwnUid()
+        && request.resource.data.postId is string;
+      allow delete: if ownsResource();
+    }
+
+    // Exclusive content catalog: seeded/managed out-of-band (seed script with
+    // admin credentials, console, or Cloud Functions). Clients only read.
+    match /videos/{video} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    match /mentors/{mentorId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+
+      // Session bookings (MentorDetailScreen.handleBook): a user may book for
+      // themselves, always starting in 'pending'. Confirmation/cancellation is
+      // the mentor/ops side, done with admin credentials.
+      match /sessions/{session} {
+        allow read: if ownsResource();
+        allow create: if writesOwnUid()
+          && request.resource.data.status == 'pending'
+          && request.resource.data.duration is int
+          && request.resource.data.keys().size() <= 15;
+        allow update, delete: if isAdmin();
+      }
+    }
+
+    // One assignment doc per user, keyed by uid (mentorSlice self-seeds it).
+    match /mentor_assignments/{userId} {
+      allow read: if isOwner(userId);
+      allow write: if isOwner(userId)
+        && request.resource.data.uid == userId
+        && request.resource.data.keys().size() <= 20;
+
+      match /messages/{message} {
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId)
+          && isNonEmptyString(request.resource.data.text, 2000);
+      }
+    }
+
+    // Plans are keyed `${uid}_${date}`; the prefix scopes them to their owner.
+    match /daily_plans/{planId} {
+      allow read, write: if isSignedIn()
+        && planId.matches(request.auth.uid + '_.*');
+    }
+
+    match /daily_metrics/{id} {
+      allow read: if ownsResource();
+      allow create: if writesOwnUid();
+      allow update: if ownsResource() && request.resource.data.uid == resource.data.uid;
+    }
+
+    match /talks_participants/{id} {
+      allow read: if ownsResource();
+      allow create: if writesOwnUid();
+    }
+
+    match /challenges/{challengeId} {
+      allow read: if isSignedIn();
+      // Any signed-in user may bump the participant counter by one when they
+      // join (see challengesSlice.joinChallenge); content changes are admin.
+      allow update: if isAdmin()
+        || (isSignedIn() && onlyChanges(['participantCount']) && bumpedByOne('participantCount'));
+      allow create, delete: if isAdmin();
+    }
+
+    // Participation records are keyed `${challengeId}_${uid}` and carry uid.
+    match /challenge_participants/{id} {
+      allow read: if ownsResource();
+      allow create: if writesOwnUid()
+        && request.resource.data.get('currentProgress', 0) == 0;
+      allow update: if ownsResource()
+        && request.resource.data.uid == resource.data.uid;
+    }
+
+    // Computed by the leaderboard Cloud Function (admin SDK); read-only here.
+    match /leaderboards/{id} {
+      allow read: if isSignedIn();
+      allow write: if false;
+    }
+
+    // Presence/leaderboard snapshot other users can see; only the owner writes.
+    match /user_status/{userId} {
+      allow read: if isSignedIn();
+      allow write: if isOwner(userId) && request.resource.data.uid == userId;
+    }
+
+    // Write-only drop boxes: clients file feedback/errors, only ops reads them
+    // (console/admin SDK). No client reads, edits, or deletes.
+    match /feedback/{id} {
+      allow create: if isSignedIn()
+        && isNonEmptyString(request.resource.data.message, 2000);
+      allow read, update, delete: if false;
+    }
+
+    match /error_logs/{id} {
+      allow create: if isSignedIn()
+        && isNonEmptyString(request.resource.data.message, 5000);
+      allow read, update, delete: if false;
     }
   }
 }
