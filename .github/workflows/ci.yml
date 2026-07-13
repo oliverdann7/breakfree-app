@@ -55,3 +55,19 @@ jobs:
           cache: 'npm'
       - run: npm install --legacy-peer-deps
       - run: npm run build:web
+
+  rules-test:
+    runs-on: ubuntu-latest
+    name: Firestore Rules
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+      - run: npm install --legacy-peer-deps
+      - run: npx --yes firebase-tools@13 emulators:exec --only firestore --project breakfree-rules-test "npx jest --config rules-tests/jest.config.js"
