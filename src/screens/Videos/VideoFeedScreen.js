@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import {
   View,
   Text,
@@ -18,7 +18,9 @@ import { colors } from '../../constants/designTokens';
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = (width - 52) / 2;
 
-const CATEGORIES = ['Tümü', 'Zihin', 'Sağlık', 'Beslenme', 'Hareket', 'Uyku'];
+// Core verticals always shown; categories introduced by new catalog docs (via
+// the admin CMS) are appended automatically so no code change is needed.
+const BASE_CATEGORIES = ['Zihin', 'Sağlık', 'Beslenme', 'Hareket', 'Uyku'];
 
 export default function VideoFeedScreen({ navigation }) {
   const dispatch = useAppDispatch();
@@ -28,6 +30,11 @@ export default function VideoFeedScreen({ navigation }) {
   useEffect(() => {
     dispatch(fetchVideos());
   }, []);
+
+  const categories = useMemo(() => {
+    const fromData = allVideos.map((v) => v.category).filter(Boolean);
+    return ['Tümü', ...new Set([...BASE_CATEGORIES, ...fromData])];
+  }, [allVideos]);
 
   const filtered =
     activeCategory === 'Tümü' ? allVideos : allVideos.filter((v) => v.category === activeCategory);
@@ -49,7 +56,7 @@ export default function VideoFeedScreen({ navigation }) {
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.categories}
         >
-          {CATEGORIES.map((cat) => (
+          {categories.map((cat) => (
             <TouchableOpacity
               key={cat}
               style={[styles.catChip, activeCategory === cat && styles.catChipActive]}

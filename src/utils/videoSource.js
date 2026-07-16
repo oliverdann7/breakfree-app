@@ -80,6 +80,22 @@ export function getStreamUrl(video) {
   }
 }
 
+const YOUTUBE_ID_PATTERN = /^[A-Za-z0-9_-]{11}$/;
+const YOUTUBE_URL_PATTERN =
+  /(?:youtube\.com\/(?:watch\?(?:.*&)?v=|embed\/|shorts\/|live\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/;
+
+/**
+ * Extract the 11-char YouTube video id from a share URL or a bare id.
+ * Accepts watch/embed/shorts/live and youtu.be forms; null when nothing matches.
+ */
+export function parseYouTubeId(input) {
+  if (typeof input !== 'string') return null;
+  const trimmed = input.trim();
+  if (YOUTUBE_ID_PATTERN.test(trimmed)) return trimmed;
+  const match = trimmed.match(YOUTUBE_URL_PATTERN);
+  return match ? match[1] : null;
+}
+
 /** True when the video plays via the YouTube iframe rather than expo-av. */
 export function isYouTube(video) {
   return getSource(video) === VIDEO_SOURCES.YOUTUBE;

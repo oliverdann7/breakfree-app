@@ -54,6 +54,16 @@ service cloud.firestore {
         allow read: if isOwner(userId);
         allow write: if false;
       }
+
+      // Per-video watch progress (videosSlice.saveWatchProgress). Owner-only;
+      // progress can never be negative.
+      match /watched_videos/{videoId} {
+        allow read: if isOwner(userId);
+        allow create, update: if isOwner(userId)
+          && request.resource.data.progressSeconds is number
+          && request.resource.data.progressSeconds >= 0
+          && request.resource.data.keys().size() <= 10;
+      }
     }
 
     match /talks/{talk} {
