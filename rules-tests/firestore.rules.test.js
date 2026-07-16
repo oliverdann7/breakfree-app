@@ -181,6 +181,36 @@ describe('videos (read-only catalog)', () => {
   });
 });
 
+describe('users/watched_videos (watch progress)', () => {
+  const progress = { progressSeconds: 120, durationSeconds: 1842, watchedAt: 1 };
+
+  it('owner can save and read their own progress', async () => {
+    await assertSucceeds(setDoc(doc(db(ALICE), `users/${ALICE}/watched_videos/v1`), progress));
+    await assertSucceeds(getDoc(doc(db(ALICE), `users/${ALICE}/watched_videos/v1`)));
+  });
+
+  it('other users cannot read or write someone else’s progress', async () => {
+    await seed(`users/${ALICE}/watched_videos/v1`, progress);
+    await assertFails(getDoc(doc(db(BOB), `users/${ALICE}/watched_videos/v1`)));
+    await assertFails(setDoc(doc(db(BOB), `users/${ALICE}/watched_videos/v1`), progress));
+  });
+
+  it('rejects negative or non-numeric progress', async () => {
+    await assertFails(
+      setDoc(doc(db(ALICE), `users/${ALICE}/watched_videos/v1`), {
+        ...progress,
+        progressSeconds: -5,
+      })
+    );
+    await assertFails(
+      setDoc(doc(db(ALICE), `users/${ALICE}/watched_videos/v1`), {
+        ...progress,
+        progressSeconds: 'çok',
+      })
+    );
+  });
+});
+
 describe('mentors and session bookings', () => {
   it('mentor docs are read-only for clients', async () => {
     await seed('mentors/m1', { name: 'Dr. Ayşe' });

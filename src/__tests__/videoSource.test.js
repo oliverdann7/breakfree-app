@@ -6,6 +6,7 @@ import {
   getStreamUrl,
   isYouTube,
   isPlayable,
+  parseYouTubeId,
 } from '../utils/videoSource';
 
 describe('videoSource', () => {
@@ -86,6 +87,31 @@ describe('videoSource', () => {
     it('native is playable only with a stream url', () => {
       expect(isPlayable({ source: 'mux', sourceId: 'pb1' })).toBe(true);
       expect(isPlayable({ source: 'mux', sourceId: null })).toBe(false);
+    });
+  });
+
+  describe('parseYouTubeId', () => {
+    it('accepts a bare 11-char id', () => {
+      expect(parseYouTubeId('inpok4MKVLM')).toBe('inpok4MKVLM');
+      expect(parseYouTubeId('  inpok4MKVLM  ')).toBe('inpok4MKVLM');
+    });
+
+    it('parses the common URL shapes', () => {
+      expect(parseYouTubeId('https://www.youtube.com/watch?v=inpok4MKVLM')).toBe('inpok4MKVLM');
+      expect(parseYouTubeId('https://www.youtube.com/watch?list=PL1&v=inpok4MKVLM')).toBe(
+        'inpok4MKVLM'
+      );
+      expect(parseYouTubeId('https://youtu.be/inpok4MKVLM?t=30')).toBe('inpok4MKVLM');
+      expect(parseYouTubeId('https://www.youtube.com/embed/inpok4MKVLM')).toBe('inpok4MKVLM');
+      expect(parseYouTubeId('https://www.youtube.com/shorts/inpok4MKVLM')).toBe('inpok4MKVLM');
+      expect(parseYouTubeId('https://www.youtube.com/live/inpok4MKVLM')).toBe('inpok4MKVLM');
+    });
+
+    it('rejects non-YouTube input', () => {
+      expect(parseYouTubeId('https://vimeo.com/12345678')).toBeNull();
+      expect(parseYouTubeId('not a link')).toBeNull();
+      expect(parseYouTubeId('')).toBeNull();
+      expect(parseYouTubeId(null)).toBeNull();
     });
   });
 });
