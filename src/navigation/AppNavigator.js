@@ -22,6 +22,11 @@ import ConnectedDevicesScreen from '../screens/Profile/ConnectedDevicesScreen';
 import VideoFeedScreen from '../screens/Videos/VideoFeedScreen';
 import VideoPlayerScreen from '../screens/Videos/VideoPlayerScreen';
 import { colors } from '../constants/designTokens';
+import { isEnabled } from '../constants/featureFlags';
+
+// The paywall is only routable while the IAP flow is live — a reachable
+// Premium screen with a non-functional purchase is a store rejection.
+const premiumEnabled = isEnabled('premiumSubscription');
 
 const Tab = createBottomTabNavigator();
 const TalksStack = createStackNavigator();
@@ -51,7 +56,7 @@ function VideoStackNavigator() {
     <VideoStack.Navigator screenOptions={{ headerShown: false }}>
       <VideoStack.Screen name="VideoFeed" component={VideoFeedScreen} />
       <VideoStack.Screen name="VideoPlayer" component={VideoPlayerScreen} />
-      <VideoStack.Screen name="Premium" component={PremiumScreen} />
+      {premiumEnabled && <VideoStack.Screen name="Premium" component={PremiumScreen} />}
     </VideoStack.Navigator>
   );
 }
@@ -70,7 +75,7 @@ function ProfileStackNavigator() {
     <ProfileStack.Navigator screenOptions={{ headerShown: false }}>
       <ProfileStack.Screen name="ProfileMain" component={ProfileScreen} />
       <ProfileStack.Screen name="EditProfile" component={EditProfileScreen} />
-      <ProfileStack.Screen name="Premium" component={PremiumScreen} />
+      {premiumEnabled && <ProfileStack.Screen name="Premium" component={PremiumScreen} />}
       <ProfileStack.Screen name="Privacy" component={PrivacyScreen} />
       <ProfileStack.Screen name="Notifications" component={NotificationsScreen} />
       <ProfileStack.Screen name="ConnectedDevices" component={ConnectedDevicesScreen} />

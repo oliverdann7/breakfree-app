@@ -27,7 +27,7 @@ Capture once per release. All images PNG, no transparency.
 4. **Mentor 1-on-1** — mentor profile + weekly focus + goals
 5. **Community feed** — post + leaderboard card
 6. **Challenges + Leaderboard** — challenge card + leaderboard with "you" highlight
-7. **BreakFree Pro paywall** — plan selector + trial banner
+7. **Expert videos** — video feed with categories
 8. **Privacy & data control** — KVKK/GDPR settings
 
 ## Caption text (overlay)

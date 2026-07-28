@@ -1,13 +1,12 @@
 import { registerRootComponent } from 'expo';
+import { Platform } from 'react-native';
 
-// Load appropriate entry point based on environment
-let RootApp;
-if (typeof window !== 'undefined') {
-  // Web environment - import web-only entry point
-  RootApp = require('./web.js').default;
-} else {
-  // Native environment - import full app
-  RootApp = require('./App.tsx').default;
-}
+// Platform split at module load time. NOTE: never use `typeof window` for
+// this — React Native defines `global.window`, so that guard sends native
+// devices down the web path.
+const RootApp =
+  Platform.OS === 'web'
+    ? require('./web.js').default // web-only root (landing + dashboard)
+    : require('./App.tsx').default; // full native app
 
 registerRootComponent(RootApp);

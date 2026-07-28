@@ -21,7 +21,11 @@ export async function signInWithGoogle() {
   await GoogleSignin.GoogleSignin.configure({
     webClientId: process.env['EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID'],
   });
-  const { idToken } = await GoogleSignin.GoogleSignin.signIn();
+  await GoogleSignin.GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
+  const response = await GoogleSignin.GoogleSignin.signIn();
+  // v13+ returns { type, data: { idToken } }; older versions return { idToken }.
+  const idToken = response?.data?.idToken ?? response?.idToken;
+  if (!idToken) throw new Error('Google girişi iptal edildi');
   const cred = GoogleAuthProvider.credential(idToken);
   const result = await signInWithCredential(auth, cred);
   return { user: result.user };

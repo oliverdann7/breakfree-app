@@ -56,7 +56,7 @@ export function getThumbnailUrl(video) {
 }
 
 /**
- * Direct stream URL for the native (expo-av) player.
+ * Direct stream URL for the native (expo-video) player.
  * YouTube does NOT return a stream URL here — it must play through the iframe
  * player, so callers should branch on `getSource()` before reaching for this.
  */
@@ -96,7 +96,7 @@ export function parseYouTubeId(input) {
   return match ? match[1] : null;
 }
 
-/** True when the video plays via the YouTube iframe rather than expo-av. */
+/** True when the video plays via the YouTube iframe rather than expo-video. */
 export function isYouTube(video) {
   return getSource(video) === VIDEO_SOURCES.YOUTUBE;
 }

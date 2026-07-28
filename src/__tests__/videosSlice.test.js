@@ -5,6 +5,13 @@ import videosReducer, {
   isVideoLocked,
 } from '../store/slices/videosSlice';
 
+// Lock semantics only apply once the IAP flow is live; force the flag on so
+// the gating logic itself stays covered.
+jest.mock('../constants/featureFlags', () => ({
+  featureFlags: { premiumSubscription: true },
+  isEnabled: (flag) => flag === 'premiumSubscription',
+}));
+
 const initialState = {
   allVideos: [],
   currentVideo: null,

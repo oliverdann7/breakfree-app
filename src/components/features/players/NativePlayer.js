@@ -1,50 +1,66 @@
-import React, { useRef, useImperativeHandle, forwardRef, useCallback } from 'react';
+import React, { useImperativeHandle, forwardRef, useEffect } from 'react';
 import { StyleSheet } from 'react-native';
-import { Video, ResizeMode } from 'expo-av';
-import { getStreamUrl, getThumbnailUrl } from '../../../utils/videoSource';
+import { useEventListener } from 'expo';
+import { useVideoPlayer, VideoView } from 'expo-video';
+import { getStreamUrl } from '../../../utils/videoSource';
 
-// Plays Mux / Vimeo / direct-URL videos through expo-av. The parent owns
+// Plays Mux / Vimeo / direct-URL videos through expo-video. The parent owns
 // play/pause (`paused`) and `rate`; we surface position/duration/end via the
 // uniform callbacks and expose `seekTo` imperatively.
 const NativePlayer = forwardRef(function NativePlayer(
   { video, paused, rate, startSeconds = 0, onProgress, onDuration, onEnd, onReady },
   ref
 ) {
-  const videoRef = useRef(null);
   const url = getStreamUrl(video);
-  const poster = getThumbnailUrl(video);
 
-  useImperativeHandle(ref, () => ({
-    seekTo: (seconds) => videoRef.current?.setPositionAsync(Math.max(0, seconds) * 1000),
-  }));
+  const player = useVideoPlayer(url ? { uri: url } : null, (p) => {
+    p.timeUpdateEventInterval = 1;
+    if (startSeconds > 0) p.currentTime = startSeconds;
+    if (typeof rate === 'number') p.playbackRate = rate;
+    if (!paused) p.play();
+  });
 
-  const handleStatus = useCallback(
-    (status) => {
-      if (!status.isLoaded) return;
-      if (typeof status.positionMillis === 'number') onProgress?.(status.positionMillis / 1000);
-      if (status.durationMillis) onDuration?.(status.durationMillis / 1000);
-      if (status.didJustFinish) onEnd?.();
-    },
-    [onProgress, onDuration, onEnd]
+  useImperativeHandle(
+    ref,
+    () => ({
+      seekTo: (seconds) => {
+        player.currentTime = Math.max(0, seconds);
+      },
+    }),
+    [player]
   );
+
+  useEffect(() => {
+    if (paused) player.pause();
+    else player.play();
+  }, [player, paused]);
+
+  useEffect(() => {
+    if (typeof rate === 'number') player.playbackRate = rate;
+  }, [player, rate]);
+
+  useEventListener(player, 'timeUpdate', ({ currentTime }) => {
+    if (typeof currentTime === 'number') onProgress?.(currentTime);
+  });
+
+  useEventListener(player, 'statusChange', ({ status }) => {
+    if (status === 'readyToPlay') {
+      if (player.duration) onDuration?.(player.duration);
+      onReady?.();
+    }
+  });
+
+  useEventListener(player, 'playToEnd', () => onEnd?.());
 
   if (!url) return null;
 
   return (
-    <Video
-      ref={videoRef}
+    <VideoView
+      player={player}
       style={styles.video}
-      source={{ uri: url }}
-      posterSource={poster ? { uri: poster } : undefined}
-      usePoster={Boolean(poster)}
-      resizeMode={ResizeMode.CONTAIN}
-      shouldPlay={!paused}
-      rate={rate}
-      progressUpdateIntervalMillis={1000}
-      positionMillis={startSeconds * 1000}
-      onReadyForDisplay={() => onReady?.()}
-      onPlaybackStatusUpdate={handleStatus}
-      useNativeControls={false}
+      contentFit="contain"
+      nativeControls={false}
+      allowsFullscreen={false}
     />
   );
 });

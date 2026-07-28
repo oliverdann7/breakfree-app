@@ -1,0 +1,54 @@
+{
+  "_readme": "Screenshot overlay captions per shot — see store/screenshots/SPEC.md. Fraunces 600 headline + Manrope 500 sub, cream #F4E8C8 on navy #0A2540.",
+  "shots": [
+    {
+      "id": "01-dashboard",
+      "tr": {
+        "headline": "Wellness skorun her gün seninle",
+        "sub": "Uyku, hareket, zihin ve beslenme tek ekranda"
+      },
+      "en": {
+        "headline": "Your wellness score, every day",
+        "sub": "Sleep, movement, mind and nutrition in one place"
+      }
+    },
+    {
+      "id": "02-talks",
+      "tr": {
+        "headline": "Uzman oturumlarını takip et",
+        "sub": "Program ve topluluk sohbeti bir arada"
+      },
+      "en": { "headline": "Follow expert talks", "sub": "Schedule and community chat together" }
+    },
+    {
+      "id": "03-analytics",
+      "tr": { "headline": "Gelişimini gör", "sub": "Haftalık grafikler ve günlük metrikler" },
+      "en": { "headline": "See your progress", "sub": "Weekly charts and daily metrics" }
+    },
+    {
+      "id": "04-mentor",
+      "tr": { "headline": "Mentorunla hedef belirle", "sub": "Haftalık odak ve kişisel hedefler" },
+      "en": { "headline": "Set goals with your mentor", "sub": "Weekly focus and personal goals" }
+    },
+    {
+      "id": "05-community",
+      "tr": { "headline": "Yolculuğunu paylaş", "sub": "Destekleyici, güvenli bir topluluk" },
+      "en": { "headline": "Share your journey", "sub": "A supportive, safe community" }
+    },
+    {
+      "id": "06-challenges",
+      "tr": { "headline": "Meydan okumalara katıl", "sub": "Lider tablosunda yerini al" },
+      "en": { "headline": "Join challenges", "sub": "Claim your spot on the leaderboard" }
+    },
+    {
+      "id": "07-videos",
+      "tr": { "headline": "Uzman videoları", "sub": "Meditasyon, nefes, beslenme ve daha fazlası" },
+      "en": { "headline": "Expert videos", "sub": "Meditation, breathing, nutrition and more" }
+    },
+    {
+      "id": "08-privacy",
+      "tr": { "headline": "Verilerin senin", "sub": "KVKK ve GDPR uyumlu — dışa aktar veya sil" },
+      "en": { "headline": "Your data is yours", "sub": "KVKK & GDPR compliant — export or delete" }
+    }
+  ]
+}

@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { collection, getDocs, doc, getDoc, query, orderBy, setDoc } from 'firebase/firestore';
 import { db } from '../../services/firebase';
+import { isEnabled } from '../../constants/featureFlags';
 
 // Each video declares a provider-agnostic `source` + `sourceId` (see
 // utils/videoSource.js). `isPremium` gates playback behind a Pro subscription.
@@ -160,6 +161,10 @@ export const { setActiveCategory, clearCurrentVideo, updateLocalProgress } = vid
 
 // A video requires Pro unless it's explicitly free (`isPremium === false`).
 // Default-locked is intentional: legacy/new docs without the flag stay gated.
-export const isVideoLocked = (video, isPremium) => video?.isPremium !== false && !isPremium;
+// While the store IAP flow isn't live (featureFlags.premiumSubscription off),
+// nothing is locked — shipping a paywall whose purchase can't complete is an
+// App Store rejection (Guideline 2.1 / 3.1.1).
+export const isVideoLocked = (video, isPremium) =>
+  isEnabled('premiumSubscription') && video?.isPremium !== false && !isPremium;
 
 export default videosSlice.reducer;

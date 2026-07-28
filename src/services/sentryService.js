@@ -1,6 +1,5 @@
 // Sentry initialization wrapper. Reads DSN from EXPO_PUBLIC_SENTRY_DSN at
-// runtime so the native module install can come later without code churn.
-// When the DSN or module is missing, this is a no-op (queue is intentional —
+// runtime; when the DSN is missing this is a no-op (queue is intentional —
 // in tests the queue is the assertion target).
 
 const queue = [];
@@ -17,20 +16,18 @@ export async function initSentry({ release } = {}) {
   if (!dsn) return false;
 
   try {
-    SentryNS = await import('sentry-expo');
+    SentryNS = await import('@sentry/react-native');
     SentryNS.init({
       dsn,
-      enableInExpoDevelopment: false,
       debug: false,
       environment: getEnv(),
       release,
       tracesSampleRate: 0.2,
-      integrations: [],
     });
     flush();
     return true;
   } catch {
-    // sentry-expo not installed yet — keep queuing.
+    // SDK failed to load (e.g. web bundle without the native module) — keep queuing.
     return false;
   }
 }
@@ -41,13 +38,13 @@ function flush() {
     const item = queue.shift();
     try {
       if (item.kind === 'exception') {
-        SentryNS.Native?.captureException(item.error, { extra: item.context });
+        SentryNS.captureException(item.error, { extra: item.context });
       } else if (item.kind === 'message') {
-        SentryNS.Native?.captureMessage(item.message, item.level || 'info');
+        SentryNS.captureMessage(item.message, item.level || 'info');
       } else if (item.kind === 'breadcrumb') {
-        SentryNS.Native?.addBreadcrumb(item.breadcrumb);
+        SentryNS.addBreadcrumb(item.breadcrumb);
       } else if (item.kind === 'user') {
-        SentryNS.Native?.setUser(item.user);
+        SentryNS.setUser(item.user);
       }
     } catch {
       // intentional no-op
@@ -56,32 +53,32 @@ function flush() {
 }
 
 export function captureException(error, context = {}) {
-  if (SentryNS?.Native) {
-    SentryNS.Native.captureException(error, { extra: context });
+  if (SentryNS) {
+    SentryNS.captureException(error, { extra: context });
   } else {
     queue.push({ kind: 'exception', error, context });
   }
 }
 
 export function captureMessage(message, level = 'info') {
-  if (SentryNS?.Native) {
-    SentryNS.Native.captureMessage(message, level);
+  if (SentryNS) {
+    SentryNS.captureMessage(message, level);
   } else {
     queue.push({ kind: 'message', message, level });
   }
 }
 
 export function addBreadcrumb(breadcrumb) {
-  if (SentryNS?.Native) {
-    SentryNS.Native.addBreadcrumb(breadcrumb);
+  if (SentryNS) {
+    SentryNS.addBreadcrumb(breadcrumb);
   } else {
     queue.push({ kind: 'breadcrumb', breadcrumb });
   }
 }
 
 export function setUser(user) {
-  if (SentryNS?.Native) {
-    SentryNS.Native.setUser(user);
+  if (SentryNS) {
+    SentryNS.setUser(user);
   } else {
     queue.push({ kind: 'user', user });
   }
