@@ -4,10 +4,10 @@
   "framework": null,
   "cleanUrls": true,
   "rewrites": [
-    { "source": "/legal", "destination": "/index.html" },
-    { "source": "/legal/:section", "destination": "/index.html" },
-    { "source": "/admin", "destination": "/index.html" },
-    { "source": "/admin/:path*", "destination": "/index.html" }
+    { "source": "/legal", "destination": "/" },
+    { "source": "/legal/:section", "destination": "/" },
+    { "source": "/admin", "destination": "/" },
+    { "source": "/admin/:path*", "destination": "/" }
   ],
   "headers": [
     {
