@@ -64,6 +64,30 @@ service cloud.firestore {
           && request.resource.data.progressSeconds >= 0
           && request.resource.data.keys().size() <= 10;
       }
+
+      // KVKK/GDPR requests (PrivacyScreen.submitRequest). The owner files a
+      // pending export/delete request and may read back its status/exportUrl;
+      // fulfillment (status transitions, exportUrl) is done by the
+      // processPrivacyRequest Cloud Function via the admin SDK.
+      match /privacy_requests/{requestId} {
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId)
+          && request.resource.data.type in ['export', 'delete']
+          && request.resource.data.status == 'pending'
+          && request.resource.data.keys().size() <= 10;
+        allow update, delete: if false;
+      }
+
+      // In-app notifications (notificationsSlice). Created by the pushFanout
+      // Cloud Function (admin SDK); the owner may read them and flip `read`
+      // to true (markRead/markAllRead), nothing else.
+      match /notifications/{notificationId} {
+        allow read: if isOwner(userId);
+        allow update: if isOwner(userId)
+          && onlyChanges(['read'])
+          && request.resource.data.read == true;
+        allow create, delete: if false;
+      }
     }
 
     match /talks/{talk} {

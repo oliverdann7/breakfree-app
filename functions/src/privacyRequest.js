@@ -16,7 +16,9 @@ exports.processPrivacyRequest = functions.firestore
         const userDoc = await db.doc(`users/${uid}`).get();
         const data = { profile: userDoc.data(), collections: {} };
 
-        for (const sub of ['health_metrics', 'mentorship_sessions', 'notifications']) {
+        // Must match the subcollections the app actually writes under
+        // users/{uid} (see firestore.rules).
+        for (const sub of ['metrics', 'subscription', 'watched_videos', 'notifications']) {
           const subSnap = await db.collection(`users/${uid}/${sub}`).get();
           data.collections[sub] = subSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
         }

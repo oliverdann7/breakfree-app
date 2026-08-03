@@ -33,6 +33,14 @@ describe('processPrivacyRequest', () => {
     await processPrivacyRequest(snap, { params: { uid: 'u1' } });
 
     expect(saveMock).toHaveBeenCalled();
+    // The export must read the subcollections the app actually writes —
+    // wrong names here mean silently empty KVKK exports.
+    expect(admin.__api.firestoreApi.collection.mock.calls.map((c) => c[0])).toEqual([
+      'users/u1/metrics',
+      'users/u1/subscription',
+      'users/u1/watched_videos',
+      'users/u1/notifications',
+    ]);
     expect(snap.ref.update).toHaveBeenCalledWith(
       expect.objectContaining({
         status: 'completed',

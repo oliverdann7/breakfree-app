@@ -360,3 +360,79 @@ describe('users/subscription', () => {
     await assertFails(setDoc(doc(db(BOB), 'daily_metrics/d2'), { uid: ALICE, date: '2026-07-11' }));
   });
 });
+
+describe('users/privacy_requests (KVKK/GDPR)', () => {
+  const request = { type: 'export', status: 'pending', createdAt: 1 };
+
+  it('owner can file a pending export or delete request and read it back', async () => {
+    await assertSucceeds(setDoc(doc(db(ALICE), `users/${ALICE}/privacy_requests/r1`), request));
+    await assertSucceeds(
+      setDoc(doc(db(ALICE), `users/${ALICE}/privacy_requests/r2`), {
+        ...request,
+        type: 'delete',
+      })
+    );
+    await assertSucceeds(getDoc(doc(db(ALICE), `users/${ALICE}/privacy_requests/r1`)));
+  });
+
+  it('other users cannot read or file requests for someone else', async () => {
+    await seed(`users/${ALICE}/privacy_requests/r1`, request);
+    await assertFails(getDoc(doc(db(BOB), `users/${ALICE}/privacy_requests/r1`)));
+    await assertFails(setDoc(doc(db(BOB), `users/${ALICE}/privacy_requests/r2`), request));
+  });
+
+  it('rejects unknown types and non-pending initial status', async () => {
+    await assertFails(
+      setDoc(doc(db(ALICE), `users/${ALICE}/privacy_requests/r1`), {
+        ...request,
+        type: 'frobnicate',
+      })
+    );
+    await assertFails(
+      setDoc(doc(db(ALICE), `users/${ALICE}/privacy_requests/r1`), {
+        ...request,
+        status: 'completed',
+      })
+    );
+  });
+
+  it('clients cannot update or delete a filed request (function-owned lifecycle)', async () => {
+    await seed(`users/${ALICE}/privacy_requests/r1`, request);
+    await assertFails(
+      updateDoc(doc(db(ALICE), `users/${ALICE}/privacy_requests/r1`), { status: 'completed' })
+    );
+    await assertFails(deleteDoc(doc(db(ALICE), `users/${ALICE}/privacy_requests/r1`)));
+  });
+});
+
+describe('users/notifications', () => {
+  const notification = { title: 'Merhaba', body: 'Yeni video eklendi', read: false, createdAt: 1 };
+
+  it('owner can read their notifications and mark them read', async () => {
+    await seed(`users/${ALICE}/notifications/n1`, notification);
+    await assertSucceeds(getDoc(doc(db(ALICE), `users/${ALICE}/notifications/n1`)));
+    await assertSucceeds(
+      updateDoc(doc(db(ALICE), `users/${ALICE}/notifications/n1`), { read: true })
+    );
+  });
+
+  it('other users cannot read someone else’s notifications', async () => {
+    await seed(`users/${ALICE}/notifications/n1`, notification);
+    await assertFails(getDoc(doc(db(BOB), `users/${ALICE}/notifications/n1`)));
+  });
+
+  it('clients cannot create, delete, un-read, or edit notification content', async () => {
+    await seed(`users/${ALICE}/notifications/n1`, { ...notification, read: true });
+    await assertFails(setDoc(doc(db(ALICE), `users/${ALICE}/notifications/n2`), notification));
+    await assertFails(deleteDoc(doc(db(ALICE), `users/${ALICE}/notifications/n1`)));
+    await assertFails(
+      updateDoc(doc(db(ALICE), `users/${ALICE}/notifications/n1`), { read: false })
+    );
+    await assertFails(
+      updateDoc(doc(db(ALICE), `users/${ALICE}/notifications/n1`), {
+        read: true,
+        title: 'değişti',
+      })
+    );
+  });
+});
