@@ -27,13 +27,17 @@ export function cdnUrl(src, { width, height, dpr = 2, quality = 'auto', fit = 'c
   }
 
   if (IMGIX_BASE && src.startsWith(IMGIX_BASE)) {
-    const url = new URL(src);
-    url.searchParams.set('auto', 'format,compress');
-    url.searchParams.set('q', quality === 'auto' ? '75' : String(quality));
-    if (width) url.searchParams.set('w', String(Math.round(width * dpr)));
-    if (height) url.searchParams.set('h', String(Math.round(height * dpr)));
-    if (fit) url.searchParams.set('fit', fit === 'cover' ? 'crop' : 'clip');
-    return url.toString();
+    // Plain string building — React Native's URL polyfill lacks searchParams.
+    const params = [
+      'auto=format%2Ccompress',
+      `q=${quality === 'auto' ? '75' : encodeURIComponent(String(quality))}`,
+    ];
+    if (width) params.push(`w=${Math.round(width * dpr)}`);
+    if (height) params.push(`h=${Math.round(height * dpr)}`);
+    if (fit) params.push(`fit=${fit === 'cover' ? 'crop' : 'clip'}`);
+    const [base, existing] = src.split('?');
+    const query = existing ? `${existing}&${params.join('&')}` : params.join('&');
+    return `${base}?${query}`;
   }
 
   return src;

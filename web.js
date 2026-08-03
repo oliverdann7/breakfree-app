@@ -1,6 +1,5 @@
 import './src/i18n';
 import React from 'react';
-import { registerRootComponent } from 'expo';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import { store, persistor } from './src/store';
@@ -75,4 +74,3 @@ function WebApp() {
 }
 
 export default WebApp;
-registerRootComponent(WebApp);

@@ -8,8 +8,10 @@ import {
   GoogleAuthProvider,
   OAuthProvider,
 } from 'firebase/auth';
+import { Platform } from 'react-native';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
 import { auth, db } from './firebase';
+import { signInWithGoogle, signInWithApple } from './socialSignIn';
 
 const checkFirebaseAvailable = () => {
   if (!auth || !db) {
@@ -68,41 +70,50 @@ export const login = async (email, password) => {
   }
 };
 
+// Shared post-sign-in step for social providers: create the Firestore user
+// doc on first login, then normalize the return shape.
+const finishSocialLogin = async (user, fallbackName) => {
+  const userDocRef = doc(db, 'users', user.uid);
+  const userDoc = await getDoc(userDocRef);
+
+  if (!userDoc.exists()) {
+    await setDoc(userDocRef, {
+      uid: user.uid,
+      email: user.email,
+      displayName: user.displayName || fallbackName,
+      avatar: user.photoURL || null,
+      bio: '',
+      goals: [],
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+      preferences: { language: 'auto', units: 'metric', notifications: true },
+    });
+  }
+
+  const token = await user.getIdToken();
+  return {
+    user: {
+      uid: user.uid,
+      email: user.email,
+      displayName: user.displayName || fallbackName,
+    },
+    token,
+  };
+};
+
 export const loginWithGoogle = async () => {
   try {
     checkFirebaseAvailable();
-    const provider = new GoogleAuthProvider();
-    const userCredential = await signInWithPopup(auth, provider);
-    const user = userCredential.user;
-
-    // Check if user exists in Firestore
-    const userDocRef = doc(db, 'users', user.uid);
-    const userDoc = await getDoc(userDocRef);
-
-    if (!userDoc.exists()) {
-      // Create user document if it doesn't exist
-      await setDoc(userDocRef, {
-        uid: user.uid,
-        email: user.email,
-        displayName: user.displayName,
-        avatar: user.photoURL,
-        bio: '',
-        goals: [],
-        createdAt: Date.now(),
-        updatedAt: Date.now(),
-        preferences: { language: 'auto', units: 'metric', notifications: true },
-      });
+    let user;
+    if (Platform.OS === 'web') {
+      const userCredential = await signInWithPopup(auth, new GoogleAuthProvider());
+      user = userCredential.user;
+    } else {
+      // Popup auth doesn't exist in React Native — use the native Google
+      // Sign-In SDK and exchange its idToken for a Firebase credential.
+      ({ user } = await signInWithGoogle());
     }
-
-    const token = await user.getIdToken();
-    return {
-      user: {
-        uid: user.uid,
-        email: user.email,
-        displayName: user.displayName || 'User',
-      },
-      token,
-    };
+    return await finishSocialLogin(user, 'User');
   } catch (error) {
     throw new Error(error.message);
   }
@@ -111,33 +122,14 @@ export const loginWithGoogle = async () => {
 export const loginWithApple = async () => {
   try {
     checkFirebaseAvailable();
-    const provider = new OAuthProvider('apple.com');
-    const userCredential = await signInWithPopup(auth, provider);
-    const user = userCredential.user;
-
-    const userDocRef = doc(db, 'users', user.uid);
-    const userDoc = await getDoc(userDocRef);
-
-    if (!userDoc.exists()) {
-      await setDoc(userDocRef, {
-        uid: user.uid,
-        email: user.email,
-        displayName: user.displayName || 'Apple User',
-        createdAt: Date.now(),
-        updatedAt: Date.now(),
-        preferences: { language: 'auto', units: 'metric', notifications: true },
-      });
+    let user;
+    if (Platform.OS === 'web') {
+      const userCredential = await signInWithPopup(auth, new OAuthProvider('apple.com'));
+      user = userCredential.user;
+    } else {
+      ({ user } = await signInWithApple());
     }
-
-    const token = await user.getIdToken();
-    return {
-      user: {
-        uid: user.uid,
-        email: user.email,
-        displayName: user.displayName || 'Apple User',
-      },
-      token,
-    };
+    return await finishSocialLogin(user, 'Apple User');
   } catch (error) {
     throw new Error(error.message);
   }

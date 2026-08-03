@@ -69,7 +69,7 @@ export const logError = async (error, context = {}) => {
       stack: error?.stack || null,
       context: JSON.stringify(context),
       timestamp: Date.now(),
-      platform: typeof navigator !== 'undefined' ? navigator.platform : 'mobile',
+      platform: require('react-native').Platform.OS,
       appVersion: '1.0.0',
     });
   } catch {

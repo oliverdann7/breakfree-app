@@ -5,22 +5,20 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
+    "scheme": "breakfree",
     "userInterfaceStyle": "dark",
-    "privacy": "public",
-    "splash": {
-      "image": "./assets/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#0A2540"
-    },
     "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.breakfree.app",
       "buildNumber": "1",
+      "usesAppleSignIn": true,
+      "config": {
+        "usesNonExemptEncryption": false
+      },
       "infoPlist": {
-        "NSCameraUsageDescription": "Profil fotoğrafı çekmek için kameraya erişim gerekiyor.",
-        "NSPhotoLibraryUsageDescription": "Profil fotoğrafı seçmek için fotoğraf kütüphanesine erişim gerekiyor.",
-        "NSMicrophoneUsageDescription": "Video görüşmeleri için mikrofona erişim gerekiyor."
+        "CFBundleDevelopmentRegion": "tr",
+        "CFBundleLocalizations": ["tr", "en"]
       }
     },
     "android": {
@@ -30,7 +28,12 @@
       },
       "package": "com.breakfree.app",
       "versionCode": 1,
-      "permissions": ["CAMERA", "READ_EXTERNAL_STORAGE", "WRITE_EXTERNAL_STORAGE", "RECORD_AUDIO"]
+      "blockedPermissions": [
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png",
@@ -38,10 +41,24 @@
       "output": "single",
       "name": "BreakFree",
       "shortName": "BreakFree",
-      "description": "Premium wellness community app",
-      "entryPoint": "./web.js"
+      "description": "Premium wellness community app"
     },
-    "plugins": ["expo-notifications"],
+    "plugins": [
+      "expo-localization",
+      "expo-notifications",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash.png",
+          "resizeMode": "contain",
+          "backgroundColor": "#0A2540"
+        }
+      ],
+      "expo-status-bar",
+      "expo-video",
+      "expo-apple-authentication",
+      "@sentry/react-native"
+    ],
     "extra": {
       "eas": {
         "projectId": ""

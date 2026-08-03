@@ -22,17 +22,11 @@ import healthReducer from './slices/healthSlice';
 import notificationsReducer from './slices/notificationsSlice';
 import premiumReducer from './slices/premiumSlice';
 
-// Wrap localStorage with async interface for redux-persist compatibility
-const createAsyncStorage = () => ({
-  getItem: (key) =>
-    Promise.resolve(typeof window !== 'undefined' ? localStorage.getItem(key) : null),
-  setItem: (key, value) =>
-    Promise.resolve(typeof window !== 'undefined' && localStorage.setItem(key, value)),
-  removeItem: (key) =>
-    Promise.resolve(typeof window !== 'undefined' && localStorage.removeItem(key)),
-});
-
-const storage = typeof window !== 'undefined' ? createAsyncStorage() : AsyncStorage;
+// AsyncStorage works on every platform: native storage on iOS/Android and a
+// localStorage-backed implementation on web (same keys as the old manual
+// wrapper, so existing web sessions survive). A `typeof window` guard here
+// would break native — React Native defines `global.window`.
+const storage = AsyncStorage;
 
 const persistConfig = {
   key: 'root',

@@ -43,16 +43,21 @@ jest.mock('../../store/slices/metricsSlice', () => ({
   logMetric: jest.fn((args) => ({ type: 'metrics/log', payload: args })),
 }));
 
-// Victory native charts need a stub
-jest.mock('victory-native', () => {
-  const React = require('react');
-  return {
-    VictoryBar: () => React.createElement('View', null),
-    VictoryChart: ({ children }) => React.createElement('View', null, children),
-    VictoryTheme: { material: {} },
-    VictoryAxis: () => React.createElement('View', null),
-  };
-});
+// Stale defensive stub — the screen no longer imports victory-native and the
+// package is uninstalled, so the mock must be virtual.
+jest.mock(
+  'victory-native',
+  () => {
+    const React = require('react');
+    return {
+      VictoryBar: () => React.createElement('View', null),
+      VictoryChart: ({ children }) => React.createElement('View', null, children),
+      VictoryTheme: { material: {} },
+      VictoryAxis: () => React.createElement('View', null),
+    };
+  },
+  { virtual: true }
+);
 
 describe('HealthMetricsScreen', () => {
   beforeEach(() => jest.clearAllMocks());
