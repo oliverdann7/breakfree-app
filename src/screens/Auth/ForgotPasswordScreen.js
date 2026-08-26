@@ -13,6 +13,7 @@ import { useTranslation } from 'react-i18next';
 import { sendPasswordResetEmail } from 'firebase/auth';
 import { auth } from '../../services/firebase';
 import BreakFreeLogo from '../../components/branding/BreakFreeLogo';
+import Icon from '../../components/common/Icon';
 import { colors } from '../../constants/designTokens';
 
 export default function ForgotPasswordScreen({ navigation }) {
@@ -64,7 +65,7 @@ export default function ForgotPasswordScreen({ navigation }) {
 
         {sent ? (
           <View style={styles.successBox}>
-            <Text style={styles.successIcon}>✉️</Text>
+            <Icon name="mail" size={56} color={colors.gold} style={styles.successIcon} />
             <Text style={styles.successTitle}>{t('auth.forgotPasswordSentTitle')}</Text>
             <Text style={styles.successText}>{t('auth.forgotPasswordSentDesc', { email })}</Text>
             <TouchableOpacity
@@ -173,7 +174,7 @@ const styles = StyleSheet.create({
   sendBtnDisabled: { opacity: 0.55 },
   sendBtnText: { color: colors.navyDeep, fontSize: 16, fontWeight: '700', letterSpacing: 0.3 },
   successBox: { alignItems: 'center', paddingTop: 24 },
-  successIcon: { fontSize: 56, marginBottom: 16 },
+  successIcon: { marginBottom: 16 },
   successTitle: { fontSize: 22, fontWeight: '700', color: colors.white, marginBottom: 12 },
   successText: {
     fontSize: 14,

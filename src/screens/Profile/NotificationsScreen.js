@@ -11,15 +11,16 @@ import {
 } from 'react-native';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { fetchNotifications, markRead, markAllRead } from '../../store/slices/notificationsSlice';
+import Icon from '../../components/common/Icon';
 import { colors } from '../../constants/designTokens';
 
 const ICONS = {
-  talk: '🎙',
-  mentor: '🤝',
-  challenge: '🏆',
-  badge: '⭐',
-  health: '💚',
-  system: '🔔',
+  talk: 'mic',
+  mentor: 'handshake',
+  challenge: 'trophy',
+  badge: 'star',
+  health: 'heart',
+  system: 'bell',
 };
 
 function timeAgo(ts, t) {
@@ -93,7 +94,7 @@ export default function NotificationsScreen({ navigation }) {
 
         {items.length === 0 ? (
           <View style={styles.empty}>
-            <Text style={styles.emptyIcon}>🔕</Text>
+            <Icon name="bellOff" size={48} color={colors.textTertiary} />
             <Text style={styles.emptyTitle}>{t('notifications.empty')}</Text>
             <Text style={styles.emptyDesc}>{t('notifications.emptyDesc')}</Text>
           </View>
@@ -106,7 +107,12 @@ export default function NotificationsScreen({ navigation }) {
               style={[styles.row, !n.read && styles.rowUnread]}
               accessibilityRole="button"
             >
-              <Text style={styles.icon}>{ICONS[n.type] || '🔔'}</Text>
+              <Icon
+                name={ICONS[n.type] || 'bell'}
+                size={22}
+                color={colors.textPrimary}
+                style={styles.icon}
+              />
               <View style={{ flex: 1 }}>
                 <Text style={styles.rowTitle}>{n.title}</Text>
                 {n.body ? (
@@ -159,14 +165,13 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   rowUnread: { backgroundColor: 'rgba(20,184,212,0.07)' },
-  icon: { fontSize: 22 },
+  icon: { marginTop: 2 },
   rowTitle: { color: colors.textPrimary, fontWeight: '700', fontSize: 13 },
   rowBody: { color: colors.textSecondary, fontSize: 12, marginTop: 3, lineHeight: 17 },
   rowTime: { color: colors.textTertiary, fontSize: 10, marginTop: 4 },
   unreadDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: colors.cyan, marginTop: 6 },
 
   empty: { alignItems: 'center', padding: 40, gap: 10 },
-  emptyIcon: { fontSize: 48 },
   emptyTitle: { color: colors.textPrimary, fontWeight: '700', fontSize: 15 },
   emptyDesc: {
     color: colors.textSecondary,

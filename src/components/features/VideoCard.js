@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
+import Icon from '../common/Icon';
 import { colors } from '../../constants/designTokens';
 import { getThumbnailUrl } from '../../utils/videoSource';
 
@@ -29,12 +30,13 @@ export default function VideoCard({ video, progress, locked = false, onPress }) 
           <Image source={{ uri: thumbnailUrl }} style={styles.thumbnailImg} resizeMode="cover" />
         ) : (
           <View style={styles.thumbnailPlaceholder}>
-            <Text style={styles.thumbnailIcon}>▶</Text>
+            <Icon name="play" filled size={28} color={colors.cyan} style={styles.thumbnailIcon} />
           </View>
         )}
         {locked && (
           <View style={styles.lockOverlay}>
-            <Text style={styles.lockBadge}>🔒 Pro</Text>
+            <Icon name="lock" size={10} color={colors.navy} />
+            <Text style={styles.lockBadge}>Pro</Text>
           </View>
         )}
         <View style={styles.durationBadge}>
@@ -83,7 +85,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: 'rgba(20,184,212,0.1)',
   },
-  thumbnailIcon: { fontSize: 28, color: colors.cyan, opacity: 0.7 },
+  thumbnailIcon: { opacity: 0.7 },
   lockOverlay: {
     position: 'absolute',
     top: 8,
@@ -92,6 +94,9 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     paddingHorizontal: 6,
     paddingVertical: 2,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
   },
   lockBadge: { fontSize: 9, color: colors.navy, fontWeight: '700' },
   durationBadge: {

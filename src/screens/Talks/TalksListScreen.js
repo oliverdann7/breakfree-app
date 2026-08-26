@@ -4,6 +4,7 @@ import { View, Text, ScrollView, TouchableOpacity, StyleSheet, SafeAreaView } fr
 import { collection, query, orderBy, onSnapshot } from 'firebase/firestore';
 import { db } from '../../services/firebase';
 import Card from '../../components/common/Card';
+import Icon from '../../components/common/Icon';
 import TalkCard from '../../components/features/TalkCard';
 import { colors } from '../../constants/designTokens';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
@@ -66,7 +67,12 @@ export default function TalksListScreen({ navigation }) {
 
         {!loading && allTalks.length === 0 && (
           <View style={{ padding: 60, alignItems: 'center' }}>
-            <Text style={{ fontSize: 40, marginBottom: 12 }}>🎧</Text>
+            <Icon
+              name="headphones"
+              size={40}
+              color={colors.textTertiary}
+              style={{ marginBottom: 12 }}
+            />
             <Text
               style={{
                 fontSize: 16,
@@ -119,7 +125,7 @@ export default function TalksListScreen({ navigation }) {
               onPress={() => dispatch(joinTalk(liveTalk.talkId))}
               accessibilityRole="button"
             >
-              <Text style={styles.liveButtonIcon}>🎧</Text>
+              <Icon name="headphones" size={14} color={colors.bgPrimary} />
               <Text style={styles.liveButtonText}>{t('talks.listenNow')}</Text>
             </TouchableOpacity>
           </Card>
@@ -297,9 +303,6 @@ const styles = StyleSheet.create({
     borderRadius: 999,
     paddingVertical: 10,
     gap: 6,
-  },
-  liveButtonIcon: {
-    fontSize: 14,
   },
   liveButtonText: {
     fontSize: 11,

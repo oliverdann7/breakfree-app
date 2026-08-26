@@ -42,6 +42,7 @@ import {
 } from '../../store/slices/communitySlice';
 import { fetchActiveChallenges, joinChallenge } from '../../store/slices/challengesSlice';
 import Card from '../../components/common/Card';
+import Icon from '../../components/common/Icon';
 import Avatar from '../../components/common/Avatar';
 import LeaderboardCard from '../../components/features/LeaderboardCard';
 import HealthStatusCard from '../../components/features/HealthStatusCard';
@@ -64,18 +65,18 @@ function StatsRow({ stats }) {
   return (
     <View style={styles.statsRow}>
       {[
-        { icon: '⭐', label: t('community.statsWellness'), value: stats.wellness },
+        { icon: 'star', label: t('community.statsWellness'), value: stats.wellness },
         {
-          icon: '👟',
+          icon: 'footprints',
           label: t('community.statsSteps'),
           value: `${(stats.steps / 1000).toFixed(1)}k`,
         },
-        { icon: '😴', label: t('community.statsSleep'), value: `${stats.sleep}s` },
+        { icon: 'moon', label: t('community.statsSleep'), value: `${stats.sleep}s` },
       ].map((s, i) => (
         <React.Fragment key={s.label}>
           {i > 0 && <View style={styles.statsDivider} />}
           <View style={styles.statItem}>
-            <Text style={styles.statIcon}>{s.icon}</Text>
+            <Icon name={s.icon} size={14} color={colors.textSecondary} />
             <Text style={styles.statValue}>{s.value}</Text>
             <Text style={styles.statLabel}>{s.label}</Text>
           </View>
@@ -123,7 +124,12 @@ function PostCard({ post, onLike, onAddComment, onFetchComments, comments = [], 
           accessibilityRole="button"
           accessibilityLabel={post.liked ? t('a11y.unlike') : t('a11y.like')}
         >
-          <Text style={styles.actionIcon}>{post.liked ? '❤️' : '🤍'}</Text>
+          <Icon
+            name="heart"
+            size={16}
+            filled={post.liked}
+            color={post.liked ? colors.gold : colors.textSecondary}
+          />
           <Text style={[styles.actionCount, post.liked && { color: colors.gold }]}>
             {post.likes}
           </Text>
@@ -135,7 +141,7 @@ function PostCard({ post, onLike, onAddComment, onFetchComments, comments = [], 
           accessibilityLabel={t('a11y.comments', { count: comments.length })}
           accessibilityState={{ expanded }}
         >
-          <Text style={styles.actionIcon}>💬</Text>
+          <Icon name="messageCircle" size={16} color={colors.textSecondary} />
           <Text style={[styles.actionCount, expanded && { color: colors.cyan }]}>
             {comments.length} {expanded ? '▲' : '▼'}
           </Text>
@@ -392,7 +398,7 @@ export default function CommunityScreen() {
             ))}
           </View>
         </View>
-        <Text style={styles.editChevron}>✎</Text>
+        <Icon name="pencil" size={12} color={colors.textTertiary} />
       </TouchableOpacity>
 
       {/* Header row */}
@@ -428,9 +434,12 @@ export default function CommunityScreen() {
           return (
             <Card key={challenge.id} style={styles.challengeCard}>
               <View style={styles.challengeHeader}>
-                <Text style={styles.challengeTitle}>
-                  🏆 {challenge.title || t('community.challengeDefault')}
-                </Text>
+                <View style={styles.challengeTitleRow}>
+                  <Icon name="trophy" size={14} color={colors.gold} />
+                  <Text style={styles.challengeTitle}>
+                    {challenge.title || t('community.challengeDefault')}
+                  </Text>
+                </View>
                 <Text style={styles.challengeDays}>
                   {daysLeft > 0
                     ? t('challenges.daysLeft', { count: daysLeft })
@@ -678,7 +687,7 @@ export default function CommunityScreen() {
               accessibilityState={{ checked: shareStats }}
             >
               <View style={[styles.toggleCheck, shareStats && styles.toggleCheckOn]}>
-                {shareStats && <Text style={styles.toggleCheckMark}>✓</Text>}
+                {shareStats && <Icon name="check" size={12} color={colors.navy} strokeWidth={3} />}
               </View>
               <Text style={[styles.statsToggleText, shareStats && { color: colors.gold }]}>
                 {t('community.shareStatsLabel')}
@@ -760,8 +769,6 @@ const styles = StyleSheet.create({
   profileStat: { alignItems: 'center' },
   profileStatVal: { fontSize: 14, fontWeight: '700' },
   profileStatLabel: { fontSize: 9, color: colors.textTertiary, fontWeight: '600' },
-  editChevron: { fontSize: 16, color: colors.textTertiary },
-
   // Header
   header: {
     flexDirection: 'row',
@@ -790,7 +797,8 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(201, 150, 26, 0.06)',
   },
   challengeHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  challengeTitle: { fontSize: 13, fontWeight: '700', color: colors.textPrimary },
+  challengeTitleRow: { flexDirection: 'row', alignItems: 'center', gap: 6, flex: 1 },
+  challengeTitle: { fontSize: 13, fontWeight: '700', color: colors.textPrimary, flexShrink: 1 },
   challengeDays: { fontSize: 11, color: colors.gold },
   challengeDesc: { fontSize: 12, color: colors.textSecondary },
   challengeBar: {
@@ -834,7 +842,6 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   statItem: { flex: 1, alignItems: 'center', paddingVertical: 10 },
-  statIcon: { fontSize: 14 },
   statValue: { fontSize: 14, fontWeight: '600', color: colors.textPrimary, marginTop: 3 },
   statLabel: {
     fontSize: 9,
@@ -866,7 +873,6 @@ const styles = StyleSheet.create({
     borderTopColor: 'rgba(255,255,255,0.07)',
   },
   actionBtn: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  actionIcon: { fontSize: 16 },
   actionCount: { fontSize: 13, color: colors.textSecondary },
 
   // Comments
@@ -996,7 +1002,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   toggleCheckOn: { backgroundColor: colors.gold },
-  toggleCheckMark: { fontSize: 12, color: colors.navy, fontWeight: '800' },
   statsToggleText: { fontSize: 13, color: colors.textSecondary, fontWeight: '500' },
 
   // Modal actions

@@ -13,6 +13,7 @@ import { db } from '../../services/firebase';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { fetchMentorProfile } from '../../store/slices/mentorSlice';
 import Card from '../../components/common/Card';
+import Icon from '../../components/common/Icon';
 import { colors } from '../../constants/designTokens';
 
 const DAY_LABELS = {
@@ -123,9 +124,12 @@ export default function MentorDetailScreen({ navigation, route }) {
           <Text style={styles.name}>{mentor.name}</Text>
           <Text style={styles.title}>{mentor.title}</Text>
           {mentor.rating != null && (
-            <Text style={styles.rating}>
-              ★ {mentor.rating.toFixed(1)} · {mentor.reviewCount} değerlendirme
-            </Text>
+            <View style={styles.ratingRow}>
+              <Icon name="star" filled size={12} color={colors.gold} />
+              <Text style={styles.rating}>
+                {mentor.rating.toFixed(1)} · {mentor.reviewCount} değerlendirme
+              </Text>
+            </View>
           )}
         </View>
 
@@ -252,7 +256,8 @@ const styles = StyleSheet.create({
   avatarEmoji: { fontSize: 42 },
   name: { color: colors.textPrimary, fontWeight: '700', fontSize: 20 },
   title: { color: colors.textSecondary, fontSize: 13 },
-  rating: { color: colors.gold, fontSize: 12, marginTop: 4 },
+  ratingRow: { flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 4 },
+  rating: { color: colors.gold, fontSize: 12 },
 
   sectionTitle: { color: colors.textPrimary, fontWeight: '700', fontSize: 14, marginBottom: 8 },
   bio: { color: colors.textSecondary, fontSize: 13, lineHeight: 20 },

@@ -12,6 +12,7 @@ import {
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { fetchAllMentors } from '../../store/slices/mentorSlice';
 import Card from '../../components/common/Card';
+import Icon from '../../components/common/Icon';
 import { colors } from '../../constants/designTokens';
 
 const CATEGORIES = ['Hepsi', 'Zihin', 'Hareket', 'Beslenme', 'Uyku', 'Performans'];
@@ -41,10 +42,13 @@ function MentorCard({ mentor, onOpen }) {
           <View style={styles.row}>
             <Text style={styles.name}>{mentor.name}</Text>
             {mentor.rating != null && (
-              <Text style={styles.rating}>
-                ★ {mentor.rating.toFixed(1)}{' '}
-                <Text style={styles.reviewCount}>({mentor.reviewCount || 0})</Text>
-              </Text>
+              <View style={styles.ratingRow}>
+                <Icon name="star" filled size={12} color={colors.gold} />
+                <Text style={styles.rating}>
+                  {mentor.rating.toFixed(1)}{' '}
+                  <Text style={styles.reviewCount}>({mentor.reviewCount || 0})</Text>
+                </Text>
+              </View>
             )}
           </View>
           <Text style={styles.title}>{mentor.title}</Text>
@@ -194,6 +198,7 @@ const styles = StyleSheet.create({
   avatarEmoji: { fontSize: 26 },
   row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   name: { color: colors.textPrimary, fontWeight: '700', fontSize: 14, flex: 1 },
+  ratingRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   rating: { color: colors.gold, fontWeight: '700', fontSize: 12 },
   reviewCount: { color: colors.textTertiary, fontSize: 10, fontWeight: '500' },
   title: { color: colors.textSecondary, fontSize: 12, marginTop: 2 },

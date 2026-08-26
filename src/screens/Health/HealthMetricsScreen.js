@@ -112,7 +112,7 @@ export default function HealthMetricsScreen() {
   const noRecord = t('health.noRecord');
   const breakdown = [
     {
-      emoji: '😴',
+      icon: 'moon',
       label: t('health.sleepQuality'),
       value: dm?.sleep?.hours ? Math.min(100, Math.round((dm.sleep.hours / 8) * 100)) : null,
       color: colors.cyan,
@@ -121,21 +121,21 @@ export default function HealthMetricsScreen() {
         : noRecord,
     },
     {
-      emoji: '👟',
+      icon: 'footprints',
       label: t('health.movement'),
       value: dm?.steps ? Math.min(100, Math.round((dm.steps / 10000) * 100)) : null,
       color: colors.gold,
       sub: dm?.steps ? `${(dm.steps / 1000).toFixed(1)}${t('health.stepsK')}` : noRecord,
     },
     {
-      emoji: '❤️',
+      icon: 'heart',
       label: t('health.heartRate'),
       value: dm?.heartRate ? Math.min(100, Math.round(((200 - dm.heartRate) / 120) * 100)) : null,
       color: colors.royal,
       sub: dm?.heartRate ? `${dm.heartRate} ${t('health.bpmResting')}` : noRecord,
     },
     {
-      emoji: '💧',
+      icon: 'droplet',
       label: t('health.water'),
       value: dm?.hydration ? Math.min(100, Math.round((dm.hydration / 2000) * 100)) : null,
       color: colors.cyan,
@@ -151,7 +151,7 @@ export default function HealthMetricsScreen() {
       sub: moodFace ? t(moodFace.labelKey) : noRecord,
     },
     {
-      emoji: '🔥',
+      icon: 'flame',
       label: t('health.kcalLabel'),
       value: dm?.calories ? Math.min(100, Math.round((dm.calories / 2500) * 100)) : null,
       color: colors.gold,
@@ -229,6 +229,7 @@ export default function HealthMetricsScreen() {
             {breakdown.map((metric, i) => (
               <MetricCard
                 key={i}
+                icon={metric.icon}
                 emoji={metric.emoji}
                 label={metric.label}
                 value={metric.value ?? '—'}

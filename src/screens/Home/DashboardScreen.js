@@ -15,6 +15,7 @@ import { fetchMetrics } from '../../store/slices/metricsSlice';
 import { fetchUserProfile, fetchDailyPlan, completeTask } from '../../store/slices/userSlice';
 import WellnessRing from '../../components/features/WellnessRing';
 import Card from '../../components/common/Card';
+import Icon, { ICON_NAMES } from '../../components/common/Icon';
 import { colors } from '../../constants/designTokens';
 import { wellnessLabel } from '../../utils/wellnessScore';
 import { topInsight } from '../../utils/wellnessInsights';
@@ -69,21 +70,21 @@ export default function DashboardScreen() {
   const scoreLabel = wellnessScore ? wellnessLabel(wellnessScore) : null;
   const metrics = [
     {
-      emoji: '😴',
+      icon: 'moon',
       label: t('health.metrics.sleep'),
       value: dm?.sleep?.hours ? `${dm.sleep.hours}${t('home.hoursSuffix')}` : '—',
       sub: dm?.sleep?.quality || t('home.noRecord'),
       color: colors.cyan,
     },
     {
-      emoji: '❤️',
+      icon: 'heart',
       label: t('health.metrics.heartRate'),
       value: dm?.heartRate ? String(dm.heartRate) : '—',
       sub: t('home.resting'),
       color: colors.gold,
     },
     {
-      emoji: '👟',
+      icon: 'footprints',
       label: t('health.metrics.steps'),
       value: dm?.steps ? `${(dm.steps / 1000).toFixed(1)}k` : '—',
       sub: dm?.steps
@@ -92,7 +93,7 @@ export default function DashboardScreen() {
       color: colors.cyan,
     },
     {
-      emoji: '🔥',
+      icon: 'flame',
       label: t('health.metrics.calories'),
       value: dm?.calories ? dm.calories.toLocaleString(locale) : '—',
       sub: t('home.active'),
@@ -116,7 +117,7 @@ export default function DashboardScreen() {
             accessibilityRole="button"
             accessibilityLabel={t('a11y.notifications')}
           >
-            <Text style={styles.notifIcon}>🔔</Text>
+            <Icon name="bell" size={16} color={colors.textPrimary} />
             <View style={styles.notifDot} />
           </TouchableOpacity>
         </View>
@@ -153,14 +154,14 @@ export default function DashboardScreen() {
           >
             <Card style={styles.insightCard}>
               <View style={styles.insightRow}>
-                <Text style={styles.insightEmoji}>{insight.emoji}</Text>
+                <Icon name={insight.icon} size={26} color={colors.cyan} strokeWidth={1.8} />
                 <View style={styles.insightBody}>
                   <Text style={styles.insightLabel}>{t('home.insightKicker')}</Text>
                   <Text style={styles.insightTitle}>{insight.title}</Text>
                   <Text style={styles.insightMessage}>{insight.message}</Text>
                   <View style={styles.insightCta}>
                     <Text style={styles.insightCtaText}>{insight.ctaLabel}</Text>
-                    <Text style={styles.insightCtaArrow}>→</Text>
+                    <Icon name="arrowRight" size={12} color={colors.cyan} />
                   </View>
                 </View>
               </View>
@@ -183,7 +184,7 @@ export default function DashboardScreen() {
                 m.color === '#C9961A' && { backgroundColor: 'rgba(201, 150, 26, 0.06)' },
               ]}
             >
-              <Text style={{ fontSize: 14, color: m.color }}>●</Text>
+              <Icon name={m.icon} size={14} color={m.color} />
               <Text style={styles.metricValue}>{m.value}</Text>
               <Text style={styles.metricLabel}>{m.label}</Text>
               <Text style={styles.metricSub}>{m.sub}</Text>
@@ -196,7 +197,7 @@ export default function DashboardScreen() {
           <View style={styles.planSection}>
             <View style={styles.planHeader}>
               <Text style={styles.sectionTitle}>{t('home.todaysPlan')}</Text>
-              <Text style={styles.planArrow}>→</Text>
+              <Icon name="arrowRight" size={12} color="rgba(255,255,255,0.4)" />
             </View>
             <View style={styles.planList}>
               {todayPlan.map((item, i) => (
@@ -214,7 +215,10 @@ export default function DashboardScreen() {
                   <View style={[styles.planItem, item.accent && styles.planItemAccent]}>
                     <View style={[styles.planIconBox, item.accent && styles.planIconBoxAccent]}>
                       {item.done ? (
-                        <Text style={styles.planCheck}>✓</Text>
+                        <Icon name="check" size={16} color={colors.cyan} strokeWidth={3} />
+                      ) : // Older daily_plans docs still carry emoji icons
+                      ICON_NAMES.includes(item.icon) ? (
+                        <Icon name={item.icon} size={18} color={colors.textSecondary} />
                       ) : (
                         <Text style={styles.planEmoji}>{item.icon}</Text>
                       )}
@@ -293,9 +297,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  notifIcon: {
-    fontSize: 16,
-  },
   notifDot: {
     position: 'absolute',
     top: 6,
@@ -372,10 +373,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 12,
   },
-  insightEmoji: {
-    fontSize: 28,
-    lineHeight: 32,
-  },
   insightBody: {
     flex: 1,
     gap: 2,
@@ -408,10 +405,6 @@ const styles = StyleSheet.create({
   insightCtaText: {
     fontSize: 12,
     fontWeight: '700',
-    color: colors.cyan,
-  },
-  insightCtaArrow: {
-    fontSize: 12,
     color: colors.cyan,
   },
   metricsGrid: {
@@ -461,10 +454,6 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: colors.textPrimary,
   },
-  planArrow: {
-    fontSize: 12,
-    color: 'rgba(255,255,255,0.4)',
-  },
   planList: {
     borderRadius: 14,
     borderWidth: 1,
@@ -496,11 +485,6 @@ const styles = StyleSheet.create({
   },
   planEmoji: {
     fontSize: 18,
-  },
-  planCheck: {
-    fontSize: 16,
-    color: colors.cyan,
-    fontWeight: '700',
   },
   planContent: {
     flex: 1,

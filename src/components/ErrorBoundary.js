@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { logCrashReport } from '../services/monitoringService';
 import { captureException, addBreadcrumb } from '../services/sentryService';
+import Icon from './common/Icon';
 import { colors } from '../constants/designTokens';
 
 export default class ErrorBoundary extends React.Component {
@@ -35,7 +36,7 @@ export default class ErrorBoundary extends React.Component {
     if (this.state.hasError) {
       return (
         <View style={styles.container}>
-          <Text style={styles.emoji}>⚠️</Text>
+          <Icon name="alertTriangle" size={40} color={colors.gold} style={styles.icon} />
           <Text style={styles.title}>Bir şeyler ters gitti</Text>
           <Text style={styles.message}>Beklenmeyen bir hata oluştu. Lütfen tekrar deneyin.</Text>
           {__DEV__ && this.state.error && (
@@ -65,7 +66,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     padding: 32,
   },
-  emoji: { fontSize: 56, marginBottom: 20 },
+  icon: { marginBottom: 20 },
   title: {
     fontSize: 22,
     fontWeight: '700',

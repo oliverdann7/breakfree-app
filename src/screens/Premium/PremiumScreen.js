@@ -18,6 +18,7 @@ import {
   cancelSubscription,
   selectIsPremium,
 } from '../../store/slices/premiumSlice';
+import Icon from '../../components/common/Icon';
 import { colors } from '../../constants/designTokens';
 
 function PlanCard({ plan, selected, onSelect }) {
@@ -49,7 +50,7 @@ function PlanCard({ plan, selected, onSelect }) {
       <View style={styles.featureList}>
         {plan.features.map((f) => (
           <View key={f} style={styles.featureRow}>
-            <Text style={styles.featureCheck}>✓</Text>
+            <Icon name="check" size={14} color={colors.cyan} strokeWidth={3} />
             <Text style={styles.featureText}>{f}</Text>
           </View>
         ))}
@@ -247,7 +248,6 @@ const styles = StyleSheet.create({
 
   featureList: { gap: 6 },
   featureRow: { flexDirection: 'row', gap: 8, alignItems: 'center' },
-  featureCheck: { color: colors.cyan, fontWeight: '800', fontSize: 13, width: 14 },
   featureText: { color: colors.textSecondary, fontSize: 13, flex: 1 },
 
   cta: {

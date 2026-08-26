@@ -13,7 +13,10 @@ import { doc, getDoc } from 'firebase/firestore';
 import { useAppSelector } from '../../store/hooks';
 import { db } from '../../services/firebase';
 import Card from '../../components/common/Card';
+import Icon from '../../components/common/Icon';
 import { colors } from '../../constants/designTokens';
+
+const MEDAL_COLORS = ['#FFD700', '#C0C0C0', '#CD7F32'];
 
 // Dev-only seed so the screen renders before the `recomputeLeaderboard` Cloud
 // Function has populated `leaderboards/{challengeId}`. Production shows a real
@@ -101,7 +104,7 @@ export default function LeaderboardScreen({ navigation, route }) {
           </View>
         ) : ranked.length === 0 ? (
           <View style={styles.stateBox}>
-            <Text style={styles.stateEmoji}>🏁</Text>
+            <Icon name="flag" size={40} color={colors.textTertiary} />
             <Text style={styles.stateText}>{t('leaderboard.noRanking')}</Text>
           </View>
         ) : (
@@ -128,9 +131,13 @@ export default function LeaderboardScreen({ navigation, route }) {
                 key={entry.uid || entry.rank}
                 style={[styles.entryRow, entry.isMe && styles.entryRowMe]}
               >
-                <Text style={[styles.entryRank, entry.rank <= 3 && styles.entryRankTop]}>
-                  {entry.rank <= 3 ? ['🥇', '🥈', '🥉'][entry.rank - 1] : `#${entry.rank}`}
-                </Text>
+                {entry.rank <= 3 ? (
+                  <View style={styles.entryRankIcon}>
+                    <Icon name="medal" size={18} color={MEDAL_COLORS[entry.rank - 1]} />
+                  </View>
+                ) : (
+                  <Text style={styles.entryRank}>{`#${entry.rank}`}</Text>
+                )}
                 <View style={[styles.avatar, { backgroundColor: entry.bg, width: 32, height: 32 }]}>
                   <Text style={{ fontSize: 14 }}>{entry.emoji}</Text>
                 </View>
@@ -164,7 +171,6 @@ const styles = StyleSheet.create({
   subtitle: { color: colors.textSecondary, fontSize: 12, marginTop: 4, lineHeight: 17 },
 
   stateBox: { alignItems: 'center', paddingVertical: 50, paddingHorizontal: 24, gap: 12 },
-  stateEmoji: { fontSize: 36 },
   stateText: { color: colors.textSecondary, fontSize: 13, textAlign: 'center', lineHeight: 19 },
 
   myCard: {
@@ -204,7 +210,7 @@ const styles = StyleSheet.create({
   },
   entryRowMe: { backgroundColor: 'rgba(20, 184, 212, 0.08)' },
   entryRank: { width: 36, color: colors.textSecondary, fontWeight: '700', fontSize: 13 },
-  entryRankTop: { fontSize: 18 },
+  entryRankIcon: { width: 36 },
   entryName: { flex: 1, color: colors.textPrimary, fontSize: 13, fontWeight: '600' },
   entryValue: { color: colors.textPrimary, fontWeight: '700', fontSize: 13 },
 });

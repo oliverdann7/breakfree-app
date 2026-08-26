@@ -22,6 +22,7 @@ import { selectIsPremium } from '../../store/slices/premiumSlice';
 import { isYouTube, isPlayable } from '../../utils/videoSource';
 import VideoPlayer from '../../components/features/players/VideoPlayer';
 import VideoCard from '../../components/features/VideoCard';
+import Icon from '../../components/common/Icon';
 import { colors } from '../../constants/designTokens';
 
 const { width } = Dimensions.get('window');
@@ -119,7 +120,7 @@ export default function VideoPlayerScreen({ route, navigation }) {
     if (locked) {
       return (
         <View style={styles.playerPlaceholder}>
-          <Text style={styles.lockIcon}>🔒</Text>
+          <Icon name="lock" size={32} color={colors.textPrimary} />
           <Text style={styles.lockTitle}>{t('video.proTitle')}</Text>
           <Text style={styles.playerNote}>{t('video.proDesc')}</Text>
           <TouchableOpacity
@@ -136,7 +137,7 @@ export default function VideoPlayerScreen({ route, navigation }) {
     if (!isPlayable(video)) {
       return (
         <View style={styles.playerPlaceholder}>
-          <Text style={styles.playerIcon}>🎬</Text>
+          <Icon name="film" size={40} color={colors.cyan} style={{ opacity: 0.6 }} />
           <Text style={styles.playerNote}>{t('video.notLoaded')}</Text>
         </View>
       );
@@ -323,8 +324,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   playerPlaceholder: { alignItems: 'center', gap: 8, paddingHorizontal: 20 },
-  playerIcon: { fontSize: 48, color: colors.cyan, opacity: 0.6 },
-  lockIcon: { fontSize: 40 },
   lockTitle: { fontSize: 16, fontWeight: '700', color: colors.textPrimary },
   playerNote: {
     fontSize: 12,

@@ -23,7 +23,7 @@ const NUDGES = [
     key: 'sleep',
     score: (dm) => sleepScore(dm?.sleep?.hours),
     nudge: (dm) => ({
-      emoji: '😴',
+      icon: 'moon',
       title: 'Uykunu önceliklendir',
       message:
         dm?.sleep?.hours != null
@@ -41,7 +41,7 @@ const NUDGES = [
     nudge: (dm) => {
       const cups = dm?.hydration ? Math.round(dm.hydration / ML_PER_CUP) : 0;
       return {
-        emoji: '💧',
+        icon: 'droplet',
         title: 'Bir bardak su iç',
         message:
           dm?.hydration != null
@@ -56,7 +56,7 @@ const NUDGES = [
     key: 'activity',
     score: (dm) => activityScore(dm?.steps),
     nudge: (dm) => ({
-      emoji: '👟',
+      icon: 'footprints',
       title: 'Kısa bir yürüyüş yap',
       message:
         dm?.steps != null
@@ -71,7 +71,7 @@ const NUDGES = [
     key: 'mood',
     score: (dm) => moodScore(dm?.mood),
     nudge: () => ({
-      emoji: '🧠',
+      icon: 'brain',
       title: 'Bir mentörle konuş',
       message: 'Ruh halin düşük görünüyor. Bir mentörle 15 dakikalık bir görüşme planla.',
       ctaLabel: 'Mentör bul',
@@ -83,7 +83,7 @@ const NUDGES = [
     key: 'heartRate',
     score: (dm) => heartRateScore(dm?.heartRate),
     nudge: () => ({
-      emoji: '❤️',
+      icon: 'heart',
       title: 'Nefes egzersizi dene',
       message: 'Dinlenme nabzın yüksek. 5 dakikalık bir nefes palestrasıyla yavaşla.',
       ctaLabel: 'Nefes palestraları',

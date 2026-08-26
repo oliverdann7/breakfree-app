@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import Icon from './web/Icons';
 
 const C = {
   navyDeep: '#061829',
@@ -133,37 +134,37 @@ const marqueeItems = [
 
 const features = [
   {
-    icon: '🎧',
+    icon: 'headphones',
     title: 'Canlı Konuşmalar',
     desc: 'Sağlık uzmanları ve doktorlarla haftalık canlı oturumlar. Sorularını gerçek zamanlı sor.',
     color: C.royal,
   },
   {
-    icon: '🧑‍⚕️',
+    icon: 'stethoscope',
     title: '1-on-1 Mentörlük',
     desc: 'Sertifikalı wellness koçlarından birebir rehberlik. Kişisel yol haritanı birlikte oluşturun.',
     color: C.cyan,
   },
   {
-    icon: '🤖',
+    icon: 'bot',
     title: 'Günlük Meydan Okumalar',
     desc: 'Her gün yeni bir meydan okuma. Toplulukla birlikte alışkanlıklarını geliştir.',
     color: C.gold,
   },
   {
-    icon: '📊',
+    icon: 'barChart',
     title: 'Sağlık Analitiği',
     desc: 'Uyku, stres ve beslenme verilerini tek panelde görüntüle. Gelişimini takip et.',
     color: '#8B5CF6',
   },
   {
-    icon: '🌿',
+    icon: 'leaf',
     title: 'Topluluk Desteği',
     desc: 'Binlerce üyeyle deneyimlerini paylaş. Birlikte daha güçlüyüz.',
     color: '#10B981',
   },
   {
-    icon: '🧘',
+    icon: 'flower',
     title: 'Rehberli Pratikler',
     desc: 'Meditasyon, nefes ve mindfulness egzersizleri. Her seviyeye uygun programlar.',
     color: '#F59E0B',
@@ -216,9 +217,7 @@ const faqs = [
 const Stars = ({ count }) => (
   <div style={{ display: 'flex', gap: 2 }}>
     {Array.from({ length: count }).map((_, i) => (
-      <span key={i} style={{ color: C.gold, fontSize: 14 }}>
-        ★
-      </span>
+      <Icon key={i} name="star" filled size={14} color={C.gold} />
     ))}
   </div>
 );
@@ -499,7 +498,7 @@ export default function BreakFreeLanding({ onStart }) {
                   letterSpacing: '0.01em',
                 }}
               >
-                Hemen Başla →
+                Hemen Başla <Icon name="arrowRight" size={17} style={{ marginLeft: 8 }} />
               </button>
               <button
                 onClick={onStart}
@@ -565,19 +564,18 @@ export default function BreakFreeLanding({ onStart }) {
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      fontSize: 20,
                     }}
                   >
-                    ✨
+                    <Icon name="sparkles" size={20} color={C.gold} />
                   </div>
                 </div>
               </div>
 
               <div style={{ display: 'flex', gap: 10, marginBottom: 20 }}>
                 {[
-                  ['😴', 'Uyku', '7.5s', C.royal],
-                  ['💚', 'Stres', 'Düşük', '#10B981'],
-                  ['🧠', 'Odak', '%91', C.cyan],
+                  ['moon', 'Uyku', '7.5s', C.royal],
+                  ['heart', 'Stres', 'Düşük', '#10B981'],
+                  ['brain', 'Odak', '%91', C.cyan],
                 ].map(([icon, label, val, color]) => (
                   <div
                     key={label}
@@ -589,7 +587,9 @@ export default function BreakFreeLanding({ onStart }) {
                       textAlign: 'center',
                     }}
                   >
-                    <div style={{ fontSize: 16, marginBottom: 4 }}>{icon}</div>
+                    <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 4 }}>
+                      <Icon name={icon} size={16} color={color} />
+                    </div>
                     <div
                       style={{
                         fontSize: 9,
@@ -624,10 +624,9 @@ export default function BreakFreeLanding({ onStart }) {
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      fontSize: 16,
                     }}
                   >
-                    🤖
+                    <Icon name="bot" size={18} color={C.navyDeep} />
                   </div>
                   <div>
                     <div
@@ -648,7 +647,10 @@ export default function BreakFreeLanding({ onStart }) {
               </div>
 
               <div style={{ display: 'flex', gap: 8 }}>
-                {['🎧 Canlı Oturum', '🧘 Meditasyon'].map((label) => (
+                {[
+                  ['headphones', 'Canlı Oturum'],
+                  ['flower', 'Meditasyon'],
+                ].map(([icon, label]) => (
                   <div
                     key={label}
                     style={{
@@ -659,12 +661,15 @@ export default function BreakFreeLanding({ onStart }) {
                       padding: '8px 10px',
                       fontSize: 11,
                       fontWeight: 600,
-                      textAlign: 'center',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: 6,
                       color: 'rgba(255,255,255,0.7)',
                       cursor: 'pointer',
                     }}
                   >
-                    {label}
+                    <Icon name={icon} size={12} /> {label}
                   </div>
                 ))}
               </div>
@@ -785,7 +790,7 @@ export default function BreakFreeLanding({ onStart }) {
                     marginBottom: 20,
                   }}
                 >
-                  {f.icon}
+                  <Icon name={f.icon} size={24} color={f.color} />
                 </div>
                 <h3
                   style={{
@@ -894,7 +899,7 @@ export default function BreakFreeLanding({ onStart }) {
                 padding: '8px 20px',
               }}
             >
-              <span style={{ fontSize: 14 }}>🚀</span>
+              <Icon name="rocket" size={14} color={C.goldLight} />
               <span
                 style={{
                   fontSize: 13,
@@ -971,7 +976,7 @@ export default function BreakFreeLanding({ onStart }) {
                   gap: 12,
                 }}
               >
-                <span style={{ fontSize: 22 }}>⏳</span>
+                <Icon name="hourglass" size={22} color={C.gold} />
                 <div>
                   <div style={{ fontSize: 13, fontWeight: 700, color: C.gold, marginBottom: 3 }}>
                     Yakında
@@ -1009,7 +1014,7 @@ export default function BreakFreeLanding({ onStart }) {
                       gap: 10,
                     }}
                   >
-                    <span style={{ color: C.gold, fontWeight: 700, flexShrink: 0 }}>✓</span> {item}
+                    <Icon name="check" size={14} color={C.gold} /> {item}
                   </li>
                 ))}
               </ul>
@@ -1045,7 +1050,7 @@ export default function BreakFreeLanding({ onStart }) {
                   gap: 12,
                 }}
               >
-                <span style={{ fontSize: 22 }}>💬</span>
+                <Icon name="messageCircle" size={22} color={C.cyan} />
                 <div>
                   <div style={{ fontSize: 13, fontWeight: 700, color: C.cyan, marginBottom: 3 }}>
                     Özel Fiyatlandırma
@@ -1093,7 +1098,7 @@ export default function BreakFreeLanding({ onStart }) {
                       gap: 10,
                     }}
                   >
-                    <span style={{ color: C.cyan, fontWeight: 700, flexShrink: 0 }}>✓</span> {item}
+                    <Icon name="check" size={14} color={C.cyan} /> {item}
                   </li>
                 ))}
               </ul>
@@ -1236,7 +1241,7 @@ export default function BreakFreeLanding({ onStart }) {
                 position: 'relative',
               }}
             >
-              Ücretsiz Başla →
+              Ücretsiz Başla <Icon name="arrowRight" size={17} style={{ marginLeft: 8 }} />
             </button>
           </div>
         </div>
@@ -1322,7 +1327,7 @@ export default function BreakFreeLanding({ onStart }) {
                   padding: '16px 20px',
                 }}
               >
-                <span style={{ fontSize: 20 }}>✅</span>
+                <Icon name="checkCircle" size={20} color="#10B981" />
                 <div>
                   <div style={{ fontWeight: 700, fontSize: 14, color: '#10B981' }}>
                     Abone oldun!
@@ -1472,9 +1477,12 @@ export default function BreakFreeLanding({ onStart }) {
                   textDecoration: 'none',
                   whiteSpace: 'nowrap',
                   flexShrink: 0,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 4,
                 }}
               >
-                Yazın →
+                Yazın <Icon name="arrowRight" size={12} />
               </a>
             </div>
           </div>
