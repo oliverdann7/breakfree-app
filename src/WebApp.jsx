@@ -38,7 +38,9 @@ function AppRouter() {
 function GlobalStyles() {
   return (
     <style>{`
+      html, body { background: #061829 !important; }
       body { overflow: auto !important; -webkit-overflow-scrolling: touch; }
+      #root { height: auto !important; min-height: 100vh; }
       html { scroll-behavior: smooth; }
     `}</style>
   );

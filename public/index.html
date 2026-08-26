@@ -1,17 +1,26 @@
 <!doctype html>
-<html lang="en">
+<html lang="tr">
   <head>
     <meta charset="utf-8" />
     <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <title>BreakFree</title>
-    <!-- The `react-native-web` recommended style reset: https://necolas.github.io/react-native-web/docs/setup/#root-element -->
+    <!--
+      Expo (Metro web) uses this file as the HTML template for `expo export`.
+      Without it the default template ships `body { overflow: hidden }`, a
+      fixed-height #root and a white canvas — anything scrolled past the first
+      viewport renders on white. Keep #root on min-height (never height) and
+      the canvas dark.
+    -->
     <style id="expo-reset">
       html,
       body {
         height: 100%;
         margin: 0;
         padding: 0;
+      }
+      html {
+        background: #061829;
       }
       body {
         overflow: auto;
@@ -21,6 +30,7 @@
         display: flex;
         min-height: 100%;
         flex: 1;
+        background: #061829;
       }
     </style>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -30,20 +40,17 @@
       rel="stylesheet"
     />
     <meta name="description" content="Premium wellness community app" />
-    <meta name="theme-color" content="#0072B0" />
+    <meta name="theme-color" content="#061829" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="BreakFree" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" href="/favicon.svg" />
-    <link rel="manifest" href="/public/manifest.json" />
+    <link rel="manifest" href="/manifest.json" />
   </head>
 
   <body>
-    <!-- Use static rendering with Expo Router to support running without JavaScript. -->
     <noscript> You need to enable JavaScript to run this app. </noscript>
-    <!-- The root element for your Expo app. -->
     <div id="root"></div>
-    <script src="/_expo/static/js/web/index-4f6ca21c0a1eb29f9560e22aa021c3cb.js" defer></script>
   </body>
 </html>

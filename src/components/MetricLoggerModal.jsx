@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { logMetric, fetchMetrics } from '../store/slices/metricsSlice';
+import Icon from './web/Icons';
 
 const C = {
   navyDeep: '#061829',
@@ -126,9 +127,12 @@ export default function MetricLoggerModal({ uid, onClose }) {
               borderRadius: 8,
               cursor: 'pointer',
               fontSize: 16,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
             }}
           >
-            ✕
+            <Icon name="x" size={16} color={C.textSecondary} />
           </button>
         </div>
 
@@ -142,11 +146,13 @@ export default function MetricLoggerModal({ uid, onClose }) {
                   fontSize: 11,
                   color: C.textTertiary,
                   fontWeight: 600,
-                  display: 'block',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 6,
                   marginBottom: 4,
                 }}
               >
-                😴 Uyku (saat)
+                <Icon name="moon" size={13} color={C.cyan} strokeWidth={1.8} /> Uyku (saat)
               </label>
               <input
                 type="number"
@@ -165,11 +171,13 @@ export default function MetricLoggerModal({ uid, onClose }) {
                   fontSize: 11,
                   color: C.textTertiary,
                   fontWeight: 600,
-                  display: 'block',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 6,
                   marginBottom: 4,
                 }}
               >
-                😴 Uyku kalitesi
+                <Icon name="moon" size={13} color={C.cyan} strokeWidth={1.8} /> Uyku kalitesi
               </label>
               <select
                 value={sleepQuality}
@@ -187,11 +195,13 @@ export default function MetricLoggerModal({ uid, onClose }) {
                   fontSize: 11,
                   color: C.textTertiary,
                   fontWeight: 600,
-                  display: 'block',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 6,
                   marginBottom: 4,
                 }}
               >
-                ❤️ Nabız (bpm)
+                <Icon name="heart" size={13} color={C.gold} strokeWidth={1.8} /> Nabız (bpm)
               </label>
               <input
                 type="number"
@@ -209,11 +219,13 @@ export default function MetricLoggerModal({ uid, onClose }) {
                   fontSize: 11,
                   color: C.textTertiary,
                   fontWeight: 600,
-                  display: 'block',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 6,
                   marginBottom: 4,
                 }}
               >
-                👟 Adım sayısı
+                <Icon name="footprints" size={13} color={C.cyan} strokeWidth={1.8} /> Adım sayısı
               </label>
               <input
                 type="number"
@@ -230,11 +242,13 @@ export default function MetricLoggerModal({ uid, onClose }) {
                   fontSize: 11,
                   color: C.textTertiary,
                   fontWeight: 600,
-                  display: 'block',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 6,
                   marginBottom: 4,
                 }}
               >
-                🔥 Kalori (kcal)
+                <Icon name="flame" size={13} color={C.gold} strokeWidth={1.8} /> Kalori (kcal)
               </label>
               <input
                 type="number"
@@ -251,11 +265,14 @@ export default function MetricLoggerModal({ uid, onClose }) {
                   fontSize: 11,
                   color: C.textTertiary,
                   fontWeight: 600,
-                  display: 'block',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 6,
                   marginBottom: 4,
                 }}
               >
-                ✨ Wellness skoru
+                <Icon name="sparkles" size={13} color={C.goldLight} strokeWidth={1.8} /> Wellness
+                skoru
               </label>
               <input
                 type="number"

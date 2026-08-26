@@ -1,6 +1,7 @@
 import React from 'react';
 import { C } from './WebStyles';
 import WeeklyChart from './WeeklyChart';
+import Icon from './Icons';
 
 function HealthTab({ metrics, weeklyData, wellnessScore, loading }) {
   const dm = metrics?.dailyMetrics;
@@ -12,28 +13,28 @@ function HealthTab({ metrics, weeklyData, wellnessScore, loading }) {
       value: dm?.sleep?.hours ? Math.round((dm.sleep.hours / 9) * 100) : 0,
       color: C.cyan,
       sub: dm?.sleep ? `${dm.sleep.quality || '—'} · ${dm.sleep.hours}s uyku` : '—',
-      icon: '😴',
+      icon: 'moon',
     },
     {
       label: 'Hareket',
       value: dm?.steps ? Math.min(100, Math.round(dm.steps / 100)) : 0,
       color: C.gold,
       sub: dm?.steps ? `${(dm.steps / 1000).toFixed(1)}k adım` : '—',
-      icon: '👟',
+      icon: 'footprints',
     },
     {
       label: 'Zihin & stres',
       value: dm?.heartRate ? Math.round(68 + (dm.heartRate < 70 ? 10 : 0)) : 0,
       color: C.royal,
       sub: '3 meditasyon',
-      icon: '🧘',
+      icon: 'flower',
     },
     {
       label: 'Kalori dengesi',
       value: dm?.calories ? Math.round((dm.calories / 2200) * 100) : 0,
       color: C.gold,
       sub: dm?.calories ? `${dm.calories.toLocaleString()} kcal aktif` : '—',
-      icon: '🔥',
+      icon: 'flame',
     },
   ];
 
@@ -159,8 +160,17 @@ function HealthTab({ metrics, weeklyData, wellnessScore, loading }) {
                   marginBottom: 6,
                 }}
               >
-                <span style={{ fontSize: 13, fontWeight: 500, color: C.textPrimary }}>
-                  {m.icon} {m.label}
+                <span
+                  style={{
+                    fontSize: 13,
+                    fontWeight: 500,
+                    color: C.textPrimary,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 7,
+                  }}
+                >
+                  <Icon name={m.icon} size={15} color={m.color} strokeWidth={1.8} /> {m.label}
                 </span>
                 <span style={{ fontSize: 18, fontWeight: 600, color: C.textPrimary }}>
                   {m.value}
@@ -210,7 +220,7 @@ function HealthTab({ metrics, weeklyData, wellnessScore, loading }) {
       {/* AI Insight */}
       <div className="wd-card-green">
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-          <span style={{ fontSize: 18 }}>✨</span>
+          <Icon name="sparkles" size={17} color={C.green} strokeWidth={1.8} />
           <span style={{ fontSize: 13, fontWeight: 600, color: C.textPrimary }}>AI İçgörü</span>
         </div>
         <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.7)', lineHeight: 1.6, margin: 0 }}>

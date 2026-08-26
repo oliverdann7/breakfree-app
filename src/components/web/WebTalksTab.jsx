@@ -2,9 +2,31 @@ import React from 'react';
 import { useAppDispatch } from '../../store/hooks';
 import { joinTalk } from '../../store/slices/talksSlice';
 import { C } from './WebStyles';
+import Icon from './Icons';
 
-function TalksTab({ talks, onSeed }) {
+const CATEGORY_ICONS = {
+  Zihin: 'brain',
+  Hareket: 'activity',
+  Uyku: 'moon',
+  Beslenme: 'apple',
+  Sağlık: 'target',
+};
+
+// Firestore may hold duplicate docs (the old seed flow could run twice), so
+// collapse identical talks before rendering.
+function dedupeTalks(talks) {
+  const seen = new Set();
+  return talks.filter((t) => {
+    const key = `${t.title}|${t.host?.name}|${t.category}|${t.status}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
+function TalksTab({ talks: rawTalks, onSeed }) {
   const dispatch = useAppDispatch();
+  const talks = dedupeTalks(rawTalks);
 
   if (talks.length === 0) {
     return (
@@ -27,7 +49,9 @@ function TalksTab({ talks, onSeed }) {
             border: '1px dashed rgba(255,255,255,0.12)',
           }}
         >
-          <p style={{ fontSize: 40, margin: '0 0 12px' }}>🎧</p>
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 14 }}>
+            <Icon name="headphones" size={40} color={C.textTertiary} strokeWidth={1.5} />
+          </div>
           <p style={{ fontSize: 18, fontWeight: 600, color: C.textPrimary, margin: '0 0 6px' }}>
             Henüz palestra yok
           </p>
@@ -112,9 +136,13 @@ function TalksTab({ talks, onSeed }) {
                 fontWeight: 700,
                 cursor: 'pointer',
                 fontFamily: 'inherit',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 8,
               }}
             >
-              🎧 Şimdi Dinle
+              <Icon name="headphones" size={16} /> Şimdi Dinle
             </button>
           </div>
         ))}
@@ -140,17 +168,11 @@ function TalksTab({ talks, onSeed }) {
               justifyContent: 'center',
             }}
           >
-            <span style={{ fontSize: 22 }}>
-              {t.category === 'Zihin'
-                ? '🧠'
-                : t.category === 'Hareket'
-                  ? '🏃'
-                  : t.category === 'Uyku'
-                    ? '🌙'
-                    : t.category === 'Beslenme'
-                      ? '🥗'
-                      : '🎯'}
-            </span>
+            <Icon
+              name={CATEGORY_ICONS[t.category] || 'target'}
+              size={22}
+              color={t.category === 'Zihin' ? C.cyan : C.gold}
+            />
           </div>
           <div style={{ flex: 1 }}>
             <p

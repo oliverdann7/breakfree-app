@@ -1,6 +1,7 @@
 import React from 'react';
 import { C } from './WebStyles';
 import WeeklyChart from './WeeklyChart';
+import Icon from './Icons';
 
 function greeting() {
   const h = new Date().getHours();
@@ -14,28 +15,28 @@ function HomeTab({ user, metrics, weeklyData, wellnessScore, loading, onLogMetri
 
   const metricCards = [
     {
-      emoji: '😴',
+      icon: 'moon',
       label: 'Uyku',
       value: dm?.sleep?.hours ? `${dm.sleep.hours}s` : '—',
       sub: dm?.sleep?.quality || '—',
       color: C.cyan,
     },
     {
-      emoji: '❤️',
+      icon: 'heart',
       label: 'Nabız',
       value: dm?.heartRate ? `${dm.heartRate} bpm` : '—',
       sub: 'Dinlenme',
       color: C.gold,
     },
     {
-      emoji: '👟',
+      icon: 'footprints',
       label: 'Adım',
       value: dm?.steps ? `${(dm.steps / 1000).toFixed(1)}k` : '—',
       sub: dm?.steps ? `Hedef %${Math.min(100, Math.round(dm.steps / 100))}` : '—',
       color: C.cyan,
     },
     {
-      emoji: '🔥',
+      icon: 'flame',
       label: 'Kalori',
       value: dm?.calories ? `${dm.calories.toLocaleString()}` : '—',
       sub: 'Aktif',
@@ -44,14 +45,14 @@ function HomeTab({ user, metrics, weeklyData, wellnessScore, loading, onLogMetri
   ];
 
   const plan = [
-    { time: '07:00', title: 'Sabah meditasyonu', dur: '10dk', done: true, icon: '🧘' },
-    { time: '17:30', title: 'Fitness · Üst beden', dur: '45dk', done: false, icon: '💪' },
+    { time: '07:00', title: 'Sabah meditasyonu', dur: '10dk', done: true, icon: 'flower' },
+    { time: '17:30', title: 'Fitness · Üst beden', dur: '45dk', done: false, icon: 'dumbbell' },
     {
       time: '20:00',
       title: 'Wellness palestrası',
       dur: '30dk',
       done: false,
-      icon: '🎙',
+      icon: 'mic',
       live: true,
     },
   ];
@@ -104,8 +105,18 @@ function HomeTab({ user, metrics, weeklyData, wellnessScore, loading, onLogMetri
           }}
         >
           <div>
-            <p style={{ fontSize: 14, fontWeight: 600, color: C.textPrimary, margin: '0 0 4px' }}>
-              📋 Bugünün verilerini gir
+            <p
+              style={{
+                fontSize: 14,
+                fontWeight: 600,
+                color: C.textPrimary,
+                margin: '0 0 4px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+              }}
+            >
+              <Icon name="clipboard" size={16} color={C.gold} /> Bugünün verilerini gir
             </p>
             <p style={{ fontSize: 12, color: C.textTertiary, margin: 0 }}>
               Uyku, nabız ve aktivite verilerini kaydederek wellness skorunu takip et.
@@ -234,7 +245,7 @@ function HomeTab({ user, metrics, weeklyData, wellnessScore, loading, onLogMetri
                   padding: '14px 12px 12px',
                 }}
               >
-                <span style={{ fontSize: 18 }}>{m.emoji}</span>
+                <Icon name={m.icon} size={18} color={m.color} strokeWidth={1.8} />
                 <p
                   style={{
                     fontSize: 19,
@@ -288,7 +299,7 @@ function HomeTab({ user, metrics, weeklyData, wellnessScore, loading, onLogMetri
               <p style={{ fontSize: 18, fontWeight: 700, color: C.textPrimary, margin: 0 }}>
                 Bugünkü plan
               </p>
-              <span style={{ fontSize: 13, color: C.textTertiary }}>→</span>
+              <Icon name="arrowRight" size={14} color={C.textTertiary} />
             </div>
             <div
               style={{
@@ -325,9 +336,14 @@ function HomeTab({ user, metrics, weeklyData, wellnessScore, loading, onLogMetri
                       }}
                     >
                       {item.done ? (
-                        <span style={{ color: C.cyan, fontWeight: 700, fontSize: 15 }}>✓</span>
+                        <Icon name="check" size={16} color={C.cyan} strokeWidth={2.5} />
                       ) : (
-                        <span style={{ fontSize: 17 }}>{item.icon}</span>
+                        <Icon
+                          name={item.icon}
+                          size={17}
+                          color={item.live ? C.navy : C.textSecondary}
+                          strokeWidth={1.8}
+                        />
                       )}
                     </div>
                     <div style={{ flex: 1 }}>

@@ -164,10 +164,11 @@ export const CSS = `
   .comm-color-btn.selected { border-color: #fff; }
 `;
 
+// `icon` is a name from src/components/web/Icons.jsx
 export const TABS = [
-  { id: 'home', label: 'Ana Sayfa', icon: '🏠' },
-  { id: 'talks', label: 'Palestralar', icon: '🎧' },
-  { id: 'health', label: 'Sağlık', icon: '❤️' },
-  { id: 'community', label: 'Topluluk', icon: '👥' },
-  { id: 'profile', label: 'Profil', icon: '👤' },
+  { id: 'home', label: 'Ana Sayfa', icon: 'home' },
+  { id: 'talks', label: 'Palestralar', icon: 'headphones' },
+  { id: 'health', label: 'Sağlık', icon: 'heart' },
+  { id: 'community', label: 'Topluluk', icon: 'users' },
+  { id: 'profile', label: 'Profil', icon: 'user' },
 ];

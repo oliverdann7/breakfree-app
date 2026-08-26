@@ -1,6 +1,7 @@
 import React from 'react';
 import { C } from './WebStyles';
 import WeeklyChart from './WeeklyChart';
+import Icon from './Icons';
 
 function ProfileTab({ user, onLogout, weeklyData }) {
   const totalTalks = 12;
@@ -125,19 +126,21 @@ function ProfileTab({ user, onLogout, weeklyData }) {
       </p>
       <div style={{ background: C.navy, borderRadius: 16, marginBottom: 20, overflow: 'hidden' }}>
         {[
-          { icon: '🌍', label: 'Dil', value: 'Türkçe' },
-          { icon: '🔔', label: 'Bildirimler', value: 'Açık' },
-          { icon: '📏', label: 'Birimler', value: 'Metrik' },
-          { icon: '🔒', label: 'Gizlilik', value: '' },
+          { icon: 'globe', label: 'Dil', value: 'Türkçe' },
+          { icon: 'bell', label: 'Bildirimler', value: 'Açık' },
+          { icon: 'ruler', label: 'Birimler', value: 'Metrik' },
+          { icon: 'lock', label: 'Gizlilik', value: '' },
         ].map((row, i, arr) => (
           <div key={row.label}>
             <div className="wd-setting-row">
-              <span style={{ fontSize: 20, width: 28 }}>{row.icon}</span>
+              <span style={{ width: 28, display: 'flex', alignItems: 'center' }}>
+                <Icon name={row.icon} size={19} color={C.cyan} strokeWidth={1.8} />
+              </span>
               <span style={{ flex: 1, fontSize: 15, color: C.textPrimary }}>{row.label}</span>
               <span style={{ fontSize: 13, color: C.textTertiary, marginRight: 4 }}>
                 {row.value}
               </span>
-              <span style={{ fontSize: 20, color: C.textTertiary }}>›</span>
+              <Icon name="chevronRight" size={16} color={C.textTertiary} />
             </div>
             {i < arr.length - 1 && (
               <div style={{ height: 1, background: C.border, marginLeft: 56 }} />
@@ -160,9 +163,13 @@ function ProfileTab({ user, onLogout, weeklyData }) {
           cursor: 'pointer',
           fontFamily: 'inherit',
           marginBottom: 32,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: 8,
         }}
       >
-        🚪 Çıkış Yap
+        <Icon name="logout" size={16} color="#EF4444" /> Çıkış Yap
       </button>
       <p style={{ textAlign: 'center', fontSize: 12, color: C.textTertiary }}>BreakFree v1.0.0</p>
     </div>

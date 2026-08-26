@@ -7,6 +7,7 @@ import {
   addDoc,
   query,
   orderBy,
+  limit,
   updateDoc,
   increment,
 } from 'firebase/firestore';
@@ -40,6 +41,10 @@ export const fetchTalkById = createAsyncThunk(
 export const seedTalks = createAsyncThunk('talks/seed', async (_, { rejectWithValue }) => {
   try {
     if (!db) return [];
+    // Never seed on top of existing data — a double click (or two devices)
+    // used to write the sample talks again, duplicating every list item.
+    const existing = await getDocs(query(collection(db, 'talks'), limit(1)));
+    if (!existing.empty) return [];
     const sample = [
       {
         title: 'Anksiyeteyi Anlamak',
