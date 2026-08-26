@@ -117,12 +117,22 @@ _Last updated: 2026-08-26_
   rules + moderation). Migration requires a data mapping, so keep as-is until
   decided.
 
-### Phase 5 — QA / regression
-- After `npm run build:web`, verify `dist/index.html` contains the dark
-  `expo-reset` block from `public/index.html`.
-- Scroll every dashboard tab past the fold at 1440×900 and 375×812 — no white
-  band, no washed-out cards.
-- Seed flow: on an empty `talks` collection the seed button loads 4 talks once;
-  clicking again adds nothing.
-- Lint gate idea (future): an ESLint rule / CI grep that rejects emoji
-  codepoints in `src/components/**` outside `AVATAR_EMOJIS` and i18n strings.
+### Phase 5 — QA / regression — DONE (automatable parts)
+- `npm run build:web` verified: `dist/index.html` carries the dark
+  `expo-reset` block from `public/index.html`. ✔
+- Headless-browser QA on the built export at 1440×900 and 375×812 (full-page,
+  scrolled to the bottom): `html`/`body` computed background is
+  `rgb(6,24,41)` end-to-end, `#root` grows with content (no viewport clamp),
+  SVG icons render, and no emoji appear in visible text. ✔ (The dashboard
+  tabs sit behind Firebase auth, so they are covered by the component render
+  tests instead of a headless login.)
+- Lint gate: `src/__tests__/noEmojiChrome.test.js` scans `src/` on every
+  `npm test` / CI run and fails on any emoji outside the explicit
+  user-content allowlist (avatars, sample posts, mood faces). ✔
+- Still manual: seed flow against a real empty `talks` collection, and
+  visual QA of the native app on iOS/Android simulators (icons render via
+  react-native-svg; covered by unit tests, worth one visual pass before a
+  store release).
+
+Remaining open item: **Phase 4** (avatar strategy) — a product decision,
+not a code task; everything else in this plan is implemented.
