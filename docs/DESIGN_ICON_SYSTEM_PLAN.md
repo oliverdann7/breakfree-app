@@ -85,25 +85,30 @@ _Last updated: 2026-08-26_
 
 ## 4. Roll-out plan for the rest of the app
 
-### Phase 2 — Landing page (`src/components/BreakFreeLanding.jsx`)
-- Replace feature-card emoji (🎧 🧑‍⚕️ 🤖 📊 🌿 🧘), stat chips (😴 💚 🧠 ✨ ⏳ 💬 🚀 ✅)
-  and arrow glyphs (→) with `Icon` names; ✓ list bullets → `check`.
-- Effort: ~half a day. No data changes; purely presentational.
+### Phase 2 — Landing page (`src/components/BreakFreeLanding.jsx`) — DONE
+- Feature-card emoji, stat chips, ★ ratings, ✓ bullets and → arrows replaced
+  with `Icon` components; auth modals' ✕ close buttons and the Legal/Admin
+  "←" back links use `x`/`arrowLeft`.
 
-### Phase 3 — Native app (React Native screens)
-- Emoji live in `src/components/features/*` (`TalkCard`, `HealthStatusCard`,
-  `LeaderboardCard`, `VideoCard`), `src/components/common/Input.js` (👁/🙈) and
-  various screens.
-- Recommended: add `react-native-svg` (Expo-compatible) and port
-  `Icons.jsx` to a shared, platform-neutral module
-  (`src/components/common/Icon.js`) rendering `Svg/Path` on native and `svg`
-  on web — the path registry is already platform-agnostic, so it can be
-  shared verbatim. Alternative: `lucide-react-native` (pulls the same icon
-  language, adds a dependency).
-- Map: category emoji in `TalkCard` → same `CATEGORY_ICONS` mapping as web;
-  medals in `LeaderboardCard` (🥇🥈🥉) → `trophy` + rank color; password eye →
-  `eye`/`eye-off` paths (add to registry).
-- Effort: ~1–2 days including visual QA on iOS/Android.
+### Phase 3 — Native app (React Native screens) — DONE
+- The registry was extracted to a platform-neutral module,
+  `src/components/icons/paths.js` (plain path/circle/rect data). Two thin
+  renderers consume it: `src/components/web/Icons.jsx` (DOM `<svg>`) and
+  `src/components/common/Icon.js` (`react-native-svg`, already an app
+  dependency — no new packages). Same API on both:
+  `<Icon name size color strokeWidth filled />`. Jest mocks
+  `react-native-svg` via `__mocks__/react-native-svg.js`.
+- Replaced across: the tab bar (`AppNavigator`), feature components
+  (`TalkCard`, `HealthStatusCard`, `LeaderboardCard`, `VideoCard`,
+  `MetricCard` — which now takes an `icon` name with `emoji` kept as the
+  content fallback), `Input` (eye/eyeOff), `ErrorBoundary`, and the Talks,
+  Community, Mentor, Videos, Home, Health, Profile, Auth and Premium screens.
+- Deliberately still emoji (content, not chrome): user avatars
+  (`AVATAR_EMOJIS`, `avatarEmoji`), emoji inside user posts, the mood-face
+  scale in `HealthMetricsScreen` (😞…😄 — an affective scale, not an icon),
+  and `challenge.icon` values stored in Firestore (the *fallback* is now the
+  `trophy` icon). The Google/Apple login buttons dropped their placeholder
+  emoji; proper brand SVGs can be added later if wanted.
 
 ### Phase 4 — Avatars (product decision, not a bug)
 - Community avatars are emoji chosen by users and stored in Firestore

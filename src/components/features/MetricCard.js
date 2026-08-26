@@ -1,13 +1,28 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import Card from '../common/Card';
+import Icon from '../common/Icon';
 import { colors } from '../../constants/designTokens';
 
-export default function MetricCard({ emoji, label, value, unit, color = colors.cyan, style }) {
+// `icon` takes a name from src/components/icons/paths.js; `emoji` remains for
+// glyphs that are content rather than chrome (e.g. the mood-face scale).
+export default function MetricCard({
+  icon,
+  emoji,
+  label,
+  value,
+  unit,
+  color = colors.cyan,
+  style,
+}) {
   return (
     <Card style={[styles.card, { borderColor: color + '35' }, style]}>
       <View style={[styles.iconBadge, { backgroundColor: color + '18' }]}>
-        <Text style={styles.emoji}>{emoji}</Text>
+        {icon ? (
+          <Icon name={icon} size={18} color={color} />
+        ) : (
+          <Text style={styles.emoji}>{emoji}</Text>
+        )}
       </View>
       <Text style={[styles.value, { color }]}>{value}</Text>
       <Text style={styles.unit}>{unit}</Text>
