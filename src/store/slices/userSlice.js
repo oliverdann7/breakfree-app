@@ -28,13 +28,15 @@ export const fetchUserProfile = createAsyncThunk(
   }
 );
 
+// `icon` is a name from src/components/icons/paths.js. Older daily_plans docs
+// in Firestore still carry emoji here — render sites keep a text fallback.
 const GOAL_TASKS = {
-  sleep: { title: 'Uyku Takibi', icon: '😴', duration: '5dk' },
-  fitness: { title: '30dk Antrenman', icon: '💪', duration: '30dk' },
-  mindfulness: { title: 'Meditasyon', icon: '🧘', duration: '10dk' },
-  nutrition: { title: 'Su İçmeyi Takip Et', icon: '💧', duration: '1dk' },
-  community: { title: 'Gönderi Paylaş', icon: '🤝', duration: '5dk' },
-  stress: { title: 'Nefes Egzersizi', icon: '🌿', duration: '5dk' },
+  sleep: { title: 'Uyku Takibi', icon: 'moon', duration: '5dk' },
+  fitness: { title: '30dk Antrenman', icon: 'dumbbell', duration: '30dk' },
+  mindfulness: { title: 'Meditasyon', icon: 'flower', duration: '10dk' },
+  nutrition: { title: 'Su İçmeyi Takip Et', icon: 'droplet', duration: '1dk' },
+  community: { title: 'Gönderi Paylaş', icon: 'users', duration: '5dk' },
+  stress: { title: 'Nefes Egzersizi', icon: 'leaf', duration: '5dk' },
 };
 
 export const fetchDailyPlan = createAsyncThunk(

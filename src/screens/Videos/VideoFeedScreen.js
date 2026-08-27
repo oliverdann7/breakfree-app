@@ -13,6 +13,7 @@ import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { fetchVideos, setActiveCategory, isVideoLocked } from '../../store/slices/videosSlice';
 import { selectIsPremium } from '../../store/slices/premiumSlice';
 import VideoCard from '../../components/features/VideoCard';
+import Icon from '../../components/common/Icon';
 import { colors } from '../../constants/designTokens';
 
 const { width } = Dimensions.get('window');
@@ -78,7 +79,7 @@ export default function VideoFeedScreen({ navigation }) {
           </View>
         ) : filtered.length === 0 ? (
           <View style={styles.emptyBox}>
-            <Text style={styles.emptyIcon}>🎬</Text>
+            <Icon name="film" size={40} color="rgba(255,255,255,0.35)" />
             <Text style={styles.emptyText}>Bu kategoride henüz video yok.</Text>
           </View>
         ) : (
@@ -152,6 +153,5 @@ const styles = StyleSheet.create({
   },
   loadingBox: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingVertical: 60 },
   emptyBox: { alignItems: 'center', paddingVertical: 60, gap: 12 },
-  emptyIcon: { fontSize: 40 },
   emptyText: { fontSize: 14, color: 'rgba(255,255,255,0.35)' },
 });

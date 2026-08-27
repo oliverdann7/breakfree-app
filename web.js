@@ -18,7 +18,12 @@ function GlobalStyles() {
   return (
     <>
       <style>{`
+        /* Guard against Expo's default web template: it ships a white canvas,
+           body{overflow:hidden} and a fixed-height #root, which paints
+           everything past the first viewport on white. */
+        html, body { background: #061829 !important; }
         body { overflow: auto !important; -webkit-overflow-scrolling: touch; }
+        #root { height: auto !important; min-height: 100vh; }
         html { scroll-behavior: smooth; }
         @media (max-width: 768px) {
           .bf-nav-links { display: none !important; }

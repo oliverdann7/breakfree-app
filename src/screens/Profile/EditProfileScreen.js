@@ -16,6 +16,7 @@ import { updateProfile, updateProfileFirestore } from '../../store/slices/userSl
 import Input from '../../components/common/Input';
 import Button from '../../components/common/Button';
 import Card from '../../components/common/Card';
+import Icon from '../../components/common/Icon';
 import { colors } from '../../constants/designTokens';
 
 const AVATAR_COLORS = [
@@ -30,13 +31,13 @@ const AVATAR_COLORS = [
 ];
 
 const GOAL_IDS = ['sleep', 'fitness', 'mindfulness', 'nutrition', 'community', 'stress'];
-const GOAL_EMOJIS = {
-  sleep: '😴',
-  fitness: '💪',
-  mindfulness: '🧘',
-  nutrition: '🥗',
-  community: '🤝',
-  stress: '🌿',
+const GOAL_ICONS = {
+  sleep: 'moon',
+  fitness: 'dumbbell',
+  mindfulness: 'flower',
+  nutrition: 'apple',
+  community: 'users',
+  stress: 'leaf',
 };
 
 export default function EditProfileScreen({ navigation }) {
@@ -179,7 +180,11 @@ export default function EditProfileScreen({ navigation }) {
                   accessibilityRole="button"
                   accessibilityState={{ selected }}
                 >
-                  <Text style={styles.goalEmoji}>{GOAL_EMOJIS[id]}</Text>
+                  <Icon
+                    name={GOAL_ICONS[id]}
+                    size={16}
+                    color={selected ? colors.cyan : colors.textSecondary}
+                  />
                   <Text style={[styles.goalLabel, selected && { color: colors.cyan }]}>
                     {t(`goals.${id}`)}
                   </Text>
@@ -265,7 +270,6 @@ const styles = StyleSheet.create({
     borderColor: colors.cyan,
     backgroundColor: 'rgba(20,184,212,0.1)',
   },
-  goalEmoji: { fontSize: 16 },
   goalLabel: { fontSize: 13, color: colors.textSecondary, fontWeight: '500' },
   saveBtn: { marginTop: 4 },
 });

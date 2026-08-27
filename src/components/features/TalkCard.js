@@ -1,13 +1,14 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import Card from '../common/Card';
+import Icon from '../common/Icon';
 import { colors } from '../../constants/designTokens';
 
-const CATEGORY_EMOJI = {
-  Zihin: '🧘',
-  Sağlık: '💚',
-  Hareket: '🏃',
-  Beslenme: '🥗',
+const CATEGORY_ICON = {
+  Zihin: 'brain',
+  Sağlık: 'heart',
+  Hareket: 'activity',
+  Beslenme: 'apple',
 };
 
 const STATUS_CONFIG = {
@@ -18,13 +19,13 @@ const STATUS_CONFIG = {
 
 export default function TalkCard({ talk, onPress, style }) {
   const status = STATUS_CONFIG[talk.status] || STATUS_CONFIG.ended;
-  const emoji = CATEGORY_EMOJI[talk.category] || '🎙';
+  const iconName = CATEGORY_ICON[talk.category] || 'mic';
 
   return (
     <TouchableOpacity onPress={onPress} activeOpacity={0.85} accessibilityRole="button">
       <Card style={[styles.card, style]}>
         <View style={styles.thumbnail}>
-          <Text style={styles.thumbnailEmoji}>{emoji}</Text>
+          <Icon name={iconName} size={32} color={colors.cyan} />
           {talk.status === 'live' && <View style={styles.liveDot} />}
         </View>
 
@@ -42,8 +43,16 @@ export default function TalkCard({ talk, onPress, style }) {
           <Text style={styles.host}>{talk.host.name}</Text>
 
           <View style={styles.footer}>
-            <Text style={styles.footerItem}>⏱ {talk.duration} dk</Text>
-            {talk.listeners > 0 && <Text style={styles.footerItem}>👥 {talk.listeners}</Text>}
+            <View style={styles.footerRow}>
+              <Icon name="clock" size={11} color={colors.textTertiary} />
+              <Text style={styles.footerItem}>{talk.duration} dk</Text>
+            </View>
+            {talk.listeners > 0 && (
+              <View style={styles.footerRow}>
+                <Icon name="users" size={11} color={colors.textTertiary} />
+                <Text style={styles.footerItem}>{talk.listeners}</Text>
+              </View>
+            )}
           </View>
         </View>
       </Card>
@@ -65,7 +74,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  thumbnailEmoji: { fontSize: 32 },
   liveDot: {
     position: 'absolute',
     top: 6,
@@ -83,5 +91,6 @@ const styles = StyleSheet.create({
   title: { fontSize: 15, fontWeight: '600', color: colors.textPrimary, lineHeight: 20 },
   host: { fontSize: 12, color: colors.cyan },
   footer: { flexDirection: 'row', gap: 12, marginTop: 2 },
+  footerRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   footerItem: { fontSize: 11, color: colors.textTertiary },
 });

@@ -75,7 +75,9 @@ describe('VideoCard lock state', () => {
       renderer = TestRenderer.create(<VideoCard video={video} locked onPress={() => {}} />);
     });
     const texts = renderer.root.findAllByType('Text').map((t) => t.props.children);
-    expect(texts).toContain('🔒 Pro');
+    expect(texts).toContain('Pro');
+    // Lock icon renders as an Svg via the shared Icon component.
+    expect(renderer.root.findAllByType('Svg').length).toBeGreaterThan(0);
   });
 
   it('hides the Pro badge when unlocked', () => {
@@ -84,6 +86,6 @@ describe('VideoCard lock state', () => {
       renderer = TestRenderer.create(<VideoCard video={video} locked={false} onPress={() => {}} />);
     });
     const texts = renderer.root.findAllByType('Text').map((t) => t.props.children);
-    expect(texts).not.toContain('🔒 Pro');
+    expect(texts).not.toContain('Pro');
   });
 });

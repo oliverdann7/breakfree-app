@@ -3,6 +3,7 @@ import { View, Text, ScrollView, TouchableOpacity, StyleSheet, SafeAreaView } fr
 import { useTranslation } from 'react-i18next';
 import BreakFreeLogo from '../../components/branding/BreakFreeLogo';
 import Button from '../../components/common/Button';
+import Icon from '../../components/common/Icon';
 import { colors } from '../../constants/designTokens';
 
 export default function LandingScreen({ navigation }) {
@@ -45,16 +46,16 @@ export default function LandingScreen({ navigation }) {
 
           <View style={styles.featuresList}>
             {[
-              { icon: '💪', nameKey: 'f1Name', descKey: 'f1Desc' },
-              { icon: '🤝', nameKey: 'f2Name', descKey: 'f2Desc' },
-              { icon: '📊', nameKey: 'f3Name', descKey: 'f3Desc' },
-              { icon: '🎯', nameKey: 'f4Name', descKey: 'f4Desc' },
-              { icon: '🎓', nameKey: 'f5Name', descKey: 'f5Desc' },
-              { icon: '🔔', nameKey: 'f6Name', descKey: 'f6Desc' },
+              { icon: 'dumbbell', nameKey: 'f1Name', descKey: 'f1Desc' },
+              { icon: 'handshake', nameKey: 'f2Name', descKey: 'f2Desc' },
+              { icon: 'barChart', nameKey: 'f3Name', descKey: 'f3Desc' },
+              { icon: 'target', nameKey: 'f4Name', descKey: 'f4Desc' },
+              { icon: 'graduationCap', nameKey: 'f5Name', descKey: 'f5Desc' },
+              { icon: 'bell', nameKey: 'f6Name', descKey: 'f6Desc' },
             ].map((f) => (
               <View key={f.nameKey} style={styles.featureCard}>
                 <View style={styles.featureIconBg}>
-                  <Text style={styles.featureIcon}>{f.icon}</Text>
+                  <Icon name={f.icon} size={32} color={colors.cyan} />
                 </View>
                 <Text style={styles.featureName}>{t(`landing.${f.nameKey}`)}</Text>
                 <Text style={styles.featureDesc}>{t(`landing.${f.descKey}`)}</Text>
@@ -143,7 +144,10 @@ export default function LandingScreen({ navigation }) {
                 }
               }}
             >
-              <Text style={styles.socialButtonText}>📱 Instagram</Text>
+              <View style={styles.socialButtonContent}>
+                <Icon name="instagram" size={18} color={colors.textPrimary} />
+                <Text style={styles.socialButtonText}>Instagram</Text>
+              </View>
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -158,7 +162,10 @@ export default function LandingScreen({ navigation }) {
                 }
               }}
             >
-              <Text style={styles.socialButtonText}>💬 WhatsApp</Text>
+              <View style={styles.socialButtonContent}>
+                <Icon name="messageCircle" size={18} color={colors.textPrimary} />
+                <Text style={styles.socialButtonText}>WhatsApp</Text>
+              </View>
             </TouchableOpacity>
           </View>
         </View>
@@ -262,9 +269,6 @@ const styles = StyleSheet.create({
   },
   featureIconBg: {
     marginBottom: 12,
-  },
-  featureIcon: {
-    fontSize: 32,
   },
   featureName: {
     fontSize: 16,
@@ -444,6 +448,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     borderRadius: 12,
     alignItems: 'center',
+  },
+  socialButtonContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
   },
   socialButtonText: {
     fontSize: 15,

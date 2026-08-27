@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { updateProfileFirestore } from '../../store/slices/userSlice';
 import { C } from './WebStyles';
+import Icon from './Icons';
 
 const AVATAR_EMOJIS = ['🧘', '🏃', '💪', '🌿', '🎯', '⭐', '🔥', '🏆', '🌸', '🦋', '💫', '🎗'];
 const AVATAR_COLORS_LIST = [
@@ -133,9 +134,9 @@ function CommStatsCard({ stats }) {
       }}
     >
       {[
-        { icon: '⭐', label: 'Wellness', value: stats.wellness },
-        { icon: '👟', label: 'Adım', value: `${(stats.steps / 1000).toFixed(1)}k` },
-        { icon: '😴', label: 'Uyku', value: `${stats.sleep}s` },
+        { icon: 'star', label: 'Wellness', value: stats.wellness },
+        { icon: 'footprints', label: 'Adım', value: `${(stats.steps / 1000).toFixed(1)}k` },
+        { icon: 'moon', label: 'Uyku', value: `${stats.sleep}s` },
       ].map((s, i) => (
         <div
           key={i}
@@ -146,7 +147,9 @@ function CommStatsCard({ stats }) {
             borderLeft: i > 0 ? '1px solid rgba(255,255,255,0.08)' : 'none',
           }}
         >
-          <div style={{ fontSize: 14 }}>{s.icon}</div>
+          <div style={{ display: 'flex', justifyContent: 'center' }}>
+            <Icon name={s.icon} size={14} color={C.textSecondary} strokeWidth={1.8} />
+          </div>
           <div style={{ fontSize: 15, fontWeight: 600, color: C.textPrimary, margin: '3px 0 2px' }}>
             {s.value}
           </div>
@@ -213,7 +216,13 @@ function CommPostCard({
             padding: 0,
           }}
         >
-          <span style={{ fontSize: 17 }}>{post.liked ? '❤️' : '🤍'}</span> {post.likes}
+          <Icon
+            name="heart"
+            size={16}
+            color={post.liked ? C.gold : 'currentColor'}
+            filled={post.liked}
+          />{' '}
+          {post.likes}
         </button>
         <button
           onClick={onToggleExpand}
@@ -230,7 +239,8 @@ function CommPostCard({
             padding: 0,
           }}
         >
-          <span style={{ fontSize: 17 }}>💬</span> {post.comments.length} {isExpanded ? '▲' : '▼'}
+          <Icon name="messageCircle" size={16} /> {post.comments.length}{' '}
+          <Icon name={isExpanded ? 'chevronUp' : 'chevronDown'} size={13} />
         </button>
       </div>
       {isExpanded && (
@@ -287,9 +297,11 @@ function CommPostCard({
                 fontSize: 16,
                 fontWeight: 700,
                 cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
               }}
             >
-              →
+              <Icon name="arrowRight" size={15} color={C.navy} strokeWidth={2.5} />
             </button>
           </div>
         </div>
@@ -453,8 +465,17 @@ function CommunityTab({
                   <div
                     style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}
                   >
-                    <strong style={{ color: C.textPrimary, fontSize: 13 }}>
-                      🏆 {challenge.title}
+                    <strong
+                      style={{
+                        color: C.textPrimary,
+                        fontSize: 13,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 6,
+                      }}
+                    >
+                      <Icon name="trophy" size={14} color={C.gold} strokeWidth={1.8} />{' '}
+                      {challenge.title}
                     </strong>
                     <span style={{ color: C.gold, fontSize: 11 }}>
                       {daysLeft > 0 ? `${daysLeft} gün kaldı` : 'Son gün'}
@@ -501,9 +522,12 @@ function CommunityTab({
                         fontWeight: 700,
                         cursor: 'pointer',
                         fontFamily: 'inherit',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: 6,
                       }}
                     >
-                      Katıl →
+                      Katıl <Icon name="arrowRight" size={12} color={C.navy} strokeWidth={2.5} />
                     </button>
                   )}
                 </div>

@@ -10,18 +10,19 @@ import {
 import Button from '../../components/common/Button';
 import Input from '../../components/common/Input';
 import BreakFreeLogo from '../../components/branding/BreakFreeLogo';
+import Icon from '../../components/common/Icon';
 import { colors } from '../../constants/designTokens';
 
 const { width } = Dimensions.get('window');
 
 const GOAL_IDS = ['sleep', 'fitness', 'mindfulness', 'nutrition', 'community', 'stress'];
-const GOAL_EMOJIS = {
-  sleep: '😴',
-  fitness: '💪',
-  mindfulness: '🧘',
-  nutrition: '🥗',
-  community: '🤝',
-  stress: '🌿',
+const GOAL_ICONS = {
+  sleep: 'moon',
+  fitness: 'dumbbell',
+  mindfulness: 'flower',
+  nutrition: 'apple',
+  community: 'users',
+  stress: 'leaf',
 };
 
 export default function OnboardingScreen({ _navigation }) {
@@ -51,17 +52,17 @@ export default function OnboardingScreen({ _navigation }) {
   const steps = [
     // Step 0: Welcome
     <View key="welcome" style={styles.stepContainer}>
-      <Text style={styles.welcomeEmoji}>🌟</Text>
+      <Icon name="sparkles" size={64} color={colors.gold} style={styles.welcomeIcon} />
       <Text style={styles.stepTitle}>{t('onboarding.welcome')}</Text>
       <Text style={styles.stepDesc}>{t('onboarding.welcomeDesc')}</Text>
       <View style={styles.featureList}>
         {[
-          { emoji: '🎙', text: t('talks.title') },
-          { emoji: '📊', text: t('health.title') },
-          { emoji: '👥', text: t('community.title') },
+          { icon: 'mic', text: t('talks.title') },
+          { icon: 'barChart', text: t('health.title') },
+          { icon: 'users', text: t('community.title') },
         ].map((f) => (
-          <View key={f.emoji} style={styles.featureRow}>
-            <Text style={styles.featureEmoji}>{f.emoji}</Text>
+          <View key={f.icon} style={styles.featureRow}>
+            <Icon name={f.icon} size={24} color={colors.cyan} />
             <Text style={styles.featureText}>{f.text}</Text>
           </View>
         ))}
@@ -84,7 +85,12 @@ export default function OnboardingScreen({ _navigation }) {
               accessibilityRole="button"
               accessibilityState={{ selected }}
             >
-              <Text style={styles.goalEmoji}>{GOAL_EMOJIS[id]}</Text>
+              <Icon
+                name={GOAL_ICONS[id]}
+                size={28}
+                color={selected ? colors.cyan : colors.textPrimary}
+                style={styles.goalIcon}
+              />
               <Text style={[styles.goalLabel, selected && styles.goalLabelSelected]}>
                 {t(`goals.${id}`)}
               </Text>
@@ -179,7 +185,7 @@ const styles = StyleSheet.create({
   progressDotActive: { backgroundColor: colors.cyan, width: 24 },
   scroll: { flexGrow: 1, paddingHorizontal: 24, paddingTop: 20 },
   stepContainer: { paddingBottom: 24 },
-  welcomeEmoji: { fontSize: 64, textAlign: 'center', marginBottom: 24 },
+  welcomeIcon: { alignSelf: 'center', marginBottom: 24 },
   stepTitle: {
     fontSize: 32,
     fontWeight: '700',
@@ -204,7 +210,6 @@ const styles = StyleSheet.create({
     padding: 16,
     gap: 12,
   },
-  featureEmoji: { fontSize: 24 },
   featureText: { fontSize: 15, color: colors.textPrimary, fontWeight: '500' },
   goalsGrid: {
     flexDirection: 'row',
@@ -224,7 +229,7 @@ const styles = StyleSheet.create({
     borderColor: colors.cyan,
     backgroundColor: 'rgba(20,184,212,0.08)',
   },
-  goalEmoji: { fontSize: 28, marginBottom: 8 },
+  goalIcon: { marginBottom: 8 },
   goalLabel: {
     fontSize: 15,
     fontWeight: '600',

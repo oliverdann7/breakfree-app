@@ -17,6 +17,7 @@ import { setQuietHours } from '../../services/localNotifications';
 import { minutesToLabel } from '../../utils/quietHours';
 import { updatePreferences, fetchUserStats } from '../../store/slices/userSlice';
 import Card from '../../components/common/Card';
+import Icon from '../../components/common/Icon';
 import { colors } from '../../constants/designTokens';
 
 function SettingRow({ icon, label, value, onPress, rightElement, isDestructive }) {
@@ -27,12 +28,14 @@ function SettingRow({ icon, label, value, onPress, rightElement, isDestructive }
       activeOpacity={0.7}
       accessibilityRole="button"
     >
-      <Text style={styles.settingIcon}>{icon}</Text>
+      <View style={styles.settingIcon}>
+        <Icon name={icon} size={20} color={isDestructive ? colors.error : colors.textPrimary} />
+      </View>
       <Text style={[styles.settingLabel, isDestructive && { color: colors.error }]}>{label}</Text>
       <View style={styles.settingRight}>
         {value && <Text style={styles.settingValue}>{value}</Text>}
         {rightElement}
-        {!rightElement && <Text style={styles.chevron}>›</Text>}
+        {!rightElement && <Icon name="chevronRight" size={18} color={colors.textTertiary} />}
       </View>
     </TouchableOpacity>
   );
@@ -160,14 +163,14 @@ export default function ProfileScreen({ navigation }) {
         <Text style={styles.settingsSectionTitle}>{t('profile.settings')}</Text>
         <Card style={styles.settingsCard}>
           <SettingRow
-            icon="🌍"
+            icon="globe"
             label={t('profile.language')}
             value={activeLanguage === 'tr' ? t('profile.turkish') : t('profile.english')}
             onPress={toggleLanguage}
           />
           <View style={styles.divider} />
           <SettingRow
-            icon="🔔"
+            icon="bell"
             label={t('profile.notifications')}
             value={preferences.notifications ? t('profile.on') : t('profile.off')}
             onPress={() =>
@@ -176,7 +179,7 @@ export default function ProfileScreen({ navigation }) {
           />
           <View style={styles.divider} />
           <SettingRow
-            icon="🌙"
+            icon="moon"
             label={t('profile.dnd')}
             value={
               quietHours.enabled
@@ -193,7 +196,7 @@ export default function ProfileScreen({ navigation }) {
           />
           <View style={styles.divider} />
           <SettingRow
-            icon="📏"
+            icon="ruler"
             label={t('profile.units')}
             value={preferences.units === 'metric' ? t('profile.metric') : t('profile.imperial')}
             onPress={() =>
@@ -207,24 +210,29 @@ export default function ProfileScreen({ navigation }) {
         <Text style={styles.settingsSectionTitle}>{t('profile.account')}</Text>
         <Card style={styles.settingsCard}>
           <SettingRow
-            icon="🔒"
+            icon="lock"
             label={t('profile.changePassword')}
             onPress={handleChangePassword}
           />
           <View style={styles.divider} />
           <SettingRow
-            icon="📱"
+            icon="smartphone"
             label={t('profile.manageDevices')}
             onPress={() => navigation.navigate('ConnectedDevices')}
           />
           <View style={styles.divider} />
           <SettingRow
-            icon="📄"
+            icon="fileText"
             label={t('profile.privacyPolicy')}
             onPress={() => navigation.navigate('Privacy')}
           />
           <View style={styles.divider} />
-          <SettingRow icon="🚪" label={t('profile.logout')} onPress={handleLogout} isDestructive />
+          <SettingRow
+            icon="logout"
+            label={t('profile.logout')}
+            onPress={handleLogout}
+            isDestructive
+          />
         </Card>
 
         <Text style={styles.version}>{t('profile.version')}</Text>
@@ -320,11 +328,10 @@ const styles = StyleSheet.create({
     padding: 16,
     gap: 12,
   },
-  settingIcon: { fontSize: 20, width: 28 },
+  settingIcon: { width: 28, alignItems: 'flex-start', justifyContent: 'center' },
   settingLabel: { flex: 1, fontSize: 15, color: colors.textPrimary },
   settingRight: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   settingValue: { fontSize: 13, color: colors.textTertiary },
-  chevron: { fontSize: 20, color: colors.textTertiary },
   divider: { height: 1, backgroundColor: colors.border, marginLeft: 56 },
   version: {
     textAlign: 'center',

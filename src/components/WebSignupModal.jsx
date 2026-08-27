@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAppDispatch } from '../store/hooks';
 import { signup, loginWithGoogle, loginWithApple } from '../store/slices/authSlice';
+import Icon from './web/Icons';
 
 // Reusing CSS from WebLoginModal for consistency
 const CSS = `
@@ -192,8 +193,8 @@ export default function WebSignupModal({ onBack, onLogin }) {
           position: 'relative',
         }}
       >
-        <button className="bfl-close" onClick={onBack}>
-          ✕
+        <button className="bfl-close" onClick={onBack} aria-label="Kapat">
+          <Icon name="x" size={20} />
         </button>
         <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 24 }}>
           <LogoSymbol />

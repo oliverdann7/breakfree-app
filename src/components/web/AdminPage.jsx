@@ -12,6 +12,7 @@ import {
 import { db } from '../../services/firebase';
 import { useAppSelector } from '../../store/hooks';
 import { parseYouTubeId } from '../../utils/videoSource';
+import Icon from './Icons';
 
 const TABS = [
   { id: 'talks', label: 'Talks', collection: 'talks' },
@@ -44,8 +45,11 @@ function Locked({ message }) {
     <div style={styles.locked}>
       <h1 style={{ color: '#FFF' }}>BreakFree Admin</h1>
       <p style={{ color: 'rgba(255,255,255,0.6)' }}>{message}</p>
-      <a href="/" style={{ color: '#14B8D4' }}>
-        ← Back
+      <a
+        href="/"
+        style={{ color: '#14B8D4', display: 'inline-flex', alignItems: 'center', gap: 6 }}
+      >
+        <Icon name="arrowLeft" size={14} /> Back
       </a>
     </div>
   );
@@ -358,8 +362,17 @@ export default function AdminPage() {
       <div style={styles.shell}>
         <header style={styles.header}>
           <h1 style={{ color: '#FFF', margin: 0, fontSize: 22 }}>BreakFree Admin</h1>
-          <a href="/" style={{ color: 'rgba(255,255,255,0.5)', fontSize: 13 }}>
-            ← App
+          <a
+            href="/"
+            style={{
+              color: 'rgba(255,255,255,0.5)',
+              fontSize: 13,
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 6,
+            }}
+          >
+            <Icon name="arrowLeft" size={14} /> App
           </a>
         </header>
 

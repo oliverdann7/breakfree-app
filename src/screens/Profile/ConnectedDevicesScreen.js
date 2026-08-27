@@ -4,12 +4,13 @@ import { View, Text, ScrollView, TouchableOpacity, StyleSheet, SafeAreaView } fr
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { connectSource, disconnectSource, syncDaily } from '../../store/slices/healthSlice';
 import { getAvailableSources } from '../../services/healthService';
+import Icon from '../../components/common/Icon';
 import { colors } from '../../constants/designTokens';
 
 const SOURCE_ICONS = {
-  appleHealth: '',
-  googleFit: '🟢',
-  garmin: '⌚',
+  appleHealth: 'apple',
+  googleFit: 'activity',
+  garmin: 'clock',
 };
 
 function lastSyncLabel(ts, t) {
@@ -70,7 +71,11 @@ export default function ConnectedDevicesScreen({ navigation }) {
           const connected = isConnected(src.id);
           return (
             <View key={src.id} style={[styles.row, connected && styles.rowConnected]}>
-              <Text style={styles.icon}>{SOURCE_ICONS[src.id] || '📲'}</Text>
+              <Icon
+                name={SOURCE_ICONS[src.id] || 'smartphone'}
+                size={26}
+                color={connected ? colors.cyan : colors.textPrimary}
+              />
               <View style={{ flex: 1 }}>
                 <Text style={styles.rowTitle}>{src.name}</Text>
                 <Text style={styles.rowStatus}>
@@ -127,7 +132,6 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   rowConnected: { backgroundColor: 'rgba(20,184,212,0.08)' },
-  icon: { fontSize: 26 },
   rowTitle: { color: colors.textPrimary, fontWeight: '700', fontSize: 14 },
   rowStatus: { color: colors.textTertiary, fontSize: 11, marginTop: 3 },
 

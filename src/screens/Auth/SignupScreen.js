@@ -14,6 +14,7 @@ import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { signup, clearError } from '../../store/slices/authSlice';
 import Button from '../../components/common/Button';
 import Input from '../../components/common/Input';
+import Icon from '../../components/common/Icon';
 import { colors } from '../../constants/designTokens';
 
 export default function SignupScreen({ navigation }) {
@@ -112,7 +113,7 @@ export default function SignupScreen({ navigation }) {
             accessibilityState={{ checked: agreed }}
           >
             <View style={[styles.checkbox, agreed && styles.checkboxChecked]}>
-              {agreed && <Text style={styles.checkmark}>✓</Text>}
+              {agreed && <Icon name="check" size={12} strokeWidth={3} color={colors.navy} />}
             </View>
             <Text style={styles.termsText}>
               <Text style={styles.termsLink}>{t('auth.terms')}</Text> {t('auth.termsAccept')}{' '}
@@ -184,7 +185,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.cyan,
     borderColor: colors.cyan,
   },
-  checkmark: { color: colors.navy, fontSize: 12, fontWeight: '700' },
   termsText: { flex: 1, fontSize: 13, color: colors.textSecondary, lineHeight: 18 },
   termsLink: { color: colors.cyan },
   errorSmall: { color: colors.error, fontSize: 12, marginBottom: 12 },

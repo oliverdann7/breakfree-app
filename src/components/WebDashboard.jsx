@@ -14,6 +14,7 @@ import {
 } from '../store/slices/communitySlice';
 import { fetchActiveChallenges, joinChallenge } from '../store/slices/challengesSlice';
 import { C, CSS, TABS } from './web/WebStyles';
+import Icon from './web/Icons';
 import HomeTab from './web/WebHomeTab';
 import TalksTab from './web/WebTalksTab';
 import HealthTab from './web/WebHealthTab';
@@ -153,7 +154,16 @@ export default function WebDashboard() {
               className={`wd-nav-item${activeTab === tab.id ? ' active' : ''}`}
               onClick={() => setActiveTab(tab.id)}
             >
-              <span style={{ fontSize: 18, width: 24, textAlign: 'center' }}>{tab.icon}</span>
+              <span
+                style={{
+                  width: 24,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <Icon name={tab.icon} size={18} />
+              </span>
               {tab.label}
             </button>
           ))}
@@ -261,7 +271,7 @@ export default function WebDashboard() {
               justifyContent: 'center',
             }}
           >
-            <span style={{ fontSize: 14 }}>🔔</span>
+            <Icon name="bell" size={15} color={C.textSecondary} />
           </div>
         </div>
       </div>
@@ -316,7 +326,7 @@ export default function WebDashboard() {
               cursor: 'pointer',
             }}
           >
-            <span style={{ fontSize: 15 }}>🔔</span>
+            <Icon name="bell" size={16} color={C.textSecondary} />
           </div>
         </div>
 
@@ -335,7 +345,9 @@ export default function WebDashboard() {
               className={`wd-tab-btn${activeTab === tab.id ? ' active' : ''}`}
               onClick={() => setActiveTab(tab.id)}
             >
-              <div style={{ fontSize: 20, marginBottom: 3 }}>{tab.icon}</div>
+              <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 4 }}>
+                <Icon name={tab.icon} size={19} />
+              </div>
               <div>{tab.label}</div>
             </button>
           ))}

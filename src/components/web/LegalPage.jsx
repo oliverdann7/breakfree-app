@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import Icon from './Icons';
 
 const SECTIONS = {
   privacy: { title: 'Privacy Policy', file: 'PRIVACY.md' },
@@ -112,8 +113,16 @@ export default function LegalPage({ section = 'privacy' }) {
         </nav>
         <article>{renderMarkdown(content)}</article>
         <footer style={{ marginTop: 60, color: 'rgba(255,255,255,0.3)', fontSize: 12 }}>
-          <a href="/" style={{ color: 'rgba(255,255,255,0.5)' }}>
-            ← BreakFree
+          <a
+            href="/"
+            style={{
+              color: 'rgba(255,255,255,0.5)',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 6,
+            }}
+          >
+            <Icon name="arrowLeft" size={14} /> BreakFree
           </a>
         </footer>
       </div>

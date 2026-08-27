@@ -22,6 +22,7 @@ import {
   seedMentorProfile,
 } from '../../store/slices/mentorSlice';
 import Card from '../../components/common/Card';
+import Icon from '../../components/common/Icon';
 import { colors } from '../../constants/designTokens';
 
 export default function MentorScreen({ navigation }) {
@@ -104,9 +105,9 @@ export default function MentorScreen({ navigation }) {
         {/* Quick Actions */}
         <View style={styles.quickActions}>
           {[
-            { label: t('mentor.chat'), icon: '💬' },
-            { label: t('mentor.session'), icon: '📹' },
-            { label: t('mentor.schedule'), icon: '📅' },
+            { label: t('mentor.chat'), icon: 'messageCircle' },
+            { label: t('mentor.session'), icon: 'video' },
+            { label: t('mentor.schedule'), icon: 'calendar' },
           ].map((action, i) => (
             <TouchableOpacity
               key={i}
@@ -114,7 +115,7 @@ export default function MentorScreen({ navigation }) {
               onPress={() => handleAction(action.label)}
               accessibilityRole="button"
             >
-              <Text style={styles.actionIcon}>{action.icon}</Text>
+              <Icon name={action.icon} size={16} color="rgba(255,255,255,0.6)" />
               <Text style={styles.actionLabel}>{action.label}</Text>
             </TouchableOpacity>
           ))}
@@ -123,7 +124,7 @@ export default function MentorScreen({ navigation }) {
         {/* This Week's Focus */}
         <Card style={styles.focusCard}>
           <View style={styles.focusHeader}>
-            <Text style={styles.focusIcon}>🎯</Text>
+            <Icon name="target" size={14} color={colors.gold} />
             <Text style={styles.focusTitle}>{t('mentor.weeklyFocus')}</Text>
           </View>
           <Text style={styles.focusGoal}>
@@ -146,7 +147,11 @@ export default function MentorScreen({ navigation }) {
                 accessibilityRole="checkbox"
                 accessibilityState={{ checked: goal.done }}
               >
-                <Text style={styles.goalCheckbox}>{goal.done ? '✓' : '○'}</Text>
+                {goal.done ? (
+                  <Icon name="check" size={14} color={colors.gold} strokeWidth={3} />
+                ) : (
+                  <Icon name="circle" size={14} color={colors.textTertiary} strokeWidth={1.5} />
+                )}
                 <Text style={[styles.goalText, goal.done && styles.goalTextDone]}>{goal.text}</Text>
               </TouchableOpacity>
             ))}
@@ -335,7 +340,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.03)',
     gap: 6,
   },
-  actionIcon: { fontSize: 16 },
   actionLabel: { fontSize: 11, color: 'rgba(255,255,255,0.6)', fontWeight: '500' },
   focusCard: {
     marginHorizontal: 20,
@@ -347,7 +351,6 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   focusHeader: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  focusIcon: { fontSize: 14 },
   focusTitle: {
     fontSize: 10,
     fontWeight: '600',
@@ -359,7 +362,6 @@ const styles = StyleSheet.create({
   focusHighlight: { color: colors.gold, fontStyle: 'italic' },
   goalsList: { gap: 8 },
   goalItem: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  goalCheckbox: { fontSize: 14, color: colors.gold, fontWeight: '600', width: 14 },
   goalText: { fontSize: 12, color: colors.textPrimary, flex: 1 },
   goalTextDone: { color: 'rgba(255,255,255,0.3)', textDecorationLine: 'line-through' },
   progressContainer: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 4 },

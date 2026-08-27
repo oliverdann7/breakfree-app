@@ -4,9 +4,10 @@ import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { fetchLeaderboard } from '../../store/slices/communitySlice';
 import Card from '../common/Card';
 import Avatar from '../common/Avatar';
+import Icon from '../common/Icon';
 import { colors } from '../../constants/designTokens';
 
-const MEDALS = ['🥇', '🥈', '🥉'];
+const MEDAL_COLORS = ['#FFD700', '#C0C0C0', '#CD7F32'];
 
 export default function LeaderboardCard() {
   const dispatch = useAppDispatch();
@@ -21,7 +22,10 @@ export default function LeaderboardCard() {
   return (
     <Card style={styles.card}>
       <View style={styles.headerRow}>
-        <Text style={styles.title}>🏆 Wellness Liderler</Text>
+        <View style={styles.titleRow}>
+          <Icon name="trophy" size={14} color={colors.gold} />
+          <Text style={styles.title}>Wellness Liderler</Text>
+        </View>
         <Text style={styles.subtitle}>Bu hafta</Text>
       </View>
       {leaderboard.slice(0, 5).map((u, i) => {
@@ -33,7 +37,13 @@ export default function LeaderboardCard() {
               : colors.gold;
         return (
           <View key={u.uid} style={styles.row}>
-            <Text style={styles.rank}>{MEDALS[i] || `${i + 1}.`}</Text>
+            <View style={styles.rank}>
+              {MEDAL_COLORS[i] ? (
+                <Icon name="medal" size={16} color={MEDAL_COLORS[i]} />
+              ) : (
+                <Text style={styles.rankText}>{`${i + 1}.`}</Text>
+              )}
+            </View>
             <Avatar
               emoji={u.avatarEmoji || '🧘'}
               bg={u.avatarBg || colors.royal}
@@ -67,10 +77,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 4,
   },
+  titleRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   title: { fontSize: 13, fontWeight: '700', color: colors.textPrimary },
   subtitle: { fontSize: 11, color: colors.gold },
   row: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  rank: { width: 24, fontSize: 16, textAlign: 'center' },
+  rank: { width: 24, alignItems: 'center' },
+  rankText: { fontSize: 16, textAlign: 'center' },
   name: { flex: 1, fontSize: 13, color: colors.textPrimary },
   score: { fontSize: 14, fontWeight: '700' },
 });

@@ -180,7 +180,10 @@ describe('CommunityScreen — post flow', () => {
     act(() => {
       card = TestRenderer.create(flatList.props.renderItem({ item: POST }));
     });
-    const likeBtn = findButtonByText(card.root, '🤍');
+    // The like control is now an SVG heart icon; find it by its a11y label.
+    const likeBtn = card.root
+      .findAll((n) => n.type === 'TouchableOpacity')
+      .find((btn) => btn.props.accessibilityLabel === 'a11y.like');
     act(() => {
       likeBtn.props.onPress();
     });

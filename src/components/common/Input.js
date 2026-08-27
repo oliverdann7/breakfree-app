@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, TextInput, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import Icon from './Icon';
 import { colors } from '../../constants/designTokens';
 
 export default function Input({
@@ -44,7 +45,7 @@ export default function Input({
             accessibilityRole="button"
             accessibilityLabel={visible ? t('a11y.hidePassword') : t('a11y.showPassword')}
           >
-            <Text style={styles.eyeIcon}>{visible ? '👁' : '🙈'}</Text>
+            <Icon name={visible ? 'eyeOff' : 'eye'} size={18} color={colors.textSecondary} />
           </TouchableOpacity>
         )}
       </View>
@@ -86,9 +87,6 @@ const styles = StyleSheet.create({
   },
   eyeBtn: {
     padding: 4,
-  },
-  eyeIcon: {
-    fontSize: 16,
   },
   errorText: {
     color: colors.error,

@@ -14,6 +14,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { login, loginWithGoogle, loginWithApple } from '../../store/slices/authSlice';
+import Icon from '../../components/common/Icon';
 import { colors } from '../../constants/designTokens';
 
 export default function LoginScreen({ navigation }) {
@@ -49,7 +50,7 @@ export default function LoginScreen({ navigation }) {
         <View style={styles.content}>
           {/* Logo area */}
           <View style={styles.logoSection}>
-            <Text style={styles.logoEmoji}>🌿</Text>
+            <Icon name="leaf" size={48} color={colors.gold} />
             <Text style={styles.logoText}>BreakFree</Text>
           </View>
 
@@ -92,9 +93,11 @@ export default function LoginScreen({ navigation }) {
                 accessibilityRole="button"
                 accessibilityLabel={showPassword ? t('a11y.hidePassword') : t('a11y.showPassword')}
               >
-                <Text style={{ fontSize: 16, color: 'rgba(255,255,255,0.4)' }}>
-                  {showPassword ? '🙈' : '👁️'}
-                </Text>
+                <Icon
+                  name={showPassword ? 'eyeOff' : 'eye'}
+                  size={18}
+                  color="rgba(255,255,255,0.4)"
+                />
               </TouchableOpacity>
             </View>
           </View>
@@ -134,7 +137,6 @@ export default function LoginScreen({ navigation }) {
             onPress={handleGoogle}
             accessibilityRole="button"
           >
-            <Text style={{ fontSize: 16 }}>🔵</Text>
             <Text style={styles.socialBtnText}>{t('auth.googleContinue')}</Text>
           </TouchableOpacity>
 
@@ -143,7 +145,6 @@ export default function LoginScreen({ navigation }) {
             onPress={handleApple}
             accessibilityRole="button"
           >
-            <Text style={{ fontSize: 16 }}>🍎</Text>
             <Text style={styles.socialBtnText}>{t('auth.appleContinue')}</Text>
           </TouchableOpacity>
 
@@ -176,7 +177,6 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.bgPrimary },
   content: { flex: 1, paddingHorizontal: 24, justifyContent: 'center' },
   logoSection: { alignItems: 'center', marginBottom: 32 },
-  logoEmoji: { fontSize: 48 },
   logoText: {
     fontSize: 24,
     fontWeight: '700',

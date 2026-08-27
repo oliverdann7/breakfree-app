@@ -13,6 +13,7 @@ import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { fetchActiveChallenges, joinChallenge } from '../../store/slices/challengesSlice';
 import { BADGES, evaluateBadges } from '../../utils/badges';
 import Card from '../../components/common/Card';
+import Icon from '../../components/common/Icon';
 import { colors } from '../../constants/designTokens';
 
 function ChallengeCard({ challenge, joined, progress, onJoin, onOpen }) {
@@ -22,7 +23,11 @@ function ChallengeCard({ challenge, joined, progress, onJoin, onOpen }) {
     <Card style={styles.card}>
       <TouchableOpacity onPress={onOpen} activeOpacity={0.85} accessibilityRole="button">
         <View style={styles.cardHead}>
-          <Text style={styles.cardIcon}>{challenge.icon || '🏆'}</Text>
+          {challenge.icon ? (
+            <Text style={styles.cardIcon}>{challenge.icon}</Text>
+          ) : (
+            <Icon name="trophy" size={26} color={colors.gold} />
+          )}
           <View style={{ flex: 1 }}>
             <Text style={styles.cardTitle}>{challenge.title || t('challenges.default')}</Text>
             <Text style={styles.cardMeta}>
@@ -57,7 +62,7 @@ function ChallengeCard({ challenge, joined, progress, onJoin, onOpen }) {
 function BadgeChip({ badge, owned }) {
   return (
     <View style={[styles.badgeChip, !owned && { opacity: 0.4 }]}>
-      <Text style={styles.badgeIcon}>{badge.icon}</Text>
+      <Icon name={badge.icon} size={16} color={colors.gold} />
       <Text style={styles.badgeName}>{badge.name}</Text>
     </View>
   );

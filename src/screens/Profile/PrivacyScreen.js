@@ -13,6 +13,7 @@ import { addDoc, collection } from 'firebase/firestore';
 import { db } from '../../services/firebase';
 import { useAppSelector } from '../../store/hooks';
 import Card from '../../components/common/Card';
+import Icon from '../../components/common/Icon';
 import { colors } from '../../constants/designTokens';
 
 export default function PrivacyScreen({ navigation }) {
@@ -73,7 +74,10 @@ export default function PrivacyScreen({ navigation }) {
         <Text style={styles.intro}>{t('privacy.intro')}</Text>
 
         <Card style={styles.section}>
-          <Text style={styles.sectionTitle}>📦 {t('privacy.exportTitle')}</Text>
+          <View style={styles.sectionTitleRow}>
+            <Icon name="package" size={16} color={colors.textPrimary} />
+            <Text style={styles.sectionTitle}>{t('privacy.exportTitle')}</Text>
+          </View>
           <Text style={styles.sectionDesc}>{t('privacy.exportDesc')}</Text>
           <TouchableOpacity
             style={styles.action}
@@ -89,14 +93,20 @@ export default function PrivacyScreen({ navigation }) {
         </Card>
 
         <Card style={styles.section}>
-          <Text style={styles.sectionTitle}>🔗 {t('privacy.integrationsTitle')}</Text>
+          <View style={styles.sectionTitleRow}>
+            <Icon name="link" size={16} color={colors.textPrimary} />
+            <Text style={styles.sectionTitle}>{t('privacy.integrationsTitle')}</Text>
+          </View>
           <Text style={styles.sectionDesc}>{t('privacy.integrationsDesc')}</Text>
         </Card>
 
         <Card style={[styles.section, styles.danger]}>
-          <Text style={[styles.sectionTitle, { color: colors.error }]}>
-            ⚠️ {t('privacy.deleteTitle')}
-          </Text>
+          <View style={styles.sectionTitleRow}>
+            <Icon name="alertTriangle" size={16} color={colors.error} />
+            <Text style={[styles.sectionTitle, { color: colors.error }]}>
+              {t('privacy.deleteTitle')}
+            </Text>
+          </View>
           <Text style={styles.sectionDesc}>{t('privacy.deleteDesc')}</Text>
           <TouchableOpacity
             style={styles.dangerAction}
@@ -130,6 +140,7 @@ const styles = StyleSheet.create({
   title: { color: colors.textPrimary, fontSize: 22, fontWeight: '700' },
   intro: { color: colors.textSecondary, fontSize: 13, lineHeight: 19, marginBottom: 20 },
   section: { marginBottom: 14, gap: 10 },
+  sectionTitleRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   sectionTitle: { color: colors.textPrimary, fontWeight: '700', fontSize: 14 },
   sectionDesc: { color: colors.textSecondary, fontSize: 12, lineHeight: 18 },
   action: {

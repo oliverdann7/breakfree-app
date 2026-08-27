@@ -11,8 +11,8 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { fetchTalkById, clearCurrentTalk, joinTalk } from '../../store/slices/talksSlice';
-import Button from '../../components/common/Button';
 import Card from '../../components/common/Card';
+import Icon from '../../components/common/Icon';
 import { colors } from '../../constants/designTokens';
 
 export default function TalkDetailScreen({ route, navigation }) {
@@ -37,14 +37,14 @@ export default function TalkDetailScreen({ route, navigation }) {
   }
 
   const isLive = currentTalk.status === 'live';
-  const categoryEmoji =
+  const categoryIcon =
     currentTalk.category === 'Zihin'
-      ? '🧘'
+      ? 'brain'
       : currentTalk.category === 'Sağlık'
-        ? '💚'
+        ? 'heart'
         : currentTalk.category === 'Hareket'
-          ? '🏃'
-          : '🥗';
+          ? 'activity'
+          : 'apple';
 
   return (
     <SafeAreaView style={styles.container}>
@@ -59,12 +59,22 @@ export default function TalkDetailScreen({ route, navigation }) {
             <Text style={styles.backText}>{t('auth.backBtn')}</Text>
           </TouchableOpacity>
           <View style={styles.heroImage}>
-            <Text style={styles.heroEmoji}>{categoryEmoji}</Text>
+            <Icon name={categoryIcon} size={80} color={colors.white} />
           </View>
           <View style={[styles.statusBadge, isLive && styles.liveBadge]}>
-            <Text style={styles.statusText}>
-              {isLive ? '🔴 CANLI' : currentTalk.status === 'scheduled' ? '📅 YAKINDA' : '✅ BİTTİ'}
-            </Text>
+            {isLive ? (
+              <Text style={styles.statusText}>● CANLI</Text>
+            ) : currentTalk.status === 'scheduled' ? (
+              <View style={styles.statusRow}>
+                <Icon name="calendar" size={12} color={colors.white} />
+                <Text style={styles.statusText}>YAKINDA</Text>
+              </View>
+            ) : (
+              <View style={styles.statusRow}>
+                <Icon name="checkCircle" size={12} color={colors.white} />
+                <Text style={styles.statusText}>BİTTİ</Text>
+              </View>
+            )}
           </View>
         </View>
 
@@ -109,14 +119,9 @@ export default function TalkDetailScreen({ route, navigation }) {
 
           {/* Actions */}
           <View style={styles.actions}>
-            <Button
-              title={
-                isLive
-                  ? `🎙 ${t('talks.joinTalk')}`
-                  : currentTalk.status === 'scheduled'
-                    ? `🔔 ${t('talks.setReminder')}`
-                    : `🎵 ${t('talks.listenRecording')}`
-              }
+            <TouchableOpacity
+              style={styles.primaryBtn}
+              accessibilityRole="button"
               onPress={() => {
                 if (isLive) {
                   dispatch(joinTalk(talkId));
@@ -133,7 +138,20 @@ export default function TalkDetailScreen({ route, navigation }) {
                   Alert.alert(t('talks.recordingTitle'), t('talks.recordingMsg'));
                 }
               }}
-            />
+            >
+              <Icon
+                name={isLive ? 'mic' : currentTalk.status === 'scheduled' ? 'bell' : 'music'}
+                size={16}
+                color={colors.navy}
+              />
+              <Text style={styles.primaryBtnText}>
+                {isLive
+                  ? t('talks.joinTalk')
+                  : currentTalk.status === 'scheduled'
+                    ? t('talks.setReminder')
+                    : t('talks.listenRecording')}
+              </Text>
+            </TouchableOpacity>
             <View style={styles.secondaryActions}>
               <TouchableOpacity
                 style={styles.iconBtn}
@@ -141,7 +159,8 @@ export default function TalkDetailScreen({ route, navigation }) {
                 accessibilityRole="button"
                 accessibilityLabel={t('talks.save')}
               >
-                <Text style={styles.iconBtnText}>🔖 {t('talks.save')}</Text>
+                <Icon name="bookmark" size={14} color={colors.textSecondary} />
+                <Text style={styles.iconBtnText}>{t('talks.save')}</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.iconBtn}
@@ -149,7 +168,8 @@ export default function TalkDetailScreen({ route, navigation }) {
                 accessibilityRole="button"
                 accessibilityLabel={t('talks.share')}
               >
-                <Text style={styles.iconBtnText}>📤 {t('talks.share')}</Text>
+                <Icon name="share" size={14} color={colors.textSecondary} />
+                <Text style={styles.iconBtnText}>{t('talks.share')}</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -175,7 +195,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  heroEmoji: { fontSize: 80 },
   backBtn: { position: 'absolute', top: 16, left: 16, zIndex: 10, padding: 8 },
   backText: { color: colors.cyan, fontSize: 15 },
   statusBadge: {
@@ -188,6 +207,7 @@ const styles = StyleSheet.create({
     borderRadius: 999,
   },
   liveBadge: { backgroundColor: 'rgba(239,68,68,0.8)' },
+  statusRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   statusText: { fontSize: 12, color: colors.white, fontWeight: '600' },
   content: { padding: 20 },
   category: {
@@ -231,8 +251,22 @@ const styles = StyleSheet.create({
   descTitle: { fontSize: 14, fontWeight: '600', color: colors.textSecondary, marginBottom: 8 },
   descText: { fontSize: 15, color: colors.textPrimary, lineHeight: 22 },
   actions: { gap: 12 },
+  primaryBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    height: 52,
+    borderRadius: 999,
+    paddingHorizontal: 24,
+    backgroundColor: colors.cyan,
+  },
+  primaryBtnText: { fontSize: 15, fontWeight: '600', letterSpacing: 0.3, color: colors.navy },
   secondaryActions: { flexDirection: 'row', gap: 12, justifyContent: 'center' },
   iconBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
     paddingHorizontal: 20,
     paddingVertical: 10,
     backgroundColor: 'rgba(255,255,255,0.06)',

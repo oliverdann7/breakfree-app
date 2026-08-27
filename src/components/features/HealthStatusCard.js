@@ -2,13 +2,14 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import Card from '../common/Card';
 import Avatar from '../common/Avatar';
+import Icon from '../common/Icon';
 import WellnessRing from './WellnessRing';
 import { colors } from '../../constants/designTokens';
 
 function Pill({ icon, value, label }) {
   return (
     <View style={styles.pill}>
-      <Text style={styles.pillIcon}>{icon}</Text>
+      <Icon name={icon} size={13} color={colors.cyan} />
       <Text style={styles.pillValue}>{value}</Text>
       <Text style={styles.pillLabel}>{label}</Text>
     </View>
@@ -37,14 +38,14 @@ export default function HealthStatusCard({
 
   const pills = [
     steps > 0 && {
-      icon: '👟',
+      icon: 'footprints',
       value: steps >= 1000 ? `${(steps / 1000).toFixed(1)}k` : String(steps),
       label: 'Adım',
     },
-    sleep > 0 && { icon: '😴', value: `${sleep}s`, label: 'Uyku' },
-    heartRate > 0 && { icon: '❤️', value: String(heartRate), label: 'Nabız' },
-    calories > 0 && { icon: '🔥', value: String(calories), label: 'kcal' },
-    streak > 0 && { icon: '⚡', value: `${streak}g`, label: 'Seri' },
+    sleep > 0 && { icon: 'moon', value: `${sleep}s`, label: 'Uyku' },
+    heartRate > 0 && { icon: 'heart', value: String(heartRate), label: 'Nabız' },
+    calories > 0 && { icon: 'flame', value: String(calories), label: 'kcal' },
+    streak > 0 && { icon: 'zap', value: `${streak}g`, label: 'Seri' },
   ].filter(Boolean);
 
   return (
@@ -109,7 +110,6 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   pill: { flex: 1, alignItems: 'center', paddingVertical: 8 },
-  pillIcon: { fontSize: 13 },
   pillValue: { fontSize: 13, fontWeight: '700', color: colors.textPrimary, marginTop: 2 },
   pillLabel: {
     fontSize: 9,

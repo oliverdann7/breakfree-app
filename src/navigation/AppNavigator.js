@@ -1,5 +1,5 @@
 import React from 'react';
-import { Text, StyleSheet } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import { useTranslation } from 'react-i18next';
@@ -21,6 +21,7 @@ import NotificationsScreen from '../screens/Profile/NotificationsScreen';
 import ConnectedDevicesScreen from '../screens/Profile/ConnectedDevicesScreen';
 import VideoFeedScreen from '../screens/Videos/VideoFeedScreen';
 import VideoPlayerScreen from '../screens/Videos/VideoPlayerScreen';
+import Icon from '../components/common/Icon';
 import { colors } from '../constants/designTokens';
 import { isEnabled } from '../constants/featureFlags';
 
@@ -36,19 +37,17 @@ const CommunityStack = createStackNavigator();
 const MentorStack = createStackNavigator();
 
 const TAB_ICONS = {
-  Home: '⬡',
-  Talks: '🎙',
-  Videos: '🎬',
-  Health: '💚',
-  Community: '👥',
-  Mentor: '🤝',
-  Profile: '👤',
+  Home: 'home',
+  Talks: 'mic',
+  Videos: 'film',
+  Health: 'heart',
+  Community: 'users',
+  Mentor: 'handshake',
+  Profile: 'user',
 };
 
-function TabIcon({ routeName, focused }) {
-  return (
-    <Text style={{ fontSize: 20, opacity: focused ? 1 : 0.45 }}>{TAB_ICONS[routeName] || '●'}</Text>
-  );
+function TabIcon({ routeName, color }) {
+  return <Icon name={TAB_ICONS[routeName] || 'circle'} size={20} color={color} />;
 }
 
 function VideoStackNavigator() {
@@ -113,7 +112,7 @@ export default function AppNavigator() {
         tabBarActiveTintColor: colors.cyan,
         tabBarInactiveTintColor: colors.textSecondary,
         tabBarLabelStyle: styles.tabLabel,
-        tabBarIcon: ({ focused }) => <TabIcon routeName={route.name} focused={focused} />,
+        tabBarIcon: ({ color }) => <TabIcon routeName={route.name} color={color} />,
       })}
     >
       <Tab.Screen
