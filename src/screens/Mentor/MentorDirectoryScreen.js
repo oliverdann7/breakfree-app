@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   View,
   Text,
@@ -15,7 +16,17 @@ import Card from '../../components/common/Card';
 import Icon from '../../components/common/Icon';
 import { colors } from '../../constants/designTokens';
 
+// Values double as filter sentinels compared against categoryFor() output;
+// only the visible chip label is localized (via CATEGORY_LABEL_KEYS).
 const CATEGORIES = ['Hepsi', 'Zihin', 'Hareket', 'Beslenme', 'Uyku', 'Performans'];
+const CATEGORY_LABEL_KEYS = {
+  Hepsi: 'all',
+  Zihin: 'mind',
+  Hareket: 'movement',
+  Beslenme: 'nutrition',
+  Uyku: 'sleep',
+  Performans: 'performance',
+};
 
 const categoryFor = (mentor) => {
   const text = `${mentor.title || ''} ${mentor.role || ''} ${(mentor.specialties || []).join(' ')}`;
@@ -27,6 +38,7 @@ const categoryFor = (mentor) => {
 };
 
 function MentorCard({ mentor, onOpen }) {
+  const { t } = useTranslation();
   return (
     <TouchableOpacity
       onPress={onOpen}
@@ -60,7 +72,9 @@ function MentorCard({ mentor, onOpen }) {
             ))}
           </View>
           {mentor.priceTryPerSession && (
-            <Text style={styles.price}>₺{mentor.priceTryPerSession} / seans</Text>
+            <Text style={styles.price}>
+              ₺{mentor.priceTryPerSession} {t('mentor.perSession')}
+            </Text>
           )}
         </View>
       </Card>
@@ -69,6 +83,7 @@ function MentorCard({ mentor, onOpen }) {
 }
 
 export default function MentorDirectoryScreen({ navigation }) {
+  const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const { allMentors } = useAppSelector((s) => s.mentor);
   const [category, setCategory] = useState('Hepsi');
@@ -103,22 +118,24 @@ export default function MentorDirectoryScreen({ navigation }) {
               onPress={() => navigation.goBack()}
               style={styles.back}
               accessibilityRole="button"
-              accessibilityLabel="Geri"
+              accessibilityLabel={t('common.back')}
             >
               <Text style={styles.backText}>←</Text>
             </TouchableOpacity>
           )}
           <View style={{ flex: 1 }}>
-            <Text style={styles.heading}>Mentörler</Text>
-            <Text style={styles.sub}>{filtered.length} mentör · 1-on-1 wellness rehberliği</Text>
+            <Text style={styles.heading}>{t('mentor.directory')}</Text>
+            <Text style={styles.sub}>
+              {t('mentor.mentorCount', { count: filtered.length })} · {t('mentor.subtitle')}
+            </Text>
           </View>
         </View>
 
         <TextInput
           value={search}
           onChangeText={setSearch}
-          accessibilityLabel="Mentör veya uzmanlık ara"
-          placeholder="Mentör veya uzmanlık ara..."
+          accessibilityLabel={t('mentor.search')}
+          placeholder={t('mentor.search')}
           placeholderTextColor="rgba(255,255,255,0.3)"
           style={styles.search}
         />
@@ -133,7 +150,9 @@ export default function MentorDirectoryScreen({ navigation }) {
                 accessibilityRole="button"
                 accessibilityState={{ selected: category === c }}
               >
-                <Text style={[styles.catText, category === c && styles.catTextActive]}>{c}</Text>
+                <Text style={[styles.catText, category === c && styles.catTextActive]}>
+                  {t(`mentor.categories.${CATEGORY_LABEL_KEYS[c]}`)}
+                </Text>
               </TouchableOpacity>
             ))}
           </View>
@@ -145,7 +164,7 @@ export default function MentorDirectoryScreen({ navigation }) {
         keyExtractor={(m) => m.id}
         contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 40 }}
         renderItem={({ item }) => <MentorCard mentor={item} onOpen={() => openMentor(item)} />}
-        ListEmptyComponent={<Text style={styles.empty}>Bu filtreyle mentör bulunamadı.</Text>}
+        ListEmptyComponent={<Text style={styles.empty}>{t('mentor.emptyFiltered')}</Text>}
       />
     </SafeAreaView>
   );

@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   View,
   Text,
@@ -24,6 +25,7 @@ const CARD_WIDTH = (width - 52) / 2;
 const BASE_CATEGORIES = ['Zihin', 'Sağlık', 'Beslenme', 'Hareket', 'Uyku'];
 
 export default function VideoFeedScreen({ navigation }) {
+  const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const { allVideos, loading, activeCategory, progress } = useAppSelector((state) => state.videos);
   const isPremium = useAppSelector(selectIsPremium);
@@ -45,9 +47,10 @@ export default function VideoFeedScreen({ navigation }) {
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.headerLabel}>İzle & Öğren</Text>
+          <Text style={styles.headerLabel}>{t('video.headerLabel')}</Text>
           <Text style={styles.headerTitle}>
-            Video <Text style={styles.headerAccent}>kütüphanesi</Text>
+            {t('video.titlePrefix')}{' '}
+            <Text style={styles.headerAccent}>{t('video.titleAccent')}</Text>
           </Text>
         </View>
 
@@ -66,7 +69,7 @@ export default function VideoFeedScreen({ navigation }) {
               accessibilityState={{ selected: activeCategory === cat }}
             >
               <Text style={[styles.catText, activeCategory === cat && styles.catTextActive]}>
-                {cat}
+                {cat === 'Tümü' ? t('video.allCategory') : cat}
               </Text>
             </TouchableOpacity>
           ))}
@@ -80,7 +83,7 @@ export default function VideoFeedScreen({ navigation }) {
         ) : filtered.length === 0 ? (
           <View style={styles.emptyBox}>
             <Icon name="film" size={40} color="rgba(255,255,255,0.35)" />
-            <Text style={styles.emptyText}>Bu kategoride henüz video yok.</Text>
+            <Text style={styles.emptyText}>{t('video.emptyCategory')}</Text>
           </View>
         ) : (
           <View style={styles.grid}>

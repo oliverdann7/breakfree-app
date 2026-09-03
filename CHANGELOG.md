@@ -8,6 +8,7 @@ Versions follow SemVer; stores use `versionCode` (Android) / `buildNumber`
 ## [Unreleased] — closeout of Phase 2 + Phase 3 scaffolding
 
 ### Changed
+
 - Extracted a shared `Avatar` component (`components/common/Avatar.js`),
   replacing three near-identical local implementations in HealthStatusCard,
   LeaderboardCard and CommunityScreen (roadmap §1.4 cleanup). The shared
@@ -15,14 +16,27 @@ Versions follow SemVer; stores use `versionCode` (Android) / `buildNumber`
   a small step toward the §1.3 accessibility gap.
 
 ### Removed
+
 - Deleted the unused `BreakFreeAppPreview.jsx` / `BreakFreeAppPreviewInline.jsx`
   preview mockups (~4,350 lines of dead code, no imports anywhere; roadmap §1.4).
 
 ### Fixed
+
 - Added missing `dispatch` to `useEffect` dependency arrays in MentorScreen and
   VideoPlayerScreen (roadmap §1.4).
 
 ### Added
+
+- i18n screen sweep completed (roadmap C4, step 2): the last three unwired
+  screens — MentorDirectoryScreen, MentorDetailScreen and VideoFeedScreen —
+  now render all UI chrome via `useTranslation()`, covering headers, search,
+  category chips, empty states, booking CTAs/alerts and day labels (with
+  locale-aware short dates via the active i18n language). Data-derived
+  category values (Firestore content, e.g. video/mentor categories used as
+  filter sentinels) intentionally stay untranslated, matching the sweep's
+  convention. Missing `mentor.*` / `video.*` keys added to both locale files
+  (tr/en key parity verified); MentorDetailScreen tests updated to the
+  key-assertion convention used by the other screen tests.
 - i18n locale foundation (roadmap C4, step 1 — unblocks the string sweep):
   device-locale detection at startup (`getDeviceLocales` — browser languages on
   web, guarded `Intl` on native) and a pure, tested `resolveLocale` helper
@@ -48,6 +62,7 @@ Versions follow SemVer; stores use `versionCode` (Android) / `buildNumber`
   numeric ring meaning at a glance.
 
 ### Added — Phase 2 (Sprints 5–10)
+
 - Premium subscription: PremiumScreen + premiumSlice (Pro Monthly ₺29.99 /
   Annual ₺299.99), 7-day trial, RevenueCat webhook ingest in Cloud Functions
 - Challenges + Leaderboard: dedicated ChallengesScreen, LeaderboardScreen,
@@ -60,9 +75,10 @@ Versions follow SemVer; stores use `versionCode` (Android) / `buildNumber`
   abstraction (mock fallback until native modules install)
 - notificationsSlice + NotificationsScreen: in-app notification center,
   mark-read, mark-all-read, Expo push fan-out via Cloud Function
-- featureFlags constant for staged rollout, override via EXPO_PUBLIC_FF_*
+- featureFlags constant for staged rollout, override via EXPO*PUBLIC_FF*\*
 
 ### Added — Phase 3 (Sprints 11–13)
+
 - Offline mirror: offlineStore.js (expo-sqlite wrapper for health_metrics,
   talks_cache, draft_posts) behind featureFlags.offlineMode
 - Image CDN: imageCdn.js URL builder (Cloudinary/Imgix) + LazyImage component
@@ -72,9 +88,10 @@ Versions follow SemVer; stores use `versionCode` (Android) / `buildNumber`
   pending DSN
 - Remote Config: featureFlags-backed get/getBool/getNumber with sensible defaults
 - Apple + Google sign-in: signInWithCredential glue via expo-apple-authentication
-  + @react-native-google-signin
+  - @react-native-google-signin
 
 ### Added — Infrastructure
+
 - Cloud Functions: mintAgoraToken, revenueCatWebhook, recomputeLeaderboard,
   scheduledBackup, onNotificationCreated, processPrivacyRequest, with
   firebase.json emulator config
@@ -89,6 +106,7 @@ Versions follow SemVer; stores use `versionCode` (Android) / `buildNumber`
   screenshot SPEC.md, legal markdown
 
 ### Tests
+
 - 43 new unit tests covering wellnessScore, badges, premiumSlice,
   healthSlice, notificationsSlice, imageCdn, requestBatcher — all passing
 - Cloud Functions unit suite (32 tests, 7 files): rate limiter, RevenueCat
@@ -100,25 +118,28 @@ Versions follow SemVer; stores use `versionCode` (Android) / `buildNumber`
   roadmap §1.3 "Cloud Functions have zero tests" gap.
 
 ### Fixed
+
 - `functions/package.json` was missing `google-auth-library`, a runtime
   `require` in `scheduledBackup` — added to dependencies.
 
 ### Docs
+
 - docs/RUNBOOK.md — on-call, severity classes, hotfix flow, rollback,
   common incidents, schema-change policy, backup/restore, quotas, contacts
 - docs/PERF_BUDGETS.md — 11 perf metrics with CI enforcement strategy
 - docs/STAGED_ROLLOUT.md — Internal → 10% → 50% → 100% phased release
 
 ### Requires (operator action before release)
+
 - Firebase production keys → .env.local
 - Agora app ID + certificate → `firebase functions:config:set agora.*`
 - RevenueCat product config + webhook token
 - Apple Developer + Google Play Console accounts + EXPO_TOKEN secret
 - Firebase Blaze plan to deploy Cloud Functions
 - Native modules: `npm i react-native-health react-native-google-fit
-  react-native-agora @stripe/stripe-react-native expo-sqlite expo-image
-  expo-shake expo-apple-authentication @react-native-google-signin/google-signin
-  sentry-expo` then EAS dev build
+react-native-agora @stripe/stripe-react-native expo-sqlite expo-image
+expo-shake expo-apple-authentication @react-native-google-signin/google-signin
+sentry-expo` then EAS dev build
 - Sentry DSN → EXPO_PUBLIC_SENTRY_DSN
 - Cloudinary / Imgix CDN → EXPO_PUBLIC_CLOUDINARY_BASE
 - VERBİS registration for KVKK
