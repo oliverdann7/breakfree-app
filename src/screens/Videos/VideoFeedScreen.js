@@ -11,7 +11,12 @@ import {
   Dimensions,
 } from 'react-native';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
-import { fetchVideos, setActiveCategory, isVideoLocked } from '../../store/slices/videosSlice';
+import {
+  fetchVideos,
+  fetchWatchProgress,
+  setActiveCategory,
+  isVideoLocked,
+} from '../../store/slices/videosSlice';
 import { selectIsPremium } from '../../store/slices/premiumSlice';
 import VideoCard from '../../components/features/VideoCard';
 import Icon from '../../components/common/Icon';
@@ -29,10 +34,17 @@ export default function VideoFeedScreen({ navigation }) {
   const dispatch = useAppDispatch();
   const { allVideos, loading, activeCategory, progress } = useAppSelector((state) => state.videos);
   const isPremium = useAppSelector(selectIsPremium);
+  const uid = useAppSelector((state) => state.auth.user?.uid);
 
   useEffect(() => {
     dispatch(fetchVideos());
   }, []);
+
+  // Hydrate saved watch progress so resume positions and progress bars
+  // survive a cold start (the videos slice is not redux-persisted).
+  useEffect(() => {
+    if (uid) dispatch(fetchWatchProgress(uid));
+  }, [uid, dispatch]);
 
   const categories = useMemo(() => {
     const fromData = allVideos.map((v) => v.category).filter(Boolean);

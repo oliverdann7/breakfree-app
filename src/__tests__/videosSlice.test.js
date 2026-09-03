@@ -108,6 +108,23 @@ describe('videosSlice', () => {
     expect(state.progress).toEqual({});
   });
 
+  it('hydrates the progress map on fetchWatchProgress.fulfilled', () => {
+    const state = videosReducer(initialState, {
+      type: 'videos/fetchProgress/fulfilled',
+      payload: { v1: 300, v2: 45 },
+    });
+    expect(state.progress).toEqual({ v1: 300, v2: 45 });
+  });
+
+  it('keeps fresher in-session progress over the fetched snapshot', () => {
+    const midSession = { ...initialState, progress: { v1: 900 } };
+    const state = videosReducer(midSession, {
+      type: 'videos/fetchProgress/fulfilled',
+      payload: { v1: 300, v2: 45 },
+    });
+    expect(state.progress).toEqual({ v1: 900, v2: 45 });
+  });
+
   describe('isVideoLocked', () => {
     it('locks premium content for non-premium users', () => {
       expect(isVideoLocked({ isPremium: true }, false)).toBe(true);

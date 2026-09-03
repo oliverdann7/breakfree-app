@@ -110,6 +110,27 @@ export const saveWatchProgress = createAsyncThunk(
   }
 );
 
+// Restores the progress map written by saveWatchProgress. Without this the
+// map only lives in memory, so resume positions and the feed's progress bars
+// were lost on every cold start (roadmap §1.3).
+export const fetchWatchProgress = createAsyncThunk(
+  'videos/fetchProgress',
+  async (uid, { rejectWithValue }) => {
+    try {
+      if (!db || !uid) return {};
+      const snap = await getDocs(collection(db, 'users', uid, 'watched_videos'));
+      const progress = {};
+      snap.forEach((d) => {
+        const seconds = d.data()?.progressSeconds;
+        if (typeof seconds === 'number' && seconds >= 0) progress[d.id] = seconds;
+      });
+      return progress;
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
 const videosSlice = createSlice({
   name: 'videos',
   initialState: {
@@ -153,6 +174,10 @@ const videosSlice = createSlice({
         if (action.payload) {
           state.progress[action.payload.videoId] = action.payload.progressSeconds;
         }
+      })
+      .addCase(fetchWatchProgress.fulfilled, (state, action) => {
+        // In-session values are fresher than the server snapshot; keep them.
+        state.progress = { ...action.payload, ...state.progress };
       });
   },
 });

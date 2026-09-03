@@ -27,6 +27,13 @@ Versions follow SemVer; stores use `versionCode` (Android) / `buildNumber`
 
 ### Added
 
+- Video watch progress now survives cold starts (roadmap §1.3): a new
+  `fetchWatchProgress` thunk hydrates the in-memory progress map from the
+  `users/{uid}/watched_videos` documents that `saveWatchProgress` was already
+  writing (the restore half was missing — the videos slice is not
+  redux-persisted). VideoFeedScreen dispatches it once the signed-in uid is
+  known; fresher in-session values win over the fetched snapshot. +2 slice
+  tests.
 - i18n screen sweep completed (roadmap C4, step 2): the last three unwired
   screens — MentorDirectoryScreen, MentorDetailScreen and VideoFeedScreen —
   now render all UI chrome via `useTranslation()`, covering headers, search,
