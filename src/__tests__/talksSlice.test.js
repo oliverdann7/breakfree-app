@@ -1,4 +1,8 @@
-import talksReducer, { setFilter, clearCurrentTalk } from '../store/slices/talksSlice';
+import talksReducer, {
+  setFilter,
+  clearCurrentTalk,
+  realtimeTalksUpdate,
+} from '../store/slices/talksSlice';
 
 const initialState = {
   allTalks: [],
@@ -23,6 +27,16 @@ describe('talksSlice', () => {
     const loaded = { ...initialState, currentTalk: { talkId: 't1' } };
     const state = talksReducer(loaded, clearCurrentTalk());
     expect(state.currentTalk).toBeNull();
+  });
+
+  // Regression: the action creator was defined in the slice but not exported,
+  // so TalksListScreen's onSnapshot dispatched `undefined(...)` and crashed on
+  // the first realtime snapshot whenever Firestore was configured.
+  it('exports realtimeTalksUpdate and replaces the talk list', () => {
+    expect(typeof realtimeTalksUpdate).toBe('function');
+    const talks = [{ talkId: 't1' }, { talkId: 't2' }];
+    const state = talksReducer(initialState, realtimeTalksUpdate(talks));
+    expect(state.allTalks).toEqual(talks);
   });
 
   it('handles fetchTalks.pending', () => {

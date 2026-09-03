@@ -172,5 +172,5 @@ const talksSlice = createSlice({
   },
 });
 
-export const { setFilter, clearCurrentTalk } = talksSlice.actions;
+export const { setFilter, clearCurrentTalk, realtimeTalksUpdate } = talksSlice.actions;
 export default talksSlice.reducer;

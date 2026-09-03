@@ -22,6 +22,16 @@ Versions follow SemVer; stores use `versionCode` (Android) / `buildNumber`
 
 ### Fixed
 
+- **TalksListScreen crashed on the first realtime snapshot** whenever
+  Firestore was configured: `realtimeTalksUpdate` was defined in `talksSlice`
+  but never exported, so the screen imported `undefined` and the `onSnapshot`
+  callback threw. Exported the action + regression test.
+- Silent 401 sign-out (roadmap §1.3 "mixed error handling"): when the API's
+  token refresh fails, the interceptor now dispatches a new
+  `auth/sessionExpired` action after logout settles, clearing the session but
+  leaving a localized "session expired" message that LoginScreen's existing
+  error box displays — previously the user was bounced to login with no
+  explanation.
 - Added missing `dispatch` to `useEffect` dependency arrays in MentorScreen and
   VideoPlayerScreen (roadmap §1.4).
 

@@ -103,6 +103,15 @@ const authSlice = createSlice({
     clearError: (state) => {
       state.error = null;
     },
+    // Forced sign-out (e.g. the API's token refresh failed). Clears the
+    // session like logout.fulfilled but keeps a message for the login screen,
+    // so the user learns why they were signed out instead of a silent bounce.
+    sessionExpired: (state, action) => {
+      state.isAuthenticated = false;
+      state.user = null;
+      state.token = null;
+      state.error = action.payload || null;
+    },
   },
   extraReducers: (builder) => {
     // Signup
@@ -211,5 +220,5 @@ const authSlice = createSlice({
   },
 });
 
-export const { clearError } = authSlice.actions;
+export const { clearError, sessionExpired } = authSlice.actions;
 export default authSlice.reducer;

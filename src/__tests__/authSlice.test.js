@@ -1,4 +1,4 @@
-import authReducer, { clearError } from '../store/slices/authSlice';
+import authReducer, { clearError, sessionExpired } from '../store/slices/authSlice';
 
 const initialState = {
   isInitializing: true,
@@ -19,6 +19,20 @@ describe('authSlice', () => {
     const errorState = { ...initialState, error: 'Something went wrong' };
     const state = authReducer(errorState, clearError());
     expect(state.error).toBeNull();
+  });
+
+  it('handles sessionExpired: clears the session but keeps the message', () => {
+    const signedIn = {
+      ...initialState,
+      isAuthenticated: true,
+      user: { uid: 'u1' },
+      token: 'tok',
+    };
+    const state = authReducer(signedIn, sessionExpired('Session expired'));
+    expect(state.isAuthenticated).toBe(false);
+    expect(state.user).toBeNull();
+    expect(state.token).toBeNull();
+    expect(state.error).toBe('Session expired');
   });
 
   it('handles login.pending', () => {

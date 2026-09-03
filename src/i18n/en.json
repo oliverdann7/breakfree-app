@@ -82,7 +82,8 @@
     "forgotPasswordSentDesc": "We sent a reset link to {{email}}. Check your inbox.",
     "backToLogin": "Back to Login",
     "noFirebase": "Firebase not configured. Please set up .env.local.",
-    "sendError": "An error occurred. Please try again."
+    "sendError": "An error occurred. Please try again.",
+    "sessionExpired": "Your session has expired. Please sign in again."
   },
   "onboarding": {
     "welcome": "Welcome to\nBreakFree!",

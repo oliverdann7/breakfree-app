@@ -82,7 +82,8 @@
     "forgotPasswordSentDesc": "{{email}} adresine sıfırlama bağlantısı gönderdik. Gelen kutunu kontrol et.",
     "backToLogin": "Giriş Ekranına Dön",
     "noFirebase": "Firebase yapılandırılmamış. Lütfen .env.local dosyasını ayarlayın.",
-    "sendError": "Bir hata oluştu. Tekrar deneyin."
+    "sendError": "Bir hata oluştu. Tekrar deneyin.",
+    "sessionExpired": "Oturumun süresi doldu. Lütfen tekrar giriş yap."
   },
   "onboarding": {
     "welcome": "BreakFree'ye\nHoş Geldin!",
