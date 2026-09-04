@@ -2,6 +2,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { collection, getDocs, doc, getDoc, query, orderBy, setDoc } from 'firebase/firestore';
 import { db } from '../../services/firebase';
 import { isEnabled } from '../../constants/featureFlags';
+import { logout } from './authSlice';
 
 // Each video declares a provider-agnostic `source` + `sourceId` (see
 // utils/videoSource.js). `isPremium` gates playback behind a Pro subscription.
@@ -137,6 +138,9 @@ const videosSlice = createSlice({
     allVideos: [],
     currentVideo: null,
     progress: {},
+    // Whose progress the map holds — guards against one account's in-memory
+    // values bleeding into another's after a sign-out/sign-in.
+    progressUid: null,
     loading: false,
     error: null,
     activeCategory: 'Tümü',
@@ -176,8 +180,22 @@ const videosSlice = createSlice({
         }
       })
       .addCase(fetchWatchProgress.fulfilled, (state, action) => {
-        // In-session values are fresher than the server snapshot; keep them.
-        state.progress = { ...action.payload, ...state.progress };
+        const uid = action.meta?.arg;
+        if (state.progressUid && uid && state.progressUid !== uid) {
+          // Different account: the in-memory values belong to the previous
+          // user — replace them wholesale with this user's snapshot.
+          state.progress = action.payload;
+        } else {
+          // Same account: in-session values are fresher than the snapshot.
+          state.progress = { ...action.payload, ...state.progress };
+        }
+        if (uid) state.progressUid = uid;
+      })
+      // Signing out drops the map so the next account never sees (or saves
+      // over) the previous account's positions.
+      .addCase(logout.fulfilled, (state) => {
+        state.progress = {};
+        state.progressUid = null;
       });
   },
 });

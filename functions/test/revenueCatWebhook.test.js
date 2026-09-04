@@ -85,10 +85,33 @@ describe('revenueCatWebhook', () => {
     expect(res.status).toHaveBeenCalledWith(200);
   });
 
-  it('rejects a path-traversing app_user_id with 400 and never writes', async () => {
+  it('acknowledges a path-traversing app_user_id with 200 but never writes', async () => {
     const res = mockRes();
     await revenueCatWebhook(
       mockReq({ body: { event: { type: 'RENEWAL', app_user_id: 'u1/subscription/other' } } }),
+      res
+    );
+    // 200 so RevenueCat does not retry forever; the write is what must not happen.
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(setMock).not.toHaveBeenCalled();
+  });
+
+  it('acknowledges a RevenueCat anonymous id with 200 but never writes', async () => {
+    const res = mockRes();
+    await revenueCatWebhook(
+      mockReq({
+        body: { event: { type: 'INITIAL_PURCHASE', app_user_id: '$RCAnonymousID:abc123' } },
+      }),
+      res
+    );
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(setMock).not.toHaveBeenCalled();
+  });
+
+  it('rejects a non-string app_user_id with 400', async () => {
+    const res = mockRes();
+    await revenueCatWebhook(
+      mockReq({ body: { event: { type: 'RENEWAL', app_user_id: { uid: 'u1' } } } }),
       res
     );
     expect(res.status).toHaveBeenCalledWith(400);

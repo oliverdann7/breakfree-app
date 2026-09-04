@@ -29,7 +29,11 @@ Versions follow SemVer; stores use `versionCode` (Android) / `buildNumber`
   and the `*_at_ms` timestamps are type/format-checked (400 on violation);
   the bearer-token comparison is constant-time. Events without a
   `product_id` no longer attempt to write `planId: undefined` (which real
-  Firestore rejects). +4 webhook tests.
+  Firestore rejects). Authenticated events whose id is well-formed but not
+  one of our uids (e.g. RevenueCat anonymous ids) are acknowledged with 200
+  and skipped — a 4xx would make RevenueCat retry them forever — while
+  nothing outside the uid shape ever reaches the Firestore path. +6 webhook
+  tests.
 - Completed the Vercel security headers (roadmap Phase 0 §4):
   `Content-Security-Policy` (script-src 'self' verified against the built
   web bundle — one external self-hosted script, no inline scripts; style
@@ -60,8 +64,10 @@ DENY`, `Strict-Transport-Security`, and a restrictive `Permissions-Policy`.
   `users/{uid}/watched_videos` documents that `saveWatchProgress` was already
   writing (the restore half was missing — the videos slice is not
   redux-persisted). VideoFeedScreen dispatches it once the signed-in uid is
-  known; fresher in-session values win over the fetched snapshot. +2 slice
-  tests.
+  known; fresher in-session values win over the fetched snapshot. The map
+  is uid-scoped: it is cleared on logout and replaced (not merged) when the
+  fetch is for a different account, so one user's positions can never bleed
+  into — or be saved over — another's on a shared device. +4 slice tests.
 - i18n screen sweep completed (roadmap C4, step 2): the last three unwired
   screens — MentorDirectoryScreen, MentorDetailScreen and VideoFeedScreen —
   now render all UI chrome via `useTranslation()`, covering headers, search,
@@ -110,7 +116,7 @@ DENY`, `Strict-Transport-Security`, and a restrictive `Permissions-Policy`.
   abstraction (mock fallback until native modules install)
 - notificationsSlice + NotificationsScreen: in-app notification center,
   mark-read, mark-all-read, Expo push fan-out via Cloud Function
-- featureFlags constant for staged rollout, override via EXPO*PUBLIC_FF*\*
+- featureFlags constant for staged rollout, override via `EXPO_PUBLIC_FF_*`
 
 ### Added — Phase 3 (Sprints 11–13)
 
@@ -122,8 +128,8 @@ DENY`, `Strict-Transport-Security`, and a restrictive `Permissions-Policy`.
 - Sentry wrapper: queue-buffered captureException/Message/Breadcrumb/setUser
   pending DSN
 - Remote Config: featureFlags-backed get/getBool/getNumber with sensible defaults
-- Apple + Google sign-in: signInWithCredential glue via expo-apple-authentication
-  - @react-native-google-signin
+- Apple + Google sign-in: signInWithCredential glue via
+  `expo-apple-authentication` + `@react-native-google-signin`
 
 ### Added — Infrastructure
 

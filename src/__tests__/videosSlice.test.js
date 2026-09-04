@@ -16,6 +16,7 @@ const initialState = {
   allVideos: [],
   currentVideo: null,
   progress: {},
+  progressUid: null,
   loading: false,
   error: null,
   activeCategory: 'Tümü',
@@ -111,18 +112,39 @@ describe('videosSlice', () => {
   it('hydrates the progress map on fetchWatchProgress.fulfilled', () => {
     const state = videosReducer(initialState, {
       type: 'videos/fetchProgress/fulfilled',
+      meta: { arg: 'u1' },
       payload: { v1: 300, v2: 45 },
     });
     expect(state.progress).toEqual({ v1: 300, v2: 45 });
+    expect(state.progressUid).toBe('u1');
   });
 
-  it('keeps fresher in-session progress over the fetched snapshot', () => {
-    const midSession = { ...initialState, progress: { v1: 900 } };
+  it('keeps fresher in-session progress over the fetched snapshot (same user)', () => {
+    const midSession = { ...initialState, progress: { v1: 900 }, progressUid: 'u1' };
     const state = videosReducer(midSession, {
       type: 'videos/fetchProgress/fulfilled',
+      meta: { arg: 'u1' },
       payload: { v1: 300, v2: 45 },
     });
     expect(state.progress).toEqual({ v1: 900, v2: 45 });
+  });
+
+  it("replaces the map when the fetch is for a different user's uid", () => {
+    const leftover = { ...initialState, progress: { v1: 900 }, progressUid: 'userA' };
+    const state = videosReducer(leftover, {
+      type: 'videos/fetchProgress/fulfilled',
+      meta: { arg: 'userB' },
+      payload: { v1: 45 },
+    });
+    expect(state.progress).toEqual({ v1: 45 });
+    expect(state.progressUid).toBe('userB');
+  });
+
+  it('clears the progress map on logout', () => {
+    const signedIn = { ...initialState, progress: { v1: 900 }, progressUid: 'userA' };
+    const state = videosReducer(signedIn, { type: 'auth/logout/fulfilled' });
+    expect(state.progress).toEqual({});
+    expect(state.progressUid).toBeNull();
   });
 
   describe('isVideoLocked', () => {

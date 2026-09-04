@@ -49,8 +49,17 @@ exports.revenueCatWebhook = functions.https.onRequest(async (req, res) => {
   }
 
   const uid = event.app_user_id;
-  if (typeof uid !== 'string' || !VALID_UID.test(uid)) {
+  if (typeof uid !== 'string' || uid.length === 0 || uid.length > 256) {
     return res.status(400).send('Invalid app_user_id');
+  }
+  if (!VALID_UID.test(uid)) {
+    // Authenticated but unmappable — e.g. a RevenueCat anonymous id
+    // ($RCAnonymousID:...) from a purchase made before sign-in, or any id
+    // that isn't one of our Firebase uids. There is no user doc to update,
+    // and a 4xx would make RevenueCat retry the delivery forever, so
+    // acknowledge and skip. The path-safety property holds either way:
+    // nothing outside VALID_UID ever reaches the Firestore path below.
+    return res.status(200).send('Ignored: unmappable app_user_id');
   }
 
   const {

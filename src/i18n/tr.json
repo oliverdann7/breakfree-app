@@ -377,6 +377,7 @@
     "close": "Kapat",
     "hostLabel": "Konuşmacı",
     "mentorCount": "{{count}} mentör",
+    "mentorCount_plural": "{{count}} mentör",
     "emptyFiltered": "Bu filtreyle mentör bulunamadı.",
     "reviews": "değerlendirme",
     "bookedMsg": "{{day}} {{hour}} için onay bekliyor.",
