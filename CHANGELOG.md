@@ -20,6 +20,24 @@ Versions follow SemVer; stores use `versionCode` (Android) / `buildNumber`
 - Deleted the unused `BreakFreeAppPreview.jsx` / `BreakFreeAppPreviewInline.jsx`
   preview mockups (~4,350 lines of dead code, no imports anywhere; roadmap §1.4).
 
+### Security
+
+- RevenueCat webhook hardening (roadmap Phase 0 §4): `app_user_id` — which is
+  interpolated into the Firestore document path — is now validated against a
+  Firebase-uid shape, closing a path-manipulation hole where a crafted id
+  containing `/` could write another user's subscription doc; `product_id`
+  and the `*_at_ms` timestamps are type/format-checked (400 on violation);
+  the bearer-token comparison is constant-time. Events without a
+  `product_id` no longer attempt to write `planId: undefined` (which real
+  Firestore rejects). +4 webhook tests.
+- Completed the Vercel security headers (roadmap Phase 0 §4):
+  `Content-Security-Policy` (script-src 'self' verified against the built
+  web bundle — one external self-hosted script, no inline scripts; style
+  needs 'unsafe-inline' for the Expo reset style + react-native-web runtime
+  injection; connect/frame/img/font sources enumerated from actual usage:
+  Firebase, formsubmit.co, YouTube, Mux, Google Fonts), `X-Frame-Options:
+DENY`, `Strict-Transport-Security`, and a restrictive `Permissions-Policy`.
+
 ### Fixed
 
 - **TalksListScreen crashed on the first realtime snapshot** whenever
