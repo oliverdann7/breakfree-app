@@ -8,6 +8,8 @@ const initialState = {
   allTalks: [],
   currentTalk: null,
   loading: false,
+  loadingMoreTalks: false,
+  hasMoreTalks: true,
   error: null,
   filter: 'all',
 };
@@ -37,6 +39,22 @@ describe('talksSlice', () => {
     const talks = [{ talkId: 't1' }, { talkId: 't2' }];
     const state = talksReducer(initialState, realtimeTalksUpdate(talks));
     expect(state.allTalks).toEqual(talks);
+  });
+
+  it('accepts the windowed { talks, hasMore } realtime payload', () => {
+    const loadingMore = { ...initialState, loadingMoreTalks: true };
+    const state = talksReducer(
+      loadingMore,
+      realtimeTalksUpdate({ talks: [{ talkId: 't1' }], hasMore: false })
+    );
+    expect(state.allTalks).toEqual([{ talkId: 't1' }]);
+    expect(state.hasMoreTalks).toBe(false);
+    expect(state.loadingMoreTalks).toBe(false);
+  });
+
+  it('handles requestMoreTalks', () => {
+    const state = talksReducer(initialState, { type: 'talks/requestMoreTalks' });
+    expect(state.loadingMoreTalks).toBe(true);
   });
 
   it('handles fetchTalks.pending', () => {

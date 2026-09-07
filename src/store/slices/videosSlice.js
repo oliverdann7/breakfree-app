@@ -1,5 +1,14 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { collection, getDocs, doc, getDoc, query, orderBy, setDoc } from 'firebase/firestore';
+import {
+  collection,
+  getDocs,
+  doc,
+  getDoc,
+  query,
+  orderBy,
+  limit,
+  setDoc,
+} from 'firebase/firestore';
 import { db } from '../../services/firebase';
 import { isEnabled } from '../../constants/featureFlags';
 import { logout } from './authSlice';
@@ -67,13 +76,20 @@ const MOCK_VIDEOS = [
 // shows a genuine empty state instead of fake content masquerading as real.
 const seedVideos = () => (__DEV__ ? MOCK_VIDEOS : []);
 
-export const fetchVideos = createAsyncThunk('videos/fetchAll', async (_, { rejectWithValue }) => {
+// One grid "page". VideoFeedScreen grows its window by this each time the user
+// nears the end of the grid (same windowed pattern as the community feed).
+export const VIDEOS_PAGE_SIZE = 20;
+
+export const fetchVideos = createAsyncThunk('videos/fetchAll', async (arg, { rejectWithValue }) => {
+  const pageSize = (arg && arg.pageSize) || VIDEOS_PAGE_SIZE;
   try {
-    if (!db) return seedVideos();
-    const q = query(collection(db, 'videos'), orderBy('publishedAt', 'desc'));
+    if (!db) return { videos: seedVideos(), hasMore: false };
+    const q = query(collection(db, 'videos'), orderBy('publishedAt', 'desc'), limit(pageSize));
     const snap = await getDocs(q);
-    if (snap.empty) return seedVideos();
-    return snap.docs.map((d) => ({ videoId: d.id, ...d.data() }));
+    if (snap.empty) return { videos: seedVideos(), hasMore: false };
+    const videos = snap.docs.map((d) => ({ videoId: d.id, ...d.data() }));
+    // A full page back means there may be older videos beyond this window.
+    return { videos, hasMore: snap.docs.length >= pageSize };
   } catch (error) {
     return rejectWithValue(error.message);
   }
@@ -142,6 +158,8 @@ const videosSlice = createSlice({
     // values bleeding into another's after a sign-out/sign-in.
     progressUid: null,
     loading: false,
+    loadingMoreVideos: false,
+    hasMoreVideos: true,
     error: null,
     activeCategory: 'Tümü',
   },
@@ -156,6 +174,9 @@ const videosSlice = createSlice({
       const { videoId, progressSeconds } = action.payload;
       state.progress[videoId] = progressSeconds;
     },
+    requestMoreVideos: (state) => {
+      state.loadingMoreVideos = true;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -165,10 +186,20 @@ const videosSlice = createSlice({
       })
       .addCase(fetchVideos.fulfilled, (state, action) => {
         state.loading = false;
-        state.allVideos = action.payload;
+        state.loadingMoreVideos = false;
+        // Accept a bare array (legacy) or { videos, hasMore } from the
+        // windowed fetch.
+        const payload = action.payload;
+        if (Array.isArray(payload)) {
+          state.allVideos = payload;
+        } else {
+          state.allVideos = payload.videos;
+          if (typeof payload.hasMore === 'boolean') state.hasMoreVideos = payload.hasMore;
+        }
       })
       .addCase(fetchVideos.rejected, (state, action) => {
         state.loading = false;
+        state.loadingMoreVideos = false;
         state.error = action.payload;
       })
       .addCase(fetchVideoById.fulfilled, (state, action) => {
@@ -200,7 +231,8 @@ const videosSlice = createSlice({
   },
 });
 
-export const { setActiveCategory, clearCurrentVideo, updateLocalProgress } = videosSlice.actions;
+export const { setActiveCategory, clearCurrentVideo, updateLocalProgress, requestMoreVideos } =
+  videosSlice.actions;
 
 // A video requires Pro unless it's explicitly free (`isPremium === false`).
 // Default-locked is intentional: legacy/new docs without the flag stay gated.

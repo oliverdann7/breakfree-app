@@ -1,7 +1,21 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet, SafeAreaView } from 'react-native';
-import { collection, query, orderBy, onSnapshot } from 'firebase/firestore';
+import {
+  View,
+  Text,
+  ScrollView,
+  TouchableOpacity,
+  StyleSheet,
+  SafeAreaView,
+  ActivityIndicator,
+} from 'react-native';
+import {
+  collection,
+  query,
+  orderBy,
+  onSnapshot,
+  limit as firestoreLimit,
+} from 'firebase/firestore';
 import { db } from '../../services/firebase';
 import Card from '../../components/common/Card';
 import Icon from '../../components/common/Icon';
@@ -13,27 +27,53 @@ import {
   seedTalks,
   joinTalk,
   realtimeTalksUpdate,
+  requestMoreTalks,
+  TALKS_PAGE_SIZE,
 } from '../../store/slices/talksSlice';
 
 export default function TalksListScreen({ navigation }) {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
-  const { allTalks, loading } = useAppSelector((state) => state.talks);
+  const { allTalks, loading, loadingMoreTalks, hasMoreTalks } = useAppSelector(
+    (state) => state.talks
+  );
   const unsubRef = useRef(null);
+
+  // Realtime list window. Grows by TALKS_PAGE_SIZE each time the user nears
+  // the end of the scroll; the listener re-subscribes with the larger limit
+  // (same pattern as the community feed).
+  const [pageSize, setPageSize] = useState(TALKS_PAGE_SIZE);
 
   useEffect(() => {
     if (!db) {
-      dispatch(fetchTalks());
+      dispatch(fetchTalks({ pageSize }));
       return;
     }
-    const q = query(collection(db, 'talks'), orderBy('scheduledAt', 'desc'));
+    const q = query(
+      collection(db, 'talks'),
+      orderBy('scheduledAt', 'desc'),
+      firestoreLimit(pageSize)
+    );
     const unsub = onSnapshot(q, (snap) => {
       const talks = snap.docs.map((d) => ({ talkId: d.id, ...d.data() }));
-      dispatch(realtimeTalksUpdate(talks));
+      dispatch(realtimeTalksUpdate({ talks, hasMore: snap.docs.length >= pageSize }));
     });
     unsubRef.current = unsub;
     return () => unsub();
-  }, [dispatch]);
+  }, [dispatch, pageSize]);
+
+  const handleLoadMore = () => {
+    if (loadingMoreTalks || !hasMoreTalks || allTalks.length === 0) return;
+    dispatch(requestMoreTalks());
+    setPageSize((size) => size + TALKS_PAGE_SIZE);
+  };
+
+  const handleScroll = ({ nativeEvent }) => {
+    const { layoutMeasurement, contentOffset, contentSize } = nativeEvent;
+    if (layoutMeasurement.height + contentOffset.y >= contentSize.height - 200) {
+      handleLoadMore();
+    }
+  };
 
   const liveTalk = allTalks.find((t) => t.status === 'live');
   const upcoming = allTalks.filter((t) => t.status === 'scheduled');
@@ -41,7 +81,12 @@ export default function TalksListScreen({ navigation }) {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
+        onScroll={handleScroll}
+        scrollEventThrottle={200}
+      >
         {/* Header */}
         <View style={styles.header}>
           <View>
@@ -180,6 +225,12 @@ export default function TalksListScreen({ navigation }) {
                 />
               ))}
             </View>
+          </View>
+        )}
+
+        {loadingMoreTalks && (
+          <View style={{ paddingVertical: 16, alignItems: 'center' }}>
+            <ActivityIndicator color={colors.cyan} />
           </View>
         )}
 

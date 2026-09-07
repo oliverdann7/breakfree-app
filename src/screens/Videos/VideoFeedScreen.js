@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   View,
@@ -16,6 +16,8 @@ import {
   fetchWatchProgress,
   setActiveCategory,
   isVideoLocked,
+  requestMoreVideos,
+  VIDEOS_PAGE_SIZE,
 } from '../../store/slices/videosSlice';
 import { selectIsPremium } from '../../store/slices/premiumSlice';
 import VideoCard from '../../components/features/VideoCard';
@@ -32,13 +34,31 @@ const BASE_CATEGORIES = ['Zihin', 'Sağlık', 'Beslenme', 'Hareket', 'Uyku'];
 export default function VideoFeedScreen({ navigation }) {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
-  const { allVideos, loading, activeCategory, progress } = useAppSelector((state) => state.videos);
+  const { allVideos, loading, loadingMoreVideos, hasMoreVideos, activeCategory, progress } =
+    useAppSelector((state) => state.videos);
   const isPremium = useAppSelector(selectIsPremium);
   const uid = useAppSelector((state) => state.auth.user?.uid);
 
+  // Grid window. Grows by VIDEOS_PAGE_SIZE each time the user nears the end;
+  // the fetch re-runs with the larger limit (community feed pattern).
+  const [pageSize, setPageSize] = useState(VIDEOS_PAGE_SIZE);
+
   useEffect(() => {
-    dispatch(fetchVideos());
-  }, []);
+    dispatch(fetchVideos({ pageSize }));
+  }, [dispatch, pageSize]);
+
+  const handleLoadMore = () => {
+    if (loading || loadingMoreVideos || !hasMoreVideos || allVideos.length === 0) return;
+    dispatch(requestMoreVideos());
+    setPageSize((size) => size + VIDEOS_PAGE_SIZE);
+  };
+
+  const handleScroll = ({ nativeEvent }) => {
+    const { layoutMeasurement, contentOffset, contentSize } = nativeEvent;
+    if (layoutMeasurement.height + contentOffset.y >= contentSize.height - 200) {
+      handleLoadMore();
+    }
+  };
 
   // Hydrate saved watch progress so resume positions and progress bars
   // survive a cold start (the videos slice is not redux-persisted).
@@ -56,7 +76,11 @@ export default function VideoFeedScreen({ navigation }) {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        onScroll={handleScroll}
+        scrollEventThrottle={200}
+      >
         {/* Header */}
         <View style={styles.header}>
           <Text style={styles.headerLabel}>{t('video.headerLabel')}</Text>
@@ -116,6 +140,12 @@ export default function VideoFeedScreen({ navigation }) {
                 </View>
               );
             })}
+          </View>
+        )}
+
+        {loadingMoreVideos && (
+          <View style={{ paddingVertical: 16, alignItems: 'center' }}>
+            <ActivityIndicator color={colors.cyan} />
           </View>
         )}
 

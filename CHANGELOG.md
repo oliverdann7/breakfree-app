@@ -59,6 +59,13 @@ DENY`, `Strict-Transport-Security`, and a restrictive `Permissions-Policy`.
 
 ### Added
 
+- Talks and videos pagination (roadmap §1.3, closing the pagination line):
+  both lists previously queried their whole Firestore collection. The talks
+  realtime listener and the videos fetch now run with a windowed `limit`
+  (`TALKS_PAGE_SIZE` / `VIDEOS_PAGE_SIZE`, 20) that grows as the user nears
+  the end of the scroll — the same pattern the community feed uses — with
+  `hasMore*`/`loadingMore*` state, a footer spinner, and back-compat for the
+  legacy bare-array payloads. +4 slice tests.
 - Video watch progress now survives cold starts (roadmap §1.3): a new
   `fetchWatchProgress` thunk hydrates the in-memory progress map from the
   `users/{uid}/watched_videos` documents that `saveWatchProgress` was already

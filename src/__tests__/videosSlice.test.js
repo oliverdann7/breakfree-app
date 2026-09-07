@@ -18,6 +18,8 @@ const initialState = {
   progress: {},
   progressUid: null,
   loading: false,
+  loadingMoreVideos: false,
+  hasMoreVideos: true,
   error: null,
   activeCategory: 'Tümü',
 };
@@ -65,6 +67,22 @@ describe('videosSlice', () => {
     expect(state.loading).toBe(false);
     expect(state.allVideos).toHaveLength(2);
     expect(state.allVideos[0].title).toBe('Anksiyeteyi Yenmek');
+  });
+
+  it('handles the windowed { videos, hasMore } payload', () => {
+    const loadingMore = { ...initialState, loadingMoreVideos: true };
+    const state = videosReducer(loadingMore, {
+      type: 'videos/fetchAll/fulfilled',
+      payload: { videos: [{ videoId: 'v1' }], hasMore: false },
+    });
+    expect(state.allVideos).toEqual([{ videoId: 'v1' }]);
+    expect(state.hasMoreVideos).toBe(false);
+    expect(state.loadingMoreVideos).toBe(false);
+  });
+
+  it('handles requestMoreVideos', () => {
+    const state = videosReducer(initialState, { type: 'videos/requestMoreVideos' });
+    expect(state.loadingMoreVideos).toBe(true);
   });
 
   it('handles fetchVideos.fulfilled with empty array', () => {
