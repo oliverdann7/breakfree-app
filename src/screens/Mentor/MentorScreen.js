@@ -23,6 +23,7 @@ import {
 } from '../../store/slices/mentorSlice';
 import Card from '../../components/common/Card';
 import Icon from '../../components/common/Icon';
+import { showToast } from '../../components/common/Toast';
 import { colors } from '../../constants/designTokens';
 
 export default function MentorScreen({ navigation }) {
@@ -59,7 +60,15 @@ export default function MentorScreen({ navigation }) {
 
   const handleSendMessage = () => {
     if (!messageText.trim() || !user?.uid) return;
-    dispatch(sendMessage({ uid: user.uid, text: messageText.trim() }));
+    // Capture the text before the input clears so the retry re-sends it.
+    const text = messageText.trim();
+    const send = () =>
+      dispatch(sendMessage({ uid: user.uid, text }))
+        .unwrap()
+        .catch(() =>
+          showToast(t('common.writeFailed'), { actionLabel: t('common.retry'), onAction: send })
+        );
+    send();
     setMessageText('');
   };
 
@@ -142,7 +151,10 @@ export default function MentorScreen({ navigation }) {
                 key={i}
                 style={styles.goalItem}
                 onPress={() => {
-                  if (user?.uid) dispatch(toggleGoal({ uid: user.uid, goalIndex: i }));
+                  if (user?.uid)
+                    dispatch(toggleGoal({ uid: user.uid, goalIndex: i }))
+                      .unwrap()
+                      .catch(() => showToast(t('common.writeFailed')));
                 }}
                 accessibilityRole="checkbox"
                 accessibilityState={{ checked: goal.done }}
