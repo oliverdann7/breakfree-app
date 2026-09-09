@@ -8,6 +8,7 @@ import BreakFreeLanding from './src/components/BreakFreeLanding';
 import WebLoginModal from './src/components/WebLoginModal';
 import WebSignupModal from './src/components/WebSignupModal';
 import WebDashboard from './src/components/WebDashboard';
+import { ToastHost } from './src/components/common/Toast';
 import LegalPage from './src/components/web/LegalPage';
 import AdminPage from './src/components/web/AdminPage';
 
@@ -73,6 +74,7 @@ function WebApp() {
       <PersistGate loading={null} persistor={persistor}>
         <GlobalStyles />
         <WebAppContent />
+        <ToastHost />
       </PersistGate>
     </Provider>
   );

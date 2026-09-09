@@ -28,13 +28,10 @@ describe('Toast', () => {
     });
     expect(textsOf(renderer)).toContain('Kaydedilemedi');
 
-    // First advance fires the auto-hide timeout; the second flushes the
-    // fade-out animation frames so the completion callback unmounts the toast.
+    // The auto-hide timeout clears the toast directly (there is no fade-out
+    // animation to wait for).
     act(() => {
       jest.advanceTimersByTime(10000);
-    });
-    act(() => {
-      jest.advanceTimersByTime(1000);
     });
     expect(renderer.toJSON()).toBeNull();
   });

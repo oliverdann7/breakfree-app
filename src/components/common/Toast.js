@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Animated, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Animated, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { colors } from '../../constants/designTokens';
 
 // Module-level registry so any screen or callback can raise a toast without
@@ -20,11 +20,12 @@ export function showToast(message, options = {}) {
 
 export function ToastHost() {
   const [toast, setToast] = useState(null);
-  const opacity = useRef(new Animated.Value(0)).current;
   const hideTimer = useRef(null);
 
   useEffect(() => {
-    const notify = (next) => setToast({ ...next, key: Date.now() });
+    // Each toast carries its own zero-valued opacity, so every one fades in
+    // from scratch — including a repeat of the same message.
+    const notify = (next) => setToast({ ...next, opacity: new Animated.Value(0) });
     listeners.add(notify);
     return () => {
       listeners.delete(notify);
@@ -34,11 +35,11 @@ export function ToastHost() {
 
   useEffect(() => {
     if (!toast) return undefined;
-    Animated.timing(opacity, { toValue: 1, duration: 180, useNativeDriver: true }).start();
+    Animated.timing(toast.opacity, { toValue: 1, duration: 180, useNativeDriver: true }).start();
     const ms = toast.onAction ? AUTO_HIDE_WITH_ACTION_MS : AUTO_HIDE_MS;
     hideTimer.current = setTimeout(() => setToast(null), ms);
     return () => clearTimeout(hideTimer.current);
-  }, [toast, opacity]);
+  }, [toast]);
 
   if (!toast) return null;
 
@@ -51,7 +52,7 @@ export function ToastHost() {
   return (
     <View pointerEvents="box-none" style={styles.wrapper}>
       <Animated.View
-        style={[styles.toast, { opacity }]}
+        style={[styles.toast, { opacity: toast.opacity }]}
         accessibilityLiveRegion="polite"
         accessibilityRole="alert"
       >
@@ -68,7 +69,10 @@ export function ToastHost() {
 
 const styles = StyleSheet.create({
   wrapper: {
-    position: 'absolute',
+    // The web app scrolls the document, where CSS `absolute` would anchor the
+    // toast to the page bottom (off-screen on long pages); `fixed` pins it to
+    // the viewport. react-native-web supports 'fixed'; native keeps absolute.
+    position: Platform.OS === 'web' ? 'fixed' : 'absolute',
     left: 0,
     right: 0,
     bottom: 90,

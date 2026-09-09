@@ -125,13 +125,17 @@ export default function TalkDetailScreen({ route, navigation }) {
               accessibilityRole="button"
               onPress={() => {
                 if (isLive) {
+                  // Confirm only once the write lands — an unconditional alert
+                  // would tell an offline user they joined, then toast a failure.
                   dispatch(joinTalk(talkId))
                     .unwrap()
+                    .then(() =>
+                      Alert.alert(
+                        t('talks.joinedTitle'),
+                        t('talks.joinedMsg', { title: currentTalk.title })
+                      )
+                    )
                     .catch(() => showToast(t('common.writeFailed')));
-                  Alert.alert(
-                    t('talks.joinedTitle'),
-                    t('talks.joinedMsg', { title: currentTalk.title })
-                  );
                 } else if (currentTalk.status === 'scheduled') {
                   Alert.alert(
                     t('talks.reminderTitle'),
