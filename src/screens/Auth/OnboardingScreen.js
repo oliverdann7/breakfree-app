@@ -11,6 +11,7 @@ import Button from '../../components/common/Button';
 import Input from '../../components/common/Input';
 import BreakFreeLogo from '../../components/branding/BreakFreeLogo';
 import Icon from '../../components/common/Icon';
+import { showToast } from '../../components/common/Toast';
 import { colors } from '../../constants/designTokens';
 
 const { width } = Dimensions.get('window');
@@ -44,7 +45,13 @@ export default function OnboardingScreen({ _navigation }) {
     const profileData = { displayName: name, bio, goals: selectedGoals };
     dispatch(updateProfile(profileData));
     if (uid) {
-      dispatch(updateProfileFirestore({ uid, ...profileData }));
+      const save = () =>
+        dispatch(updateProfileFirestore({ uid, ...profileData }))
+          .unwrap()
+          .catch(() =>
+            showToast(t('common.writeFailed'), { actionLabel: t('common.retry'), onAction: save })
+          );
+      save();
     }
     dispatch(setHasCompletedOnboarding(true));
   };

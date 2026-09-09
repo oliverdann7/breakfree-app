@@ -13,6 +13,7 @@ import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { fetchTalkById, clearCurrentTalk, joinTalk } from '../../store/slices/talksSlice';
 import Card from '../../components/common/Card';
 import Icon from '../../components/common/Icon';
+import { showToast } from '../../components/common/Toast';
 import { colors } from '../../constants/designTokens';
 
 export default function TalkDetailScreen({ route, navigation }) {
@@ -124,7 +125,9 @@ export default function TalkDetailScreen({ route, navigation }) {
               accessibilityRole="button"
               onPress={() => {
                 if (isLive) {
-                  dispatch(joinTalk(talkId));
+                  dispatch(joinTalk(talkId))
+                    .unwrap()
+                    .catch(() => showToast(t('common.writeFailed')));
                   Alert.alert(
                     t('talks.joinedTitle'),
                     t('talks.joinedMsg', { title: currentTalk.title })

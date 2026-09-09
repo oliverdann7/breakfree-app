@@ -20,6 +20,12 @@ import TalksTab from './web/WebTalksTab';
 import HealthTab from './web/WebHealthTab';
 import CommunityTab from './web/WebCommunityTab';
 import ProfileTab from './web/WebProfileTab';
+import { showToast } from './common/Toast';
+import i18n from '../i18n';
+
+// Web tabs don't run useTranslation; surface failed Firestore writes with the
+// active language directly.
+const notifyWriteFailed = () => showToast(i18n.t('common.writeFailed'));
 
 const Logo = ({ size = 30 }) => (
   <svg
@@ -111,11 +117,13 @@ export default function WebDashboard() {
             challenges={challenges}
             userParticipation={userParticipation}
             onFetchComments={(postId) => dispatch(fetchComments(postId))}
-            onAddComment={(data) => dispatch(addComment(data))}
-            onToggleLike={(data) => dispatch(toggleLike(data))}
-            onCreatePost={(data) => dispatch(createPost(data))}
+            onAddComment={(data) => dispatch(addComment(data)).unwrap().catch(notifyWriteFailed)}
+            onToggleLike={(data) => dispatch(toggleLike(data)).unwrap().catch(notifyWriteFailed)}
+            onCreatePost={(data) => dispatch(createPost(data)).unwrap().catch(notifyWriteFailed)}
             onJoinChallenge={(challengeId) =>
               dispatch(joinChallenge({ challengeId, uid: user?.uid }))
+                .unwrap()
+                .catch(notifyWriteFailed)
             }
           />
         );

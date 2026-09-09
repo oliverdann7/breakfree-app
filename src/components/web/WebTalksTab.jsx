@@ -3,6 +3,8 @@ import { useAppDispatch } from '../../store/hooks';
 import { joinTalk } from '../../store/slices/talksSlice';
 import { C } from './WebStyles';
 import Icon from './Icons';
+import { showToast } from '../common/Toast';
+import i18n from '../../i18n';
 
 const CATEGORY_ICONS = {
   Zihin: 'brain',
@@ -124,7 +126,11 @@ function TalksTab({ talks: rawTalks, onSeed }) {
               {t.host.name} · {t.duration}dk
             </p>
             <button
-              onClick={() => dispatch(joinTalk(t.talkId))}
+              onClick={() =>
+                dispatch(joinTalk(t.talkId))
+                  .unwrap()
+                  .catch(() => showToast(i18n.t('common.writeFailed')))
+              }
               style={{
                 width: '100%',
                 background: C.gold,
