@@ -14,6 +14,7 @@ import { fetchActiveChallenges, joinChallenge } from '../../store/slices/challen
 import { BADGES, evaluateBadges } from '../../utils/badges';
 import Card from '../../components/common/Card';
 import Icon from '../../components/common/Icon';
+import { showToast } from '../../components/common/Toast';
 import { colors } from '../../constants/designTokens';
 
 function ChallengeCard({ challenge, joined, progress, onJoin, onOpen }) {
@@ -127,7 +128,10 @@ export default function ChallengesScreen({ navigation }) {
                 joined={!!p}
                 progress={progress}
                 onJoin={() =>
-                  user?.uid && dispatch(joinChallenge({ challengeId: c.id, uid: user.uid }))
+                  user?.uid &&
+                  dispatch(joinChallenge({ challengeId: c.id, uid: user.uid }))
+                    .unwrap()
+                    .catch(() => showToast(t('common.writeFailed')))
                 }
                 onOpen={() => openDetail(c)}
               />

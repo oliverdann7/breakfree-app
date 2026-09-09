@@ -59,6 +59,20 @@ DENY`, `Strict-Transport-Security`, and a restrictive `Permissions-Policy`.
 
 ### Added
 
+- Failed Firestore writes now surface to the user (roadmap §1.3 "retry +
+  user feedback on writes"): a new dependency-free toast
+  (`components/common/Toast.js` — imperative `showToast` + a `ToastHost`,
+  with a11y live-region/alert semantics) shows a localized "couldn't save"
+  message whenever a fire-and-forget write rejects. The host is mounted at
+  the native root and at the real web root (`web.js` — `src/WebApp.jsx` is
+  the unreachable legacy web branch), and the toast pins to the viewport on
+  web (`position: fixed`) since the web app scrolls the document. Wired
+  into posts, comments, likes, challenge joins, talk joins and profile
+  saves on native and web; on native, posts, comments and profile saves
+  offer a one-tap retry that re-dispatches the same write.
+  TalkDetailScreen's "joined" alert now waits for the join write to settle
+  instead of confirming unconditionally. New `common.writeFailed` key
+  (tr/en). +4 Toast component tests.
 - Talks and videos pagination (roadmap §1.3, closing the pagination line):
   both lists previously queried their whole Firestore collection. The talks
   realtime listener and the videos fetch now run with a windowed `limit`

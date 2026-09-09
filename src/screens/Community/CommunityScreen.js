@@ -44,6 +44,7 @@ import { fetchActiveChallenges, joinChallenge } from '../../store/slices/challen
 import Card from '../../components/common/Card';
 import Icon from '../../components/common/Icon';
 import Avatar from '../../components/common/Avatar';
+import { showToast } from '../../components/common/Toast';
 import LeaderboardCard from '../../components/features/LeaderboardCard';
 import HealthStatusCard from '../../components/features/HealthStatusCard';
 import { colors } from '../../constants/designTokens';
@@ -302,26 +303,38 @@ export default function CommunityScreen() {
     };
     dispatch(updateProfile(profileData));
     if (user?.uid) {
-      dispatch(updateProfileFirestore({ uid: user.uid, ...profileData }));
+      const save = () =>
+        dispatch(updateProfileFirestore({ uid: user.uid, ...profileData }))
+          .unwrap()
+          .catch(() =>
+            showToast(t('common.writeFailed'), { actionLabel: t('common.retry'), onAction: save })
+          );
+      save();
     }
   };
 
   const submitPost = () => {
     if (!postText.trim()) return;
     const dm = dailyMetrics;
-    dispatch(
-      createPost({
-        uid: user?.uid,
-        authorName: myProfile.nickname,
-        authorEmoji: myProfile.emoji,
-        authorBg: myProfile.bg,
-        text: postText.trim(),
-        sharedStats:
-          shareStats && dm
-            ? { wellness: wellnessScore, steps: dm.steps, sleep: dm.sleep?.hours }
-            : null,
-      })
-    );
+    const post = () =>
+      dispatch(
+        createPost({
+          uid: user?.uid,
+          authorName: myProfile.nickname,
+          authorEmoji: myProfile.emoji,
+          authorBg: myProfile.bg,
+          text: postText.trim(),
+          sharedStats:
+            shareStats && dm
+              ? { wellness: wellnessScore, steps: dm.steps, sleep: dm.sleep?.hours }
+              : null,
+        })
+      )
+        .unwrap()
+        .catch(() =>
+          showToast(t('common.writeFailed'), { actionLabel: t('common.retry'), onAction: post })
+        );
+    post();
     setPostText('');
     setShareStats(false);
     setPostVisible(false);
@@ -329,21 +342,29 @@ export default function CommunityScreen() {
 
   const handleToggleLike = (postId, currentlyLiked) => {
     if (!user?.uid) return;
-    dispatch(toggleLike({ postId, uid: user.uid, currentlyLiked }));
+    dispatch(toggleLike({ postId, uid: user.uid, currentlyLiked }))
+      .unwrap()
+      .catch(() => showToast(t('common.writeFailed')));
   };
 
   const handleAddComment = (postId, text) => {
     if (!user?.uid) return;
-    dispatch(
-      addComment({
-        postId,
-        uid: user.uid,
-        authorName: myProfile.nickname,
-        authorEmoji: myProfile.emoji,
-        authorBg: myProfile.bg,
-        text,
-      })
-    );
+    const post = () =>
+      dispatch(
+        addComment({
+          postId,
+          uid: user.uid,
+          authorName: myProfile.nickname,
+          authorEmoji: myProfile.emoji,
+          authorBg: myProfile.bg,
+          text,
+        })
+      )
+        .unwrap()
+        .catch(() =>
+          showToast(t('common.writeFailed'), { actionLabel: t('common.retry'), onAction: post })
+        );
+    post();
   };
 
   const handleFetchComments = (postId) => {
@@ -464,6 +485,8 @@ export default function CommunityScreen() {
                   style={styles.joinBtn}
                   onPress={() =>
                     dispatch(joinChallenge({ challengeId: challenge.id, uid: user?.uid }))
+                      .unwrap()
+                      .catch(() => showToast(t('common.writeFailed')))
                   }
                   accessibilityRole="button"
                 >

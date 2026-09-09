@@ -13,6 +13,7 @@ import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { fetchTalkById, clearCurrentTalk, joinTalk } from '../../store/slices/talksSlice';
 import Card from '../../components/common/Card';
 import Icon from '../../components/common/Icon';
+import { showToast } from '../../components/common/Toast';
 import { colors } from '../../constants/designTokens';
 
 export default function TalkDetailScreen({ route, navigation }) {
@@ -124,11 +125,17 @@ export default function TalkDetailScreen({ route, navigation }) {
               accessibilityRole="button"
               onPress={() => {
                 if (isLive) {
-                  dispatch(joinTalk(talkId));
-                  Alert.alert(
-                    t('talks.joinedTitle'),
-                    t('talks.joinedMsg', { title: currentTalk.title })
-                  );
+                  // Confirm only once the write lands — an unconditional alert
+                  // would tell an offline user they joined, then toast a failure.
+                  dispatch(joinTalk(talkId))
+                    .unwrap()
+                    .then(() =>
+                      Alert.alert(
+                        t('talks.joinedTitle'),
+                        t('talks.joinedMsg', { title: currentTalk.title })
+                      )
+                    )
+                    .catch(() => showToast(t('common.writeFailed')));
                 } else if (currentTalk.status === 'scheduled') {
                   Alert.alert(
                     t('talks.reminderTitle'),

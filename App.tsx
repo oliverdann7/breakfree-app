@@ -10,6 +10,7 @@ import { store, persistor } from './src/store';
 import RootNavigator from './src/navigation/RootNavigator';
 import WebApp from './src/WebApp';
 import ErrorBoundary from './src/components/ErrorBoundary';
+import { ToastHost } from './src/components/common/Toast';
 import { registerForPushNotificationsAsync } from './src/services/notificationService';
 import { initSentry } from './src/services/sentryService';
 import { initRemoteConfig } from './src/services/remoteConfig';
@@ -51,6 +52,7 @@ function MobileAppContent() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <StatusBar style="light" />
       <RootNavigator />
+      <ToastHost />
     </GestureHandlerRootView>
   );
 }

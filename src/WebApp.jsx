@@ -6,6 +6,7 @@ import { useAppSelector } from './store/hooks';
 import BreakFreeLanding from './components/BreakFreeLanding';
 import WebLoginModal from './components/WebLoginModal';
 import WebDashboard from './components/WebDashboard';
+import { ToastHost } from './components/common/Toast';
 import LegalPage from './components/web/LegalPage';
 import AdminPage from './components/web/AdminPage';
 
@@ -52,6 +53,7 @@ export default function WebApp() {
       <PersistGate loading={null} persistor={persistor}>
         <GlobalStyles />
         <AppRouter />
+        <ToastHost />
       </PersistGate>
     </Provider>
   );

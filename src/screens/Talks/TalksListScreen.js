@@ -20,6 +20,7 @@ import { db } from '../../services/firebase';
 import Card from '../../components/common/Card';
 import Icon from '../../components/common/Icon';
 import TalkCard from '../../components/features/TalkCard';
+import { showToast } from '../../components/common/Toast';
 import { colors } from '../../constants/designTokens';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import {
@@ -167,7 +168,11 @@ export default function TalksListScreen({ navigation }) {
             </View>
             <TouchableOpacity
               style={styles.liveButton}
-              onPress={() => dispatch(joinTalk(liveTalk.talkId))}
+              onPress={() =>
+                dispatch(joinTalk(liveTalk.talkId))
+                  .unwrap()
+                  .catch(() => showToast(t('common.writeFailed')))
+              }
               accessibilityRole="button"
             >
               <Icon name="headphones" size={14} color={colors.bgPrimary} />
