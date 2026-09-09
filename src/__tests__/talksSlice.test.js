@@ -1,9 +1,15 @@
-import talksReducer, { setFilter, clearCurrentTalk } from '../store/slices/talksSlice';
+import talksReducer, {
+  setFilter,
+  clearCurrentTalk,
+  realtimeTalksUpdate,
+} from '../store/slices/talksSlice';
 
 const initialState = {
   allTalks: [],
   currentTalk: null,
   loading: false,
+  loadingMoreTalks: false,
+  hasMoreTalks: true,
   error: null,
   filter: 'all',
 };
@@ -23,6 +29,32 @@ describe('talksSlice', () => {
     const loaded = { ...initialState, currentTalk: { talkId: 't1' } };
     const state = talksReducer(loaded, clearCurrentTalk());
     expect(state.currentTalk).toBeNull();
+  });
+
+  // Regression: the action creator was defined in the slice but not exported,
+  // so TalksListScreen's onSnapshot dispatched `undefined(...)` and crashed on
+  // the first realtime snapshot whenever Firestore was configured.
+  it('exports realtimeTalksUpdate and replaces the talk list', () => {
+    expect(typeof realtimeTalksUpdate).toBe('function');
+    const talks = [{ talkId: 't1' }, { talkId: 't2' }];
+    const state = talksReducer(initialState, realtimeTalksUpdate(talks));
+    expect(state.allTalks).toEqual(talks);
+  });
+
+  it('accepts the windowed { talks, hasMore } realtime payload', () => {
+    const loadingMore = { ...initialState, loadingMoreTalks: true };
+    const state = talksReducer(
+      loadingMore,
+      realtimeTalksUpdate({ talks: [{ talkId: 't1' }], hasMore: false })
+    );
+    expect(state.allTalks).toEqual([{ talkId: 't1' }]);
+    expect(state.hasMoreTalks).toBe(false);
+    expect(state.loadingMoreTalks).toBe(false);
+  });
+
+  it('handles requestMoreTalks', () => {
+    const state = talksReducer(initialState, { type: 'talks/requestMoreTalks' });
+    expect(state.loadingMoreTalks).toBe(true);
   });
 
   it('handles fetchTalks.pending', () => {

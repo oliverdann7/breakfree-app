@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { store } from '../store';
-import { logout, refreshToken } from '../store/slices/authSlice';
+import { logout, refreshToken, sessionExpired } from '../store/slices/authSlice';
+import i18n from '../i18n';
 
 const BASE_URL = process.env.EXPO_PUBLIC_API_URL || 'https://api.breakfree.app/v1';
 
@@ -67,7 +68,11 @@ api.interceptors.response.use(
         }
       } catch (refreshError) {
         processQueue(refreshError, null);
-        store.dispatch(logout());
+        // Not a silent bounce: after logout settles (its fulfilled handler
+        // nulls auth.error), leave a localized message for the login screen.
+        store.dispatch(logout()).finally(() => {
+          store.dispatch(sessionExpired(i18n.t('auth.sessionExpired')));
+        });
         return Promise.reject(refreshError);
       } finally {
         isRefreshing = false;

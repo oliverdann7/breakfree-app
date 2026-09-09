@@ -82,7 +82,8 @@
     "forgotPasswordSentDesc": "We sent a reset link to {{email}}. Check your inbox.",
     "backToLogin": "Back to Login",
     "noFirebase": "Firebase not configured. Please set up .env.local.",
-    "sendError": "An error occurred. Please try again."
+    "sendError": "An error occurred. Please try again.",
+    "sessionExpired": "Your session has expired. Please sign in again."
   },
   "onboarding": {
     "welcome": "Welcome to\nBreakFree!",
@@ -374,7 +375,29 @@
     "chatWith": "Chat with {{name}}",
     "messagePlaceholder": "Write a message...",
     "close": "Close",
-    "hostLabel": "Host"
+    "hostLabel": "Host",
+    "mentorCount": "{{count}} mentor",
+    "mentorCount_plural": "{{count}} mentors",
+    "emptyFiltered": "No mentors match this filter.",
+    "reviews": "reviews",
+    "bookedMsg": "Awaiting confirmation for {{day}} {{hour}}.",
+    "days": {
+      "Mon": "Mon",
+      "Tue": "Tue",
+      "Wed": "Wed",
+      "Thu": "Thu",
+      "Fri": "Fri",
+      "Sat": "Sat",
+      "Sun": "Sun"
+    },
+    "categories": {
+      "all": "All",
+      "mind": "Mind",
+      "movement": "Movement",
+      "nutrition": "Nutrition",
+      "sleep": "Sleep",
+      "performance": "Performance"
+    }
   },
   "privacy": {
     "title": "Privacy & Data",
@@ -459,7 +482,12 @@
     "proDesc": "BreakFree Pro is required to watch this video.",
     "proUpgrade": "Upgrade to Pro",
     "notLoaded": "Video not yet loaded",
-    "relatedVideos": "Related videos"
+    "relatedVideos": "Related videos",
+    "headerLabel": "Watch & Learn",
+    "titlePrefix": "Video",
+    "titleAccent": "library",
+    "allCategory": "All",
+    "emptyCategory": "No videos in this category yet."
   },
   "devices": {
     "title": "Manage Devices",

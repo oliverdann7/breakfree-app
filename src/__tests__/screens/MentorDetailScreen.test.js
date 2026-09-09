@@ -13,6 +13,10 @@ jest.mock('../../store/hooks', () => ({
 
 jest.mock('../../services/firebase', () => ({ db: {} }));
 
+jest.mock('react-i18next', () => ({
+  useTranslation: () => ({ t: (k) => k, i18n: { language: 'tr' } }),
+}));
+
 const mockAddDoc = jest.fn(() => Promise.resolve({ id: 'session-1' }));
 jest.mock('firebase/firestore', () => ({
   addDoc: (...args) => mockAddDoc(...args),
@@ -67,7 +71,7 @@ const renderScreen = (props = {}) => {
 };
 
 const selectFirstSlot = (renderer) => {
-  const dayPill = findButtonByText(renderer.root, 'Bugün');
+  const dayPill = findButtonByText(renderer.root, 'mentor.today');
   act(() => {
     dayPill.props.onPress();
   });
@@ -90,7 +94,7 @@ describe('MentorDetailScreen — booking flow', () => {
     const renderer = renderScreen();
     const texts = renderer.root.findAllByType('Text').map(textOf);
     expect(texts).toContain('Dr. Ayşe Demir');
-    expect(texts).toContain('₺250 · Seans Rezerve Et');
+    expect(texts).toContain('₺250 · mentor.bookSession');
   });
 
   it('fetches the profile when the mentor is not loaded yet', () => {
@@ -101,21 +105,21 @@ describe('MentorDetailScreen — booking flow', () => {
       payload: 'm1',
     });
     const texts = renderer.root.findAllByType('Text').map(textOf);
-    expect(texts).toContain('Yükleniyor...');
+    expect(texts).toContain('common.loading');
   });
 
   it('keeps the CTA disabled until a day and hour are picked', () => {
     const renderer = renderScreen();
-    const cta = findButtonByText(renderer.root, 'Seans Rezerve Et');
+    const cta = findButtonByText(renderer.root, 'mentor.bookSession');
     expect(cta.props.disabled).toBe(true);
     selectFirstSlot(renderer);
-    expect(findButtonByText(renderer.root, 'Seans Rezerve Et').props.disabled).toBe(false);
+    expect(findButtonByText(renderer.root, 'mentor.bookSession').props.disabled).toBe(false);
   });
 
   it('books a pending 30-minute session for the picked slot', async () => {
     const renderer = renderScreen();
     selectFirstSlot(renderer);
-    const cta = findButtonByText(renderer.root, 'Seans Rezerve Et');
+    const cta = findButtonByText(renderer.root, 'mentor.bookSession');
     await act(async () => {
       cta.props.onPress();
     });
@@ -130,35 +134,35 @@ describe('MentorDetailScreen — booking flow', () => {
         scheduledFor: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T10:00:00\+03:00$/),
       })
     );
-    expect(Alert.alert).toHaveBeenCalledWith('Seans rezerve edildi', expect.any(String));
+    expect(Alert.alert).toHaveBeenCalledWith('mentor.bookedTitle', expect.any(String));
   });
 
   it('resets the selection after a successful booking', async () => {
     const renderer = renderScreen();
     selectFirstSlot(renderer);
-    const cta = findButtonByText(renderer.root, 'Seans Rezerve Et');
+    const cta = findButtonByText(renderer.root, 'mentor.bookSession');
     await act(async () => {
       cta.props.onPress();
     });
-    expect(findButtonByText(renderer.root, 'Seans Rezerve Et').props.disabled).toBe(true);
+    expect(findButtonByText(renderer.root, 'mentor.bookSession').props.disabled).toBe(true);
   });
 
   it('surfaces booking failures in an alert', async () => {
     mockAddDoc.mockRejectedValueOnce(new Error('permission-denied'));
     const renderer = renderScreen();
     selectFirstSlot(renderer);
-    const cta = findButtonByText(renderer.root, 'Seans Rezerve Et');
+    const cta = findButtonByText(renderer.root, 'mentor.bookSession');
     await act(async () => {
       cta.props.onPress();
     });
-    expect(Alert.alert).toHaveBeenCalledWith('Hata', 'permission-denied');
+    expect(Alert.alert).toHaveBeenCalledWith('common.error', 'permission-denied');
   });
 
   it('does not book when signed out', async () => {
     mockState.auth.user = null;
     const renderer = renderScreen();
     selectFirstSlot(renderer);
-    const cta = findButtonByText(renderer.root, 'Seans Rezerve Et');
+    const cta = findButtonByText(renderer.root, 'mentor.bookSession');
     await act(async () => {
       cta.props.onPress();
     });

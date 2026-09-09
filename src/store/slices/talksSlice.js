@@ -13,12 +13,20 @@ import {
 } from 'firebase/firestore';
 import { db } from '../../services/firebase';
 
-export const fetchTalks = createAsyncThunk('talks/fetchAll', async (_, { rejectWithValue }) => {
+// One list "page". The realtime listener in TalksListScreen grows its limit by
+// this each time the user nears the end, mirroring the community feed pattern,
+// so the query never loads the whole collection at once.
+export const TALKS_PAGE_SIZE = 20;
+
+export const fetchTalks = createAsyncThunk('talks/fetchAll', async (arg, { rejectWithValue }) => {
+  const pageSize = (arg && arg.pageSize) || TALKS_PAGE_SIZE;
   try {
-    if (!db) return [];
-    const q = query(collection(db, 'talks'), orderBy('scheduledAt', 'desc'));
+    if (!db) return { talks: [], hasMore: false };
+    const q = query(collection(db, 'talks'), orderBy('scheduledAt', 'desc'), limit(pageSize));
     const snap = await getDocs(q);
-    return snap.docs.map((d) => ({ talkId: d.id, ...d.data() }));
+    const talks = snap.docs.map((d) => ({ talkId: d.id, ...d.data() }));
+    // A full page back means there may be older talks beyond this window.
+    return { talks, hasMore: snap.docs.length >= pageSize };
   } catch (error) {
     return rejectWithValue(error.message);
   }
@@ -120,6 +128,8 @@ const talksSlice = createSlice({
     allTalks: [],
     currentTalk: null,
     loading: false,
+    loadingMoreTalks: false,
+    hasMoreTalks: true,
     error: null,
     filter: 'all',
   },
@@ -131,7 +141,19 @@ const talksSlice = createSlice({
       state.currentTalk = null;
     },
     realtimeTalksUpdate: (state, action) => {
-      state.allTalks = action.payload;
+      // Accept a bare array (legacy) or { talks, hasMore } from the paginated
+      // realtime listener. A fresh snapshot always ends an in-flight load-more.
+      const payload = action.payload;
+      if (Array.isArray(payload)) {
+        state.allTalks = payload;
+      } else {
+        state.allTalks = payload.talks;
+        if (typeof payload.hasMore === 'boolean') state.hasMoreTalks = payload.hasMore;
+      }
+      state.loadingMoreTalks = false;
+    },
+    requestMoreTalks: (state) => {
+      state.loadingMoreTalks = true;
     },
   },
   extraReducers: (builder) => {
@@ -142,7 +164,14 @@ const talksSlice = createSlice({
       })
       .addCase(fetchTalks.fulfilled, (state, action) => {
         state.loading = false;
-        state.allTalks = action.payload;
+        state.loadingMoreTalks = false;
+        const payload = action.payload;
+        if (Array.isArray(payload)) {
+          state.allTalks = payload;
+        } else {
+          state.allTalks = payload.talks;
+          if (typeof payload.hasMore === 'boolean') state.hasMoreTalks = payload.hasMore;
+        }
       })
       .addCase(fetchTalks.rejected, (state, action) => {
         state.loading = false;
@@ -172,5 +201,6 @@ const talksSlice = createSlice({
   },
 });
 
-export const { setFilter, clearCurrentTalk } = talksSlice.actions;
+export const { setFilter, clearCurrentTalk, realtimeTalksUpdate, requestMoreTalks } =
+  talksSlice.actions;
 export default talksSlice.reducer;

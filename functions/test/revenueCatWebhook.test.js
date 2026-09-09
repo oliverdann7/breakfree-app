@@ -85,6 +85,77 @@ describe('revenueCatWebhook', () => {
     expect(res.status).toHaveBeenCalledWith(200);
   });
 
+  it('acknowledges a path-traversing app_user_id with 200 but never writes', async () => {
+    const res = mockRes();
+    await revenueCatWebhook(
+      mockReq({ body: { event: { type: 'RENEWAL', app_user_id: 'u1/subscription/other' } } }),
+      res
+    );
+    // 200 so RevenueCat does not retry forever; the write is what must not happen.
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(setMock).not.toHaveBeenCalled();
+  });
+
+  it('acknowledges a RevenueCat anonymous id with 200 but never writes', async () => {
+    const res = mockRes();
+    await revenueCatWebhook(
+      mockReq({
+        body: { event: { type: 'INITIAL_PURCHASE', app_user_id: '$RCAnonymousID:abc123' } },
+      }),
+      res
+    );
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(setMock).not.toHaveBeenCalled();
+  });
+
+  it('rejects a non-string app_user_id with 400', async () => {
+    const res = mockRes();
+    await revenueCatWebhook(
+      mockReq({ body: { event: { type: 'RENEWAL', app_user_id: { uid: 'u1' } } } }),
+      res
+    );
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(setMock).not.toHaveBeenCalled();
+  });
+
+  it('rejects a non-string product_id with 400', async () => {
+    const res = mockRes();
+    await revenueCatWebhook(
+      mockReq({
+        body: { event: { type: 'RENEWAL', app_user_id: 'u1', product_id: { $ne: '' } } },
+      }),
+      res
+    );
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(setMock).not.toHaveBeenCalled();
+  });
+
+  it('rejects a non-numeric expiration_at_ms with 400', async () => {
+    const res = mockRes();
+    await revenueCatWebhook(
+      mockReq({
+        body: {
+          event: { type: 'RENEWAL', app_user_id: 'u1', expiration_at_ms: 'tomorrow' },
+        },
+      }),
+      res
+    );
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(setMock).not.toHaveBeenCalled();
+  });
+
+  it('omits planId when the event has no product_id (Firestore rejects undefined)', async () => {
+    const res = mockRes();
+    await revenueCatWebhook(
+      mockReq({ body: { event: { type: 'CANCELLATION', app_user_id: 'u1' } } }),
+      res
+    );
+    expect(res.status).toHaveBeenCalledWith(200);
+    const written = setMock.mock.calls[0][0];
+    expect('planId' in written).toBe(false);
+    expect(written.status).toBe('cancelled');
+  });
+
   it('marks the subscription cancelled on an expiration event', async () => {
     const res = mockRes();
     await revenueCatWebhook(

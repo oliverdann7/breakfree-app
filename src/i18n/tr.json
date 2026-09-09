@@ -82,7 +82,8 @@
     "forgotPasswordSentDesc": "{{email}} adresine sıfırlama bağlantısı gönderdik. Gelen kutunu kontrol et.",
     "backToLogin": "Giriş Ekranına Dön",
     "noFirebase": "Firebase yapılandırılmamış. Lütfen .env.local dosyasını ayarlayın.",
-    "sendError": "Bir hata oluştu. Tekrar deneyin."
+    "sendError": "Bir hata oluştu. Tekrar deneyin.",
+    "sessionExpired": "Oturumun süresi doldu. Lütfen tekrar giriş yap."
   },
   "onboarding": {
     "welcome": "BreakFree'ye\nHoş Geldin!",
@@ -374,7 +375,29 @@
     "chatWith": "{{name}} ile Sohbet",
     "messagePlaceholder": "Mesaj yaz...",
     "close": "Kapat",
-    "hostLabel": "Konuşmacı"
+    "hostLabel": "Konuşmacı",
+    "mentorCount": "{{count}} mentör",
+    "mentorCount_plural": "{{count}} mentör",
+    "emptyFiltered": "Bu filtreyle mentör bulunamadı.",
+    "reviews": "değerlendirme",
+    "bookedMsg": "{{day}} {{hour}} için onay bekliyor.",
+    "days": {
+      "Mon": "Pzt",
+      "Tue": "Sal",
+      "Wed": "Çar",
+      "Thu": "Per",
+      "Fri": "Cum",
+      "Sat": "Cmt",
+      "Sun": "Paz"
+    },
+    "categories": {
+      "all": "Hepsi",
+      "mind": "Zihin",
+      "movement": "Hareket",
+      "nutrition": "Beslenme",
+      "sleep": "Uyku",
+      "performance": "Performans"
+    }
   },
   "privacy": {
     "title": "Gizlilik & Veriler",
@@ -459,7 +482,12 @@
     "proDesc": "Bu videoyu izlemek için BreakFree Pro gerekli.",
     "proUpgrade": "Pro'ya geç",
     "notLoaded": "Video henüz yüklenmedi",
-    "relatedVideos": "İlgili videolar"
+    "relatedVideos": "İlgili videolar",
+    "headerLabel": "İzle & Öğren",
+    "titlePrefix": "Video",
+    "titleAccent": "kütüphanesi",
+    "allCategory": "Tümü",
+    "emptyCategory": "Bu kategoride henüz video yok."
   },
   "devices": {
     "title": "Cihazları Yönet",

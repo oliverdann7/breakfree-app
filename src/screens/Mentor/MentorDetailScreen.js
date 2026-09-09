@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   View,
   Text,
@@ -16,17 +17,7 @@ import Card from '../../components/common/Card';
 import Icon from '../../components/common/Icon';
 import { colors } from '../../constants/designTokens';
 
-const DAY_LABELS = {
-  Mon: 'Pzt',
-  Tue: 'Sal',
-  Wed: 'Çar',
-  Thu: 'Per',
-  Fri: 'Cum',
-  Sat: 'Cmt',
-  Sun: 'Paz',
-};
-
-function buildSlots(availability) {
+function buildSlots(availability, t, dateLocale) {
   if (!availability) return [];
   const today = new Date();
   const dayKeys = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -39,8 +30,8 @@ function buildSlots(availability) {
     if (hours.length === 0) continue;
     next7.push({
       key,
-      label: i === 0 ? 'Bugün' : i === 1 ? 'Yarın' : DAY_LABELS[key],
-      date: d.toLocaleDateString('tr-TR', { day: '2-digit', month: 'short' }),
+      label: i === 0 ? t('mentor.today') : i === 1 ? t('mentor.tomorrow') : t(`mentor.days.${key}`),
+      date: d.toLocaleDateString(dateLocale, { day: '2-digit', month: 'short' }),
       iso: d.toISOString().slice(0, 10),
       hours,
     });
@@ -49,6 +40,7 @@ function buildSlots(availability) {
 }
 
 export default function MentorDetailScreen({ navigation, route }) {
+  const { t, i18n } = useTranslation();
   const mentorId = route?.params?.mentorId;
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((s) => s.auth);
@@ -69,12 +61,13 @@ export default function MentorDetailScreen({ navigation, route }) {
   if (!mentor) {
     return (
       <SafeAreaView style={styles.container}>
-        <Text style={styles.loading}>Yükleniyor...</Text>
+        <Text style={styles.loading}>{t('common.loading')}</Text>
       </SafeAreaView>
     );
   }
 
-  const slots = buildSlots(mentor.availability);
+  const dateLocale = i18n.language === 'en' ? 'en-US' : 'tr-TR';
+  const slots = buildSlots(mentor.availability, t, dateLocale);
 
   const handleBook = async () => {
     if (!user?.uid || !selectedDay || !selectedHour) return;
@@ -91,11 +84,14 @@ export default function MentorDetailScreen({ navigation, route }) {
           createdAt: Date.now(),
         });
       }
-      Alert.alert('Seans rezerve edildi', `${selectedDay} ${selectedHour} için onay bekliyor.`);
+      Alert.alert(
+        t('mentor.bookedTitle'),
+        t('mentor.bookedMsg', { day: selectedDay, hour: selectedHour })
+      );
       setSelectedDay(null);
       setSelectedHour(null);
     } catch (err) {
-      Alert.alert('Hata', err.message);
+      Alert.alert(t('common.error'), err.message);
     } finally {
       setBooking(false);
     }
@@ -110,7 +106,7 @@ export default function MentorDetailScreen({ navigation, route }) {
               onPress={() => navigation.goBack()}
               style={styles.back}
               accessibilityRole="button"
-              accessibilityLabel="Geri"
+              accessibilityLabel={t('common.back')}
             >
               <Text style={styles.backText}>←</Text>
             </TouchableOpacity>
@@ -127,7 +123,7 @@ export default function MentorDetailScreen({ navigation, route }) {
             <View style={styles.ratingRow}>
               <Icon name="star" filled size={12} color={colors.gold} />
               <Text style={styles.rating}>
-                {mentor.rating.toFixed(1)} · {mentor.reviewCount} değerlendirme
+                {mentor.rating.toFixed(1)} · {mentor.reviewCount} {t('mentor.reviews')}
               </Text>
             </View>
           )}
@@ -135,14 +131,18 @@ export default function MentorDetailScreen({ navigation, route }) {
 
         <View style={{ paddingHorizontal: 16, gap: 14 }}>
           <Card>
-            <Text style={styles.sectionTitle}>Hakkında</Text>
+            <Text style={styles.sectionTitle}>{t('mentor.about')}</Text>
             <Text style={styles.bio}>{mentor.bio}</Text>
-            {mentor.experience && <Text style={styles.meta}>{mentor.experience} deneyim</Text>}
+            {mentor.experience && (
+              <Text style={styles.meta}>
+                {mentor.experience} {t('mentor.yearsExperience')}
+              </Text>
+            )}
           </Card>
 
           {mentor.specialties?.length > 0 && (
             <Card>
-              <Text style={styles.sectionTitle}>Uzmanlık</Text>
+              <Text style={styles.sectionTitle}>{t('mentor.expertise')}</Text>
               <View style={styles.specRow}>
                 {mentor.specialties.map((s) => (
                   <View key={s} style={styles.specChip}>
@@ -154,9 +154,9 @@ export default function MentorDetailScreen({ navigation, route }) {
           )}
 
           <Card>
-            <Text style={styles.sectionTitle}>Müsait Zamanlar</Text>
+            <Text style={styles.sectionTitle}>{t('mentor.availability')}</Text>
             {slots.length === 0 ? (
-              <Text style={styles.meta}>Şu anda müsait zaman yok.</Text>
+              <Text style={styles.meta}>{t('mentor.noSlots')}</Text>
             ) : (
               <>
                 <ScrollView
@@ -217,10 +217,10 @@ export default function MentorDetailScreen({ navigation, route }) {
           >
             <Text style={styles.ctaText}>
               {booking
-                ? 'Rezerve ediliyor...'
+                ? t('mentor.booking')
                 : mentor.priceTryPerSession
-                  ? `₺${mentor.priceTryPerSession} · Seans Rezerve Et`
-                  : 'Seans Rezerve Et'}
+                  ? `₺${mentor.priceTryPerSession} · ${t('mentor.bookSession')}`
+                  : t('mentor.bookSession')}
             </Text>
           </TouchableOpacity>
         </View>
