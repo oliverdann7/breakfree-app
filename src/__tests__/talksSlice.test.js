@@ -1,8 +1,17 @@
+import { configureStore } from '@reduxjs/toolkit';
 import talksReducer, {
   setFilter,
   clearCurrentTalk,
   realtimeTalksUpdate,
+  isTalksCacheFresh,
+  fetchTalks,
+  requestMoreTalks,
+  TALKS_TTL_MS,
 } from '../store/slices/talksSlice';
+
+// Force the no-backend path so the thunk's payload creator is deterministic
+// in the condition/load-more regression tests below.
+jest.mock('../services/firebase', () => ({ db: null }));
 
 const initialState = {
   allTalks: [],
@@ -10,6 +19,8 @@ const initialState = {
   loading: false,
   loadingMoreTalks: false,
   hasMoreTalks: true,
+  lastFetchedAt: null,
+  fetchedPageSize: 0,
   error: null,
   filter: 'all',
 };
@@ -116,6 +127,73 @@ describe('talksSlice', () => {
     });
     expect(state.loading).toBe(false);
     expect(state.error).toBe('Talk not found');
+  });
+
+  describe('isTalksCacheFresh (fetch TTL)', () => {
+    const now = 1_000_000_000;
+    const cached = {
+      ...initialState,
+      allTalks: [{ talkId: 't1' }],
+      lastFetchedAt: now - 1000,
+      fetchedPageSize: 20,
+    };
+
+    it('is fresh within the TTL for a covered window', () => {
+      expect(isTalksCacheFresh(cached, 20, now)).toBe(true);
+    });
+
+    it('is stale once the TTL elapses', () => {
+      expect(isTalksCacheFresh(cached, 20, now + TALKS_TTL_MS + 1)).toBe(false);
+    });
+
+    it('is stale when a larger window is requested or the list is empty', () => {
+      expect(isTalksCacheFresh(cached, 40, now)).toBe(false);
+      expect(isTalksCacheFresh({ ...cached, allTalks: [] }, 20, now)).toBe(false);
+    });
+  });
+
+  describe('fetch condition × load-more (regression)', () => {
+    const makeStore = (talks) =>
+      configureStore({
+        reducer: { talks: talksReducer },
+        preloadedState: { talks },
+      });
+
+    const freshState = {
+      ...initialState,
+      allTalks: [{ talkId: 't1' }],
+      lastFetchedAt: Date.now(),
+      fetchedPageSize: 40,
+    };
+
+    it('skips the fetch entirely while the cache window is fresh', async () => {
+      const store = makeStore(freshState);
+      const result = await store.dispatch(fetchTalks({ pageSize: 20 }));
+      expect(result.meta.condition).toBe(true);
+    });
+
+    // Regression (mirrors videosSlice): requestMoreTalks() sets
+    // loadingMoreTalks before the fetch dispatches; a condition-cancelled
+    // dispatch fires no lifecycle action, so nothing on the fetch path would
+    // ever clear the flag.
+    it('never cancels a pending load-more, so loadingMoreTalks always clears', async () => {
+      const store = makeStore(freshState);
+      store.dispatch(requestMoreTalks());
+      expect(store.getState().talks.loadingMoreTalks).toBe(true);
+      const result = await store.dispatch(fetchTalks({ pageSize: 40 }));
+      expect(result.meta.condition).not.toBe(true);
+      expect(store.getState().talks.loadingMoreTalks).toBe(false);
+    });
+  });
+
+  it('records cache metadata on fetchTalks.fulfilled', () => {
+    const state = talksReducer(initialState, {
+      type: 'talks/fetchAll/fulfilled',
+      meta: { arg: { pageSize: 40 } },
+      payload: { talks: [{ talkId: 't1' }], hasMore: true },
+    });
+    expect(typeof state.lastFetchedAt).toBe('number');
+    expect(state.fetchedPageSize).toBe(40);
   });
 
   it('handles seedTalks.fulfilled', () => {

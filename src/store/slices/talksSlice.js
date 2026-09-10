@@ -18,19 +18,47 @@ import { db } from '../../services/firebase';
 // so the query never loads the whole collection at once.
 export const TALKS_PAGE_SIZE = 20;
 
-export const fetchTalks = createAsyncThunk('talks/fetchAll', async (arg, { rejectWithValue }) => {
-  const pageSize = (arg && arg.pageSize) || TALKS_PAGE_SIZE;
-  try {
-    if (!db) return { talks: [], hasMore: false };
-    const q = query(collection(db, 'talks'), orderBy('scheduledAt', 'desc'), limit(pageSize));
-    const snap = await getDocs(q);
-    const talks = snap.docs.map((d) => ({ talkId: d.id, ...d.data() }));
-    // A full page back means there may be older talks beyond this window.
-    return { talks, hasMore: snap.docs.length >= pageSize };
-  } catch (error) {
-    return rejectWithValue(error.message);
+// Roadmap §1.3 cache TTL for the non-realtime fetch path (WebDashboard, no-db
+// fallback); the native list uses a realtime listener and is unaffected. Pass
+// { force: true } to bypass.
+export const TALKS_TTL_MS = 5 * 60 * 1000;
+
+// Pure so the slice tests can cover the skip logic without a store.
+export const isTalksCacheFresh = (talksState, pageSize, now = Date.now()) =>
+  Boolean(talksState.lastFetchedAt) &&
+  now - talksState.lastFetchedAt < TALKS_TTL_MS &&
+  talksState.allTalks.length > 0 &&
+  pageSize <= talksState.fetchedPageSize;
+
+export const fetchTalks = createAsyncThunk(
+  'talks/fetchAll',
+  async (arg, { rejectWithValue }) => {
+    const pageSize = (arg && arg.pageSize) || TALKS_PAGE_SIZE;
+    try {
+      if (!db) return { talks: [], hasMore: false };
+      const q = query(collection(db, 'talks'), orderBy('scheduledAt', 'desc'), limit(pageSize));
+      const snap = await getDocs(q);
+      const talks = snap.docs.map((d) => ({ talkId: d.id, ...d.data() }));
+      // A full page back means there may be older talks beyond this window.
+      return { talks, hasMore: snap.docs.length >= pageSize };
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  },
+  {
+    condition: (arg, { getState }) => {
+      if (arg && arg.force) return true;
+      const talksState = getState().talks;
+      // A pending load-more must never be cancelled: requestMoreTalks has
+      // already set loadingMoreTalks and only a lifecycle action (or a
+      // realtime snapshot) clears it — a condition-cancelled dispatch fires
+      // neither, which would strand the spinner and dead-lock pagination.
+      if (talksState.loadingMoreTalks) return true;
+      const pageSize = (arg && arg.pageSize) || TALKS_PAGE_SIZE;
+      return !isTalksCacheFresh(talksState, pageSize);
+    },
   }
-});
+);
 
 export const fetchTalkById = createAsyncThunk(
   'talks/fetchById',
@@ -130,6 +158,9 @@ const talksSlice = createSlice({
     loading: false,
     loadingMoreTalks: false,
     hasMoreTalks: true,
+    // Cache metadata for the TTL condition above.
+    lastFetchedAt: null,
+    fetchedPageSize: 0,
     error: null,
     filter: 'all',
   },
@@ -172,6 +203,8 @@ const talksSlice = createSlice({
           state.allTalks = payload.talks;
           if (typeof payload.hasMore === 'boolean') state.hasMoreTalks = payload.hasMore;
         }
+        state.lastFetchedAt = Date.now();
+        state.fetchedPageSize = (action.meta?.arg && action.meta.arg.pageSize) || TALKS_PAGE_SIZE;
       })
       .addCase(fetchTalks.rejected, (state, action) => {
         state.loading = false;

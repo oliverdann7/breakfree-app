@@ -1,9 +1,18 @@
+import { configureStore } from '@reduxjs/toolkit';
 import videosReducer, {
   setActiveCategory,
   clearCurrentVideo,
   updateLocalProgress,
   isVideoLocked,
+  isVideosCacheFresh,
+  fetchVideos,
+  requestMoreVideos,
+  VIDEOS_TTL_MS,
 } from '../store/slices/videosSlice';
+
+// Force the no-backend path so the thunk's payload creator is deterministic
+// in the condition/load-more regression tests below.
+jest.mock('../services/firebase', () => ({ db: null }));
 
 // Lock semantics only apply once the IAP flow is live; force the flag on so
 // the gating logic itself stays covered.
@@ -20,6 +29,8 @@ const initialState = {
   loading: false,
   loadingMoreVideos: false,
   hasMoreVideos: true,
+  lastFetchedAt: null,
+  fetchedPageSize: 0,
   error: null,
   activeCategory: 'Tümü',
 };
@@ -163,6 +174,92 @@ describe('videosSlice', () => {
     const state = videosReducer(signedIn, { type: 'auth/logout/fulfilled' });
     expect(state.progress).toEqual({});
     expect(state.progressUid).toBeNull();
+  });
+
+  describe('isVideosCacheFresh (fetch TTL)', () => {
+    const now = 1_000_000_000;
+    const cached = {
+      ...initialState,
+      allVideos: [{ videoId: 'v1' }],
+      lastFetchedAt: now - 1000,
+      fetchedPageSize: 20,
+    };
+
+    it('is fresh within the TTL for a covered window', () => {
+      expect(isVideosCacheFresh(cached, 20, now)).toBe(true);
+    });
+
+    it('is stale once the TTL elapses', () => {
+      expect(isVideosCacheFresh(cached, 20, now + VIDEOS_TTL_MS + 1)).toBe(false);
+    });
+
+    it('is stale when a larger window is requested (load more)', () => {
+      expect(isVideosCacheFresh(cached, 40, now)).toBe(false);
+    });
+
+    it('is stale when nothing was fetched yet or the list is empty', () => {
+      expect(isVideosCacheFresh(initialState, 20, now)).toBe(false);
+      expect(isVideosCacheFresh({ ...cached, allVideos: [] }, 20, now)).toBe(false);
+    });
+  });
+
+  it('records cache metadata on fetchVideos.fulfilled', () => {
+    const state = videosReducer(initialState, {
+      type: 'videos/fetchAll/fulfilled',
+      meta: { arg: { pageSize: 40 } },
+      payload: { videos: [{ videoId: 'v1' }], hasMore: true },
+    });
+    expect(typeof state.lastFetchedAt).toBe('number');
+    expect(state.fetchedPageSize).toBe(40);
+  });
+
+  // Seeded results (dev mocks / no backend) are stand-ins: recording them as
+  // a fresh fetch would let an empty backend mask newly created real docs
+  // for a whole TTL window.
+  it('does not record cache metadata for seeded (mock/no-backend) results', () => {
+    const state = videosReducer(initialState, {
+      type: 'videos/fetchAll/fulfilled',
+      meta: { arg: { pageSize: 20 } },
+      payload: { videos: [{ videoId: 'v1' }], hasMore: false, seeded: true },
+    });
+    expect(state.allVideos).toEqual([{ videoId: 'v1' }]);
+    expect(state.lastFetchedAt).toBeNull();
+    expect(state.fetchedPageSize).toBe(0);
+  });
+
+  describe('fetch condition × load-more (regression)', () => {
+    const makeStore = (videos) =>
+      configureStore({
+        reducer: { videos: videosReducer },
+        preloadedState: { videos },
+      });
+
+    const freshState = {
+      ...initialState,
+      allVideos: [{ videoId: 'v1' }],
+      lastFetchedAt: Date.now(),
+      fetchedPageSize: 40,
+    };
+
+    it('skips the fetch entirely while the cache window is fresh', async () => {
+      const store = makeStore(freshState);
+      const result = await store.dispatch(fetchVideos({ pageSize: 20 }));
+      expect(result.meta.condition).toBe(true);
+    });
+
+    // Regression: a screen remount resets its local pageSize while the store
+    // still holds a fresh, wider window. requestMoreVideos() has already set
+    // loadingMoreVideos when the fetch dispatches; if the condition cancelled
+    // it, no lifecycle action would ever clear the flag — endless footer
+    // spinner and pagination dead for the life of the screen.
+    it('never cancels a pending load-more, so loadingMoreVideos always clears', async () => {
+      const store = makeStore(freshState);
+      store.dispatch(requestMoreVideos());
+      expect(store.getState().videos.loadingMoreVideos).toBe(true);
+      const result = await store.dispatch(fetchVideos({ pageSize: 40 }));
+      expect(result.meta.condition).not.toBe(true);
+      expect(store.getState().videos.loadingMoreVideos).toBe(false);
+    });
   });
 
   describe('isVideoLocked', () => {
