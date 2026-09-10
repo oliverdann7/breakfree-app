@@ -67,7 +67,14 @@ DENY`, `Strict-Transport-Security`, and a restrictive `Permissions-Policy`.
   `{ force: true }` always bypasses the cache; realtime listeners are
   unaffected. +12 slice tests.
 - `npm audit --omit=dev --audit-level=high` now gates CI (roadmap Phase 0
-  §3 dependency scanning); verified to pass on the current lockfile.
+  §3 dependency scanning). Getting it green meant remediating 13 high
+  advisories in the production tree: `npm audit fix` cleared most (ws,
+  axios, form-data, nanoid, js-yaml, ...), and a package.json `overrides`
+  pin dedupes metro/metro-config/metro-transform-worker to ^0.84.5 (the
+  patched line, already within react-native's declared `^0.84.3` range),
+  which also removes the vulnerable image-size copy. 15 moderate expo-chain
+  advisories remain below the gate; they clear with the next Expo SDK
+  upgrade.
 - Failed Firestore writes now surface to the user (roadmap §1.3 "retry +
   user feedback on writes"): a new dependency-free toast
   (`components/common/Toast.js` — imperative `showToast` + a `ToastHost`,
