@@ -48,8 +48,14 @@ export const fetchTalks = createAsyncThunk(
   {
     condition: (arg, { getState }) => {
       if (arg && arg.force) return true;
+      const talksState = getState().talks;
+      // A pending load-more must never be cancelled: requestMoreTalks has
+      // already set loadingMoreTalks and only a lifecycle action (or a
+      // realtime snapshot) clears it — a condition-cancelled dispatch fires
+      // neither, which would strand the spinner and dead-lock pagination.
+      if (talksState.loadingMoreTalks) return true;
       const pageSize = (arg && arg.pageSize) || TALKS_PAGE_SIZE;
-      return !isTalksCacheFresh(getState().talks, pageSize);
+      return !isTalksCacheFresh(talksState, pageSize);
     },
   }
 );

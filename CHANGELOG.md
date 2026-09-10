@@ -65,7 +65,14 @@ DENY`, `Strict-Transport-Security`, and a restrictive `Permissions-Policy`.
   thunks, backed by pure `is*CacheFresh` helpers), so re-visiting a tab no
   longer refires the same Firestore query. A grown pagination window or
   `{ force: true }` always bypasses the cache; realtime listeners are
-  unaffected. +12 slice tests.
+  unaffected. +12 slice tests. Self-review hardening: the `condition` never
+  cancels a dispatch while a load-more is pending (`requestMoreVideos` /
+  `requestMoreTalks` set the loading flag before dispatch, and only a
+  lifecycle action clears it — a cancelled dispatch would strand the footer
+  spinner and dead-lock pagination after a screen remount within the TTL),
+  and dev-seeded mock results are never recorded as a fresh fetch (an empty
+  backend no longer masks newly created real docs for a TTL window). +5
+  regression tests.
 - `npm audit --omit=dev --audit-level=high` now gates CI (roadmap Phase 0
   §3 dependency scanning). Getting it green meant remediating 13 high
   advisories in the production tree: `npm audit fix` cleared most (ws,

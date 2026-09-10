@@ -97,10 +97,13 @@ export const fetchVideos = createAsyncThunk(
   async (arg, { rejectWithValue }) => {
     const pageSize = (arg && arg.pageSize) || VIDEOS_PAGE_SIZE;
     try {
-      if (!db) return { videos: seedVideos(), hasMore: false };
+      // `seeded` marks stand-in data (dev mocks / no backend) so the reducer
+      // never records it as a fresh fetch — otherwise an empty backend would
+      // mask newly created real docs for a whole TTL window.
+      if (!db) return { videos: seedVideos(), hasMore: false, seeded: true };
       const q = query(collection(db, 'videos'), orderBy('publishedAt', 'desc'), limit(pageSize));
       const snap = await getDocs(q);
-      if (snap.empty) return { videos: seedVideos(), hasMore: false };
+      if (snap.empty) return { videos: seedVideos(), hasMore: false, seeded: true };
       const videos = snap.docs.map((d) => ({ videoId: d.id, ...d.data() }));
       // A full page back means there may be older videos beyond this window.
       return { videos, hasMore: snap.docs.length >= pageSize };
@@ -111,8 +114,14 @@ export const fetchVideos = createAsyncThunk(
   {
     condition: (arg, { getState }) => {
       if (arg && arg.force) return true;
+      const videosState = getState().videos;
+      // A pending load-more must never be cancelled: requestMoreVideos has
+      // already set loadingMoreVideos and only this thunk's lifecycle actions
+      // clear it — a condition-cancelled dispatch fires none of them, which
+      // would strand the spinner and dead-lock pagination.
+      if (videosState.loadingMoreVideos) return true;
       const pageSize = (arg && arg.pageSize) || VIDEOS_PAGE_SIZE;
-      return !isVideosCacheFresh(getState().videos, pageSize);
+      return !isVideosCacheFresh(videosState, pageSize);
     },
   }
 );
@@ -221,8 +230,13 @@ const videosSlice = createSlice({
           state.allVideos = payload.videos;
           if (typeof payload.hasMore === 'boolean') state.hasMoreVideos = payload.hasMore;
         }
-        state.lastFetchedAt = Date.now();
-        state.fetchedPageSize = (action.meta?.arg && action.meta.arg.pageSize) || VIDEOS_PAGE_SIZE;
+        // Seeded (mock / no-backend) results are stand-ins, not fetch
+        // results — recording them would let the TTL treat them as fresh.
+        if (!(payload && payload.seeded)) {
+          state.lastFetchedAt = Date.now();
+          state.fetchedPageSize =
+            (action.meta?.arg && action.meta.arg.pageSize) || VIDEOS_PAGE_SIZE;
+        }
       })
       .addCase(fetchVideos.rejected, (state, action) => {
         state.loading = false;
