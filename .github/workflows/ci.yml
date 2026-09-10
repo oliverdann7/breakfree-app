@@ -7,6 +7,18 @@ on:
     branches: [main, develop]
 
 jobs:
+  audit:
+    runs-on: ubuntu-latest
+    name: Dependency Audit
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      # Production deps only; fails on high/critical advisories. Verified to
+      # pass on the current lockfile before this gate was added.
+      - run: npm audit --omit=dev --audit-level=high
+
   lint:
     runs-on: ubuntu-latest
     name: Lint

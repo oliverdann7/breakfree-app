@@ -80,20 +80,42 @@ const seedVideos = () => (__DEV__ ? MOCK_VIDEOS : []);
 // nears the end of the grid (same windowed pattern as the community feed).
 export const VIDEOS_PAGE_SIZE = 20;
 
-export const fetchVideos = createAsyncThunk('videos/fetchAll', async (arg, { rejectWithValue }) => {
-  const pageSize = (arg && arg.pageSize) || VIDEOS_PAGE_SIZE;
-  try {
-    if (!db) return { videos: seedVideos(), hasMore: false };
-    const q = query(collection(db, 'videos'), orderBy('publishedAt', 'desc'), limit(pageSize));
-    const snap = await getDocs(q);
-    if (snap.empty) return { videos: seedVideos(), hasMore: false };
-    const videos = snap.docs.map((d) => ({ videoId: d.id, ...d.data() }));
-    // A full page back means there may be older videos beyond this window.
-    return { videos, hasMore: snap.docs.length >= pageSize };
-  } catch (error) {
-    return rejectWithValue(error.message);
+// Roadmap §1.3 cache TTL: skip refetching the catalog on every screen mount
+// while the last successful fetch is this recent (and covered the requested
+// window). Pass { force: true } to bypass.
+export const VIDEOS_TTL_MS = 5 * 60 * 1000;
+
+// Pure so the slice tests can cover the skip logic without a store.
+export const isVideosCacheFresh = (videosState, pageSize, now = Date.now()) =>
+  Boolean(videosState.lastFetchedAt) &&
+  now - videosState.lastFetchedAt < VIDEOS_TTL_MS &&
+  videosState.allVideos.length > 0 &&
+  pageSize <= videosState.fetchedPageSize;
+
+export const fetchVideos = createAsyncThunk(
+  'videos/fetchAll',
+  async (arg, { rejectWithValue }) => {
+    const pageSize = (arg && arg.pageSize) || VIDEOS_PAGE_SIZE;
+    try {
+      if (!db) return { videos: seedVideos(), hasMore: false };
+      const q = query(collection(db, 'videos'), orderBy('publishedAt', 'desc'), limit(pageSize));
+      const snap = await getDocs(q);
+      if (snap.empty) return { videos: seedVideos(), hasMore: false };
+      const videos = snap.docs.map((d) => ({ videoId: d.id, ...d.data() }));
+      // A full page back means there may be older videos beyond this window.
+      return { videos, hasMore: snap.docs.length >= pageSize };
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  },
+  {
+    condition: (arg, { getState }) => {
+      if (arg && arg.force) return true;
+      const pageSize = (arg && arg.pageSize) || VIDEOS_PAGE_SIZE;
+      return !isVideosCacheFresh(getState().videos, pageSize);
+    },
   }
-});
+);
 
 export const fetchVideoById = createAsyncThunk(
   'videos/fetchById',
@@ -160,6 +182,9 @@ const videosSlice = createSlice({
     loading: false,
     loadingMoreVideos: false,
     hasMoreVideos: true,
+    // Cache metadata for the TTL condition above.
+    lastFetchedAt: null,
+    fetchedPageSize: 0,
     error: null,
     activeCategory: 'Tümü',
   },
@@ -196,6 +221,8 @@ const videosSlice = createSlice({
           state.allVideos = payload.videos;
           if (typeof payload.hasMore === 'boolean') state.hasMoreVideos = payload.hasMore;
         }
+        state.lastFetchedAt = Date.now();
+        state.fetchedPageSize = (action.meta?.arg && action.meta.arg.pageSize) || VIDEOS_PAGE_SIZE;
       })
       .addCase(fetchVideos.rejected, (state, action) => {
         state.loading = false;

@@ -3,6 +3,8 @@ import videosReducer, {
   clearCurrentVideo,
   updateLocalProgress,
   isVideoLocked,
+  isVideosCacheFresh,
+  VIDEOS_TTL_MS,
 } from '../store/slices/videosSlice';
 
 // Lock semantics only apply once the IAP flow is live; force the flag on so
@@ -20,6 +22,8 @@ const initialState = {
   loading: false,
   loadingMoreVideos: false,
   hasMoreVideos: true,
+  lastFetchedAt: null,
+  fetchedPageSize: 0,
   error: null,
   activeCategory: 'Tümü',
 };
@@ -163,6 +167,43 @@ describe('videosSlice', () => {
     const state = videosReducer(signedIn, { type: 'auth/logout/fulfilled' });
     expect(state.progress).toEqual({});
     expect(state.progressUid).toBeNull();
+  });
+
+  describe('isVideosCacheFresh (fetch TTL)', () => {
+    const now = 1_000_000_000;
+    const cached = {
+      ...initialState,
+      allVideos: [{ videoId: 'v1' }],
+      lastFetchedAt: now - 1000,
+      fetchedPageSize: 20,
+    };
+
+    it('is fresh within the TTL for a covered window', () => {
+      expect(isVideosCacheFresh(cached, 20, now)).toBe(true);
+    });
+
+    it('is stale once the TTL elapses', () => {
+      expect(isVideosCacheFresh(cached, 20, now + VIDEOS_TTL_MS + 1)).toBe(false);
+    });
+
+    it('is stale when a larger window is requested (load more)', () => {
+      expect(isVideosCacheFresh(cached, 40, now)).toBe(false);
+    });
+
+    it('is stale when nothing was fetched yet or the list is empty', () => {
+      expect(isVideosCacheFresh(initialState, 20, now)).toBe(false);
+      expect(isVideosCacheFresh({ ...cached, allVideos: [] }, 20, now)).toBe(false);
+    });
+  });
+
+  it('records cache metadata on fetchVideos.fulfilled', () => {
+    const state = videosReducer(initialState, {
+      type: 'videos/fetchAll/fulfilled',
+      meta: { arg: { pageSize: 40 } },
+      payload: { videos: [{ videoId: 'v1' }], hasMore: true },
+    });
+    expect(typeof state.lastFetchedAt).toBe('number');
+    expect(state.fetchedPageSize).toBe(40);
   });
 
   describe('isVideoLocked', () => {

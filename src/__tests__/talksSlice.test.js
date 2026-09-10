@@ -2,6 +2,8 @@ import talksReducer, {
   setFilter,
   clearCurrentTalk,
   realtimeTalksUpdate,
+  isTalksCacheFresh,
+  TALKS_TTL_MS,
 } from '../store/slices/talksSlice';
 
 const initialState = {
@@ -10,6 +12,8 @@ const initialState = {
   loading: false,
   loadingMoreTalks: false,
   hasMoreTalks: true,
+  lastFetchedAt: null,
+  fetchedPageSize: 0,
   error: null,
   filter: 'all',
 };
@@ -116,6 +120,39 @@ describe('talksSlice', () => {
     });
     expect(state.loading).toBe(false);
     expect(state.error).toBe('Talk not found');
+  });
+
+  describe('isTalksCacheFresh (fetch TTL)', () => {
+    const now = 1_000_000_000;
+    const cached = {
+      ...initialState,
+      allTalks: [{ talkId: 't1' }],
+      lastFetchedAt: now - 1000,
+      fetchedPageSize: 20,
+    };
+
+    it('is fresh within the TTL for a covered window', () => {
+      expect(isTalksCacheFresh(cached, 20, now)).toBe(true);
+    });
+
+    it('is stale once the TTL elapses', () => {
+      expect(isTalksCacheFresh(cached, 20, now + TALKS_TTL_MS + 1)).toBe(false);
+    });
+
+    it('is stale when a larger window is requested or the list is empty', () => {
+      expect(isTalksCacheFresh(cached, 40, now)).toBe(false);
+      expect(isTalksCacheFresh({ ...cached, allTalks: [] }, 20, now)).toBe(false);
+    });
+  });
+
+  it('records cache metadata on fetchTalks.fulfilled', () => {
+    const state = talksReducer(initialState, {
+      type: 'talks/fetchAll/fulfilled',
+      meta: { arg: { pageSize: 40 } },
+      payload: { talks: [{ talkId: 't1' }], hasMore: true },
+    });
+    expect(typeof state.lastFetchedAt).toBe('number');
+    expect(state.fetchedPageSize).toBe(40);
   });
 
   it('handles seedTalks.fulfilled', () => {

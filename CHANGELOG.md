@@ -59,6 +59,15 @@ DENY`, `Strict-Transport-Security`, and a restrictive `Permissions-Policy`.
 
 ### Added
 
+- Fetch cache TTLs (roadmap §1.3, closing the resilience line): the videos
+  catalog, mentor directory, and the talks non-realtime fetch path now skip
+  refetching for 5 minutes after a successful fetch (`condition` on the
+  thunks, backed by pure `is*CacheFresh` helpers), so re-visiting a tab no
+  longer refires the same Firestore query. A grown pagination window or
+  `{ force: true }` always bypasses the cache; realtime listeners are
+  unaffected. +12 slice tests.
+- `npm audit --omit=dev --audit-level=high` now gates CI (roadmap Phase 0
+  §3 dependency scanning); verified to pass on the current lockfile.
 - Failed Firestore writes now surface to the user (roadmap §1.3 "retry +
   user feedback on writes"): a new dependency-free toast
   (`components/common/Toast.js` — imperative `showToast` + a `ToastHost`,

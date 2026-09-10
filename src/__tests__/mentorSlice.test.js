@@ -1,9 +1,10 @@
-import mentorReducer from '../store/slices/mentorSlice';
+import mentorReducer, { isMentorsCacheFresh, MENTORS_TTL_MS } from '../store/slices/mentorSlice';
 
 const initialState = {
   assignment: null,
   mentorProfile: null,
   allMentors: [],
+  mentorsFetchedAt: null,
   latestMessage: null,
   messages: [],
   goals: [],
@@ -12,6 +13,28 @@ const initialState = {
   loading: false,
   error: null,
 };
+
+describe('isMentorsCacheFresh (fetch TTL)', () => {
+  const now = 1_000_000_000;
+  const cached = { ...initialState, allMentors: [{ id: 'm1' }], mentorsFetchedAt: now - 1000 };
+
+  it('is fresh within the TTL', () => {
+    expect(isMentorsCacheFresh(cached, now)).toBe(true);
+  });
+
+  it('is stale once the TTL elapses or nothing was fetched', () => {
+    expect(isMentorsCacheFresh(cached, now + MENTORS_TTL_MS + 1)).toBe(false);
+    expect(isMentorsCacheFresh(initialState, now)).toBe(false);
+  });
+
+  it('records the fetch time on fetchAllMentors.fulfilled', () => {
+    const state = mentorReducer(initialState, {
+      type: 'mentor/fetchAll/fulfilled',
+      payload: [{ id: 'm1' }],
+    });
+    expect(typeof state.mentorsFetchedAt).toBe('number');
+  });
+});
 
 describe('mentorSlice', () => {
   it('returns initial state', () => {

@@ -88,6 +88,17 @@ export const fetchMentorAssignment = createAsyncThunk(
   }
 );
 
+// Roadmap §1.3 cache TTL: the mentor directory changes rarely, so skip
+// refetching it on every mount while the last fetch is this recent. Pass
+// { force: true } to bypass.
+export const MENTORS_TTL_MS = 5 * 60 * 1000;
+
+// Pure so the slice tests can cover the skip logic without a store.
+export const isMentorsCacheFresh = (mentorState, now = Date.now()) =>
+  Boolean(mentorState.mentorsFetchedAt) &&
+  now - mentorState.mentorsFetchedAt < MENTORS_TTL_MS &&
+  mentorState.allMentors.length > 0;
+
 export const fetchAllMentors = createAsyncThunk(
   'mentor/fetchAll',
   async (_, { rejectWithValue }) => {
@@ -98,6 +109,12 @@ export const fetchAllMentors = createAsyncThunk(
     } catch (error) {
       return rejectWithValue(error.message);
     }
+  },
+  {
+    condition: (arg, { getState }) => {
+      if (arg && arg.force) return true;
+      return !isMentorsCacheFresh(getState().mentor);
+    },
   }
 );
 
@@ -195,6 +212,8 @@ const mentorSlice = createSlice({
     assignment: null,
     mentorProfile: null,
     allMentors: [],
+    // Cache metadata for the fetchAllMentors TTL condition.
+    mentorsFetchedAt: null,
     latestMessage: null,
     messages: [],
     goals: [],
@@ -228,6 +247,7 @@ const mentorSlice = createSlice({
       })
       .addCase(fetchAllMentors.fulfilled, (state, action) => {
         state.allMentors = action.payload;
+        state.mentorsFetchedAt = Date.now();
       })
       .addCase(fetchLatestMessage.fulfilled, (state, action) => {
         state.latestMessage = action.payload;
