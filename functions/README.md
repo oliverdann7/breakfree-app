@@ -4,15 +4,15 @@ Firebase Cloud Functions backing the Phase 2 + Phase 3 features.
 
 ## Functions
 
-| Name | Type | Purpose |
-| --- | --- | --- |
-| `mintAgoraToken` | Callable | Mint short-lived Agora RTC token for live talks. |
-| `revenueCatWebhook` | HTTPS | Receive RevenueCat subscription events → mirror to Firestore. |
-| `onMetricUpdated` | Firestore trigger | Recompute leaderboard when a participant's progress changes. |
-| `recomputeLeaderboard` | Callable (admin) | Manual leaderboard rebuild. |
-| `scheduledBackup` | Cron (24h) | Daily Firestore export to Cloud Storage. |
-| `onNotificationCreated` | Firestore trigger | Fan out Expo push for new in-app notifications. |
-| `processPrivacyRequest` | Firestore trigger | Fulfill KVKK/GDPR export / delete requests. |
+| Name                    | Type              | Purpose                                                       |
+| ----------------------- | ----------------- | ------------------------------------------------------------- |
+| `mintAgoraToken`        | Callable          | Mint short-lived Agora RTC token for live talks.              |
+| `revenueCatWebhook`     | HTTPS             | Receive RevenueCat subscription events → mirror to Firestore. |
+| `onMetricUpdated`       | Firestore trigger | Recompute leaderboard when a participant's progress changes.  |
+| `recomputeLeaderboard`  | Callable (admin)  | Manual leaderboard rebuild.                                   |
+| `scheduledBackup`       | Cron (24h)        | Daily Firestore export to Cloud Storage.                      |
+| `onNotificationCreated` | Firestore trigger | Fan out Expo push for new in-app notifications.               |
+| `processPrivacyRequest` | Firestore trigger | Fulfill KVKK/GDPR export / delete requests.                   |
 
 ## Setup
 

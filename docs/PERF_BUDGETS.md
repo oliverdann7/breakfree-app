@@ -5,19 +5,19 @@ guardrails, not floors — CI fails when a PR regresses any metric by > 10%.
 
 ## Targets
 
-| Metric | Target | Stretch | Measured how |
-| --- | --- | --- | --- |
-| App startup (cold) | < 2.0s | < 1.5s | Sentry App Start span |
-| Time to interactive (web) | < 2.5s | < 2.0s | Lighthouse CI |
-| First Contentful Paint (web) | < 1.5s | < 1.2s | Lighthouse CI |
-| Screen transition | < 300ms | < 200ms | Sentry navigation span |
-| API call p95 | < 500ms | < 300ms | Sentry HTTP span |
-| Talks audio join latency | < 1.5s | < 1.0s | Agora dashboard |
-| List scroll FPS (FlatList) | > 55 | 60 | RN Perf Monitor |
-| App bundle (native) | < 80 MB | < 60 MB | EAS artifact size |
-| App bundle (web initial) | < 2 MB | < 1.5 MB | `expo export` analyze |
-| Cold cache image load | < 800ms | < 500ms | Sentry resource span |
-| Crash-free sessions | > 99.5% | > 99.8% | Sentry / Crashlytics |
+| Metric                       | Target  | Stretch  | Measured how           |
+| ---------------------------- | ------- | -------- | ---------------------- |
+| App startup (cold)           | < 2.0s  | < 1.5s   | Sentry App Start span  |
+| Time to interactive (web)    | < 2.5s  | < 2.0s   | Lighthouse CI          |
+| First Contentful Paint (web) | < 1.5s  | < 1.2s   | Lighthouse CI          |
+| Screen transition            | < 300ms | < 200ms  | Sentry navigation span |
+| API call p95                 | < 500ms | < 300ms  | Sentry HTTP span       |
+| Talks audio join latency     | < 1.5s  | < 1.0s   | Agora dashboard        |
+| List scroll FPS (FlatList)   | > 55    | 60       | RN Perf Monitor        |
+| App bundle (native)          | < 80 MB | < 60 MB  | EAS artifact size      |
+| App bundle (web initial)     | < 2 MB  | < 1.5 MB | `expo export` analyze  |
+| Cold cache image load        | < 800ms | < 500ms  | Sentry resource span   |
+| Crash-free sessions          | > 99.5% | > 99.8%  | Sentry / Crashlytics   |
 
 ## How CI enforces
 

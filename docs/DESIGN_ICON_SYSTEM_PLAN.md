@@ -51,19 +51,19 @@ _Last updated: 2026-08-26_
   `aria-hidden` (decorative; adjacent text labels carry meaning).
 - All UI-chrome emoji in the dashboard replaced with icons:
 
-  | Location | Before | After |
-  |---|---|---|
-  | Sidebar / bottom nav tabs | 🏠 🎧 ❤️ 👥 👤 | `home` `headphones` `heart` `users` `user` |
-  | Header notification | 🔔 | `bell` |
-  | Talks category badges | 🧠 🏃 🌙 🥗 🎯 | `brain` `activity` `moon` `apple` `target` |
-  | Talks empty state / listen CTA | 🎧 | `headphones` |
-  | Profile settings rows | 🌍 🔔 📏 🔒 › | `globe` `bell` `ruler` `lock` `chevronRight` |
-  | Logout | 🚪 | `logout` |
-  | Home metric cards | 😴 ❤️ 👟 🔥 | `moon` `heart` `footprints` `flame` |
-  | Home plan rows | 🧘 💪 🎙 ✓ → 📋 | `flower` `dumbbell` `mic` `check` `arrowRight` `clipboard` |
-  | Health breakdown / AI insight | 😴 👟 🧘 🔥 ✨ | `moon` `footprints` `flower` `flame` `sparkles` |
-  | Community stats / actions | ⭐ 👟 😴 ❤️ 🤍 💬 ▲▼ 🏆 → | `star` `footprints` `moon` `heart(filled)` `messageCircle` `chevronUp/Down` `trophy` `arrowRight` |
-  | Metric logger labels / close | 😴 ❤️ 👟 🔥 ✨ ✕ | `moon` `heart` `footprints` `flame` `sparkles` `x` |
+  | Location                       | Before                    | After                                                                                             |
+  | ------------------------------ | ------------------------- | ------------------------------------------------------------------------------------------------- |
+  | Sidebar / bottom nav tabs      | 🏠 🎧 ❤️ 👥 👤            | `home` `headphones` `heart` `users` `user`                                                        |
+  | Header notification            | 🔔                        | `bell`                                                                                            |
+  | Talks category badges          | 🧠 🏃 🌙 🥗 🎯            | `brain` `activity` `moon` `apple` `target`                                                        |
+  | Talks empty state / listen CTA | 🎧                        | `headphones`                                                                                      |
+  | Profile settings rows          | 🌍 🔔 📏 🔒 ›             | `globe` `bell` `ruler` `lock` `chevronRight`                                                      |
+  | Logout                         | 🚪                        | `logout`                                                                                          |
+  | Home metric cards              | 😴 ❤️ 👟 🔥               | `moon` `heart` `footprints` `flame`                                                               |
+  | Home plan rows                 | 🧘 💪 🎙 ✓ → 📋           | `flower` `dumbbell` `mic` `check` `arrowRight` `clipboard`                                        |
+  | Health breakdown / AI insight  | 😴 👟 🧘 🔥 ✨            | `moon` `footprints` `flower` `flame` `sparkles`                                                   |
+  | Community stats / actions      | ⭐ 👟 😴 ❤️ 🤍 💬 ▲▼ 🏆 → | `star` `footprints` `moon` `heart(filled)` `messageCircle` `chevronUp/Down` `trophy` `arrowRight` |
+  | Metric logger labels / close   | 😴 ❤️ 👟 🔥 ✨ ✕          | `moon` `heart` `footprints` `flame` `sparkles` `x`                                                |
 
 - **Deliberately kept as emoji:** community avatars (`AVATAR_EMOJIS`) and emoji
   typed inside user posts — that is user-generated content, not UI chrome.
@@ -86,11 +86,13 @@ _Last updated: 2026-08-26_
 ## 4. Roll-out plan for the rest of the app
 
 ### Phase 2 — Landing page (`src/components/BreakFreeLanding.jsx`) — DONE
+
 - Feature-card emoji, stat chips, ★ ratings, ✓ bullets and → arrows replaced
   with `Icon` components; auth modals' ✕ close buttons and the Legal/Admin
   "←" back links use `x`/`arrowLeft`.
 
 ### Phase 3 — Native app (React Native screens) — DONE
+
 - The registry was extracted to a platform-neutral module,
   `src/components/icons/paths.js` (plain path/circle/rect data). Two thin
   renderers consume it: `src/components/web/Icons.jsx` (DOM `<svg>`) and
@@ -106,11 +108,12 @@ _Last updated: 2026-08-26_
 - Deliberately still emoji (content, not chrome): user avatars
   (`AVATAR_EMOJIS`, `avatarEmoji`), emoji inside user posts, the mood-face
   scale in `HealthMetricsScreen` (😞…😄 — an affective scale, not an icon),
-  and `challenge.icon` values stored in Firestore (the *fallback* is now the
+  and `challenge.icon` values stored in Firestore (the _fallback_ is now the
   `trophy` icon). The Google/Apple login buttons dropped their placeholder
   emoji; proper brand SVGs can be added later if wanted.
 
 ### Phase 4 — Avatars (product decision, not a bug)
+
 - Community avatars are emoji chosen by users and stored in Firestore
   (`avatarEmoji`). Long-term options: (a) keep emoji avatars as a playful
   brand element, (b) curated SVG avatar set, (c) photo uploads (needs storage
@@ -118,6 +121,7 @@ _Last updated: 2026-08-26_
   decided.
 
 ### Phase 5 — QA / regression — DONE (automatable parts)
+
 - `npm run build:web` verified: `dist/index.html` carries the dark
   `expo-reset` block from `public/index.html`. ✔
 - Headless-browser QA on the built export at 1440×900 and 375×812 (full-page,

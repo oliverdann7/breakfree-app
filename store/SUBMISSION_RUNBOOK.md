@@ -31,7 +31,7 @@ hours of console work plus review wait time (1–3 days per store).
    `com.breakfree.app`). Download:
    - `GoogleService-Info.plist` → repo root; add `"ios": { "googleServicesFile": "./GoogleService-Info.plist" }`
    - `google-services.json` → repo root; add `"android": { "googleServicesFile": "./google-services.json" }`
-   Both files are gitignored — also upload them as EAS secrets:
+     Both files are gitignored — also upload them as EAS secrets:
    ```bash
    eas env:create --name GOOGLE_SERVICES_JSON --type file --value ./google-services.json
    ```
@@ -43,9 +43,12 @@ hours of console work plus review wait time (1–3 days per store).
 8. **Google Sign-In (iOS)**: from the Firebase iOS app config take the
    `REVERSED_CLIENT_ID` and add to `app.json` plugins:
    ```json
-   ["@react-native-google-signin/google-signin", { "iosUrlScheme": "com.googleusercontent.apps.XXXX" }]
+   [
+     "@react-native-google-signin/google-signin",
+     { "iosUrlScheme": "com.googleusercontent.apps.XXXX" }
+   ]
    ```
-   Set `EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID` (the *Web* client id from Google
+   Set `EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID` (the _Web_ client id from Google
    Cloud console) as an EAS env var for all build profiles. Android needs
    the SHA-1 of the EAS keystore registered in Firebase: get it from
    `eas credentials`, paste into Firebase Android app settings.
@@ -111,7 +114,7 @@ hours of console work plus review wait time (1–3 days per store).
     ```
     Android goes to the **internal** track first (per `eas.json`) — promote
     internal → closed → production in the console after testing. Google
-    requires 12+ testers for 14 days for *personal* (new individual)
+    requires 12+ testers for 14 days for _personal_ (new individual)
     accounts — if that applies, recruit testers via the internal track link.
 
 ## Phase E — After approval
@@ -124,13 +127,14 @@ hours of console work plus review wait time (1–3 days per store).
 
 ## Deliberately disabled at launch (re-enable later)
 
-| Feature | Flag | Unblock |
-| --- | --- | --- |
+| Feature                    | Flag                        | Unblock                                                                                                                                                                                                          |
+| -------------------------- | --------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Pro subscription / paywall | `premiumSubscription` (off) | Integrate `react-native-purchases` (RevenueCat), create products in both consoles, add Restore Purchases + Terms links to PremiumScreen, then set `EXPO_PUBLIC_FF_PREMIUM=true`. Server webhook is already live. |
-| Live audio talks | `liveAudioTalks` (off) | Add `react-native-agora` + config plugin; token minting function already deployed. |
-| Wearable sync | `wearableSync` (off) | Add HealthKit/Health Connect module behind `healthService`; update privacy labels/data safety forms when it ships. |
+| Live audio talks           | `liveAudioTalks` (off)      | Add `react-native-agora` + config plugin; token minting function already deployed.                                                                                                                               |
+| Wearable sync              | `wearableSync` (off)        | Add HealthKit/Health Connect module behind `healthService`; update privacy labels/data safety forms when it ships.                                                                                               |
 
 ## Known follow-ups (not blockers)
+
 - Android notification small icon: add a white-on-transparent 96×96 PNG and
   set it via the `expo-notifications` plugin options (currently the app icon
   is used, which renders as a flat silhouette).

@@ -4,20 +4,20 @@ Capture once per release. All images PNG, no transparency.
 
 ## iOS sizes (App Store Connect)
 
-| Display | Size | Required? |
-| --- | --- | --- |
-| 6.7" (iPhone 15 Pro Max) | 1290 × 2796 | ✅ |
-| 6.5" (iPhone 14 Plus) | 1284 × 2778 | ✅ |
-| 5.5" (iPhone 8 Plus) | 1242 × 2208 | optional |
-| 12.9" iPad Pro | 2048 × 2732 | only if iPad supported |
+| Display                  | Size        | Required?              |
+| ------------------------ | ----------- | ---------------------- |
+| 6.7" (iPhone 15 Pro Max) | 1290 × 2796 | ✅                     |
+| 6.5" (iPhone 14 Plus)    | 1284 × 2778 | ✅                     |
+| 5.5" (iPhone 8 Plus)     | 1242 × 2208 | optional               |
+| 12.9" iPad Pro           | 2048 × 2732 | only if iPad supported |
 
 ## Android sizes (Google Play Console)
 
-| Display | Size | Required? |
-| --- | --- | --- |
-| Phone | 1080 × 1920 (min) | ✅ |
-| 7" tablet | 1200 × 1920 | optional |
-| 10" tablet | 1920 × 1200 | optional |
+| Display    | Size              | Required? |
+| ---------- | ----------------- | --------- |
+| Phone      | 1080 × 1920 (min) | ✅        |
+| 7" tablet  | 1200 × 1920       | optional  |
+| 10" tablet | 1920 × 1200       | optional  |
 
 ## Shots to capture (8 total per size)
 

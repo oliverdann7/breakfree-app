@@ -27,6 +27,7 @@ Notify us at security@breakfree.tr of any compromise.
 ## 5. Acceptable use
 
 You agree not to:
+
 - Harass other users or post hateful/violent content.
 - Impersonate professionals (mentors, doctors) without verification.
 - Scrape, reverse-engineer, or interfere with the service.

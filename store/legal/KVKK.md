@@ -22,13 +22,13 @@ hazırlanmış aydınlatma metnidir.
 
 ## 3. Aktarım
 
-| Alıcı | Amaç | Lokasyon |
-| --- | --- | --- |
+| Alıcı                   | Amaç                         | Lokasyon |
+| ----------------------- | ---------------------------- | -------- |
 | Firebase / Google Cloud | barındırma, kimlik doğrulama | AB + ABD |
-| RevenueCat / Stripe | ödeme | AB + ABD |
-| Agora.io | canlı ses yayını | global |
-| Sentry | hata teşhisi | AB |
-| Apple / Google | uygulama dağıtımı, ödeme | global |
+| RevenueCat / Stripe     | ödeme                        | AB + ABD |
+| Agora.io                | canlı ses yayını             | global   |
+| Sentry                  | hata teşhisi                 | AB       |
+| Apple / Google          | uygulama dağıtımı, ödeme     | global   |
 
 Yurtdışı aktarım için açık rızanız alınır; Veri Sorumluları Sicili (VERBİS)
 kaydımız tamamlandığında bu sayfada belirtilir.

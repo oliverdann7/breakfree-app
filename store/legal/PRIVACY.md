@@ -10,15 +10,15 @@ Kanunu, Law No. 6698).
 
 ## 1. Data we collect
 
-| Category | Examples | Source |
-| --- | --- | --- |
-| Account | email, display name, avatar, language | you |
-| Health metrics | sleep, steps, heart rate, hydration, mood | wearables (Apple Health, Google Fit, Garmin), manual entry |
-| Community | posts, comments, likes, challenge participation | you |
-| Mentor sessions | bookings, chat messages, notes, goals | you, mentors |
-| Subscription | plan, renewal date, payment provider id | RevenueCat / Stripe / App Store / Play Store |
-| Device | OS, app version, push token, IP | device |
-| Analytics | screen views, feature usage | device |
+| Category        | Examples                                        | Source                                                     |
+| --------------- | ----------------------------------------------- | ---------------------------------------------------------- |
+| Account         | email, display name, avatar, language           | you                                                        |
+| Health metrics  | sleep, steps, heart rate, hydration, mood       | wearables (Apple Health, Google Fit, Garmin), manual entry |
+| Community       | posts, comments, likes, challenge participation | you                                                        |
+| Mentor sessions | bookings, chat messages, notes, goals           | you, mentors                                               |
+| Subscription    | plan, renewal date, payment provider id         | RevenueCat / Stripe / App Store / Play Store               |
+| Device          | OS, app version, push token, IP                 | device                                                     |
+| Analytics       | screen views, feature usage                     | device                                                     |
 
 We do not collect: payment card numbers (handled by Stripe/Apple/Google), exact location, contacts, microphone audio outside live talks.
 
@@ -40,13 +40,13 @@ We do not sell your data. We do not use it to train third-party AI models.
 
 ## 4. Sharing
 
-| Recipient | Purpose | Region |
-| --- | --- | --- |
-| Firebase / Google Cloud | hosting, auth, storage | EU + USA |
-| RevenueCat / Stripe / Apple / Google | payments | EU + USA |
-| Agora.io | live audio for talks | global |
-| Sentry | crash diagnostics | EU |
-| Expo | push delivery | USA |
+| Recipient                            | Purpose                | Region   |
+| ------------------------------------ | ---------------------- | -------- |
+| Firebase / Google Cloud              | hosting, auth, storage | EU + USA |
+| RevenueCat / Stripe / Apple / Google | payments               | EU + USA |
+| Agora.io                             | live audio for talks   | global   |
+| Sentry                               | crash diagnostics      | EU       |
+| Expo                                 | push delivery          | USA      |
 
 International transfers rely on Standard Contractual Clauses (SCCs) where applicable.
 
