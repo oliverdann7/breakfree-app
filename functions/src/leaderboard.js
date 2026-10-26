@@ -11,9 +11,10 @@ exports.onMetricUpdated = functions.firestore
     return recompute(after.challengeId);
   });
 
-// Manual recompute callable (admin only).
+// Manual recompute callable (admin only). `isAdmin` is the one admin custom
+// claim used everywhere (firestore.rules isAdmin(), AdminPage, set-admin script).
 exports.recomputeLeaderboard = functions.https.onCall(async (data, context) => {
-  if (!context.auth?.token?.admin) {
+  if (context.auth?.token?.isAdmin !== true) {
     throw new functions.https.HttpsError('permission-denied', 'Admin only');
   }
   const { challengeId } = data || {};

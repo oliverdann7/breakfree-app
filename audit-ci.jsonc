@@ -1,0 +1,18 @@
+{
+  // Production-dependency audit gate (CI "Dependency Audit" job). Fails on any
+  // high/critical advisory EXCEPT the ones allowlisted below. Every entry must
+  // say why it can't be fixed and where it lives; revisit on each Expo/Firebase
+  // upgrade and delete entries as soon as `npm audit` stops reporting them.
+  "$schema": "https://github.com/IBM/audit-ci/raw/main/docs/schema.json",
+  "high": true,
+  "skip-dev": true,
+  "allowlist": [
+    // node-forge: no patched release exists (all versions affected). Pulled in
+    // only by expo's CLI (@expo/cli, @expo/code-signing-certificates) for
+    // build-time code signing; never bundled into the app or web build.
+    "GHSA-86w9-cpqp-85rv",
+    // zod <4.6.6: @expo/cli pins zod 3.x (3.25.76 is the last 3.x). CLI-only,
+    // validates local config; not shipped to users. Clears when Expo moves to zod 4.
+    "GHSA-mrhx-c7xc-m3w5",
+  ],
+}

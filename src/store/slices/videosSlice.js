@@ -11,6 +11,7 @@ import {
 } from 'firebase/firestore';
 import { db } from '../../services/firebase';
 import { isEnabled } from '../../constants/featureFlags';
+import { getSource } from '../../utils/videoSource';
 import { logout } from './authSlice';
 
 // Each video declares a provider-agnostic `source` + `sourceId` (see
@@ -133,7 +134,20 @@ export const fetchVideoById = createAsyncThunk(
       if (!db) return seedVideos().find((v) => v.videoId === videoId) || null;
       const snap = await getDoc(doc(db, 'videos', videoId));
       if (!snap.exists()) throw new Error('Video not found');
-      return { videoId: snap.id, ...snap.data() };
+      const video = { videoId: snap.id, ...snap.data() };
+      // Pro videos keep their playback fields in a gated subdoc (see
+      // utils/videoSource.splitPlaybackFields). A denied read just means the
+      // viewer isn't entitled — return the catalog entry and the player stays
+      // locked/unplayable.
+      if (!getSource(video)) {
+        try {
+          const playback = await getDoc(doc(db, 'videos', videoId, 'playback', 'current'));
+          if (playback.exists()) Object.assign(video, playback.data());
+        } catch (_err) {
+          // permission-denied → not entitled
+        }
+      }
+      return video;
     } catch (error) {
       return rejectWithValue(error.message);
     }

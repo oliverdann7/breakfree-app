@@ -18,12 +18,12 @@ Acknowledge in PagerDuty within 5 min. Post `:eyes:` in `#bf-oncall` Slack.
 
 ## 2. Severity classes
 
-| Sev | Definition | Examples | Response target |
-| --- | --- | --- | --- |
-| Sev 1 | All users blocked | Auth down, app won't open, payments broken | Page primary + secondary, war-room within 10m |
-| Sev 2 | Major feature broken for many | Talks audio fails, push not delivering | Primary on-call, fix within 4h |
-| Sev 3 | Minor regression or degraded UX | Slow chart render, one talk audio glitch | Track in Linear, fix within 2 business days |
-| Sev 4 | Cosmetic / single-user | Layout typo, edge-case crash | Backlog |
+| Sev   | Definition                      | Examples                                   | Response target                               |
+| ----- | ------------------------------- | ------------------------------------------ | --------------------------------------------- |
+| Sev 1 | All users blocked               | Auth down, app won't open, payments broken | Page primary + secondary, war-room within 10m |
+| Sev 2 | Major feature broken for many   | Talks audio fails, push not delivering     | Primary on-call, fix within 4h                |
+| Sev 3 | Minor regression or degraded UX | Slow chart render, one talk audio glitch   | Track in Linear, fix within 2 business days   |
+| Sev 4 | Cosmetic / single-user          | Layout typo, edge-case crash               | Backlog                                       |
 
 ## 3. Hotfix flow
 
@@ -47,27 +47,32 @@ Acknowledge in PagerDuty within 5 min. Post `:eyes:` in `#bf-oncall` Slack.
 ## 5. Common incidents
 
 ### App won't sign in
+
 1. Firebase Status → Auth.
 2. Sentry → search "auth/" errors last 30m.
 3. Try anonymous sign-in via console. If broken globally → Firebase support.
 4. If only Apple/Google sign-in: check OAuth client config didn't expire.
 
 ### Live talks audio drops
+
 1. Agora dashboard → channel quality.
 2. Verify `mintAgoraToken` 200s in Functions logs.
 3. Cert rotated? Re-set `firebase functions:config:set agora.app_certificate=...` and redeploy.
 
 ### Payments failing
+
 1. RevenueCat → Webhook deliveries. Re-deliver failed events.
 2. Stripe dashboard → recent disputes / declines.
 3. App Store / Play receipt validation errors → check shared secret.
 
 ### Push not delivering
+
 1. Expo push receipts: `expo push:receipt`.
 2. Check `onNotificationCreated` Function logs.
 3. Verify `users/{uid}.pushToken` is recent (< 30d).
 
 ### KVKK / GDPR request not processed
+
 1. `users/{uid}/privacy_requests` doc → `status` field.
 2. Function logs `processPrivacyRequest` for error.
 3. If `delete` stuck in `pending_cooloff`, that's normal — purges after 30d via scheduled job.
@@ -75,6 +80,7 @@ Acknowledge in PagerDuty within 5 min. Post `:eyes:` in `#bf-oncall` Slack.
 ## 6. Firestore schema changes
 
 Forward-only. Strategy:
+
 1. Write new field alongside old.
 2. Backfill via one-shot Cloud Function.
 3. Update reads to prefer new.
@@ -100,15 +106,15 @@ Never rename. Never drop without staged removal.
 
 ## 9. Contact list
 
-| Service | Account | Owner |
-| --- | --- | --- |
-| Firebase / GCP | breakfree-prod | TBD |
-| Vercel | breakfree-web | TBD |
-| RevenueCat | breakfree | TBD |
-| Agora.io | breakfree | TBD |
-| Sentry | breakfree-org | TBD |
-| Apple Developer | Team ID TBD | TBD |
-| Google Play Console | Account TBD | TBD |
-| Stripe | breakfree-tr | TBD |
+| Service             | Account        | Owner |
+| ------------------- | -------------- | ----- |
+| Firebase / GCP      | breakfree-prod | TBD   |
+| Vercel              | breakfree-web  | TBD   |
+| RevenueCat          | breakfree      | TBD   |
+| Agora.io            | breakfree      | TBD   |
+| Sentry              | breakfree-org  | TBD   |
+| Apple Developer     | Team ID TBD    | TBD   |
+| Google Play Console | Account TBD    | TBD   |
+| Stripe              | breakfree-tr   | TBD   |
 
 Fill in owners when accounts are provisioned. Keep credentials in 1Password vault `BreakFree-Ops`.

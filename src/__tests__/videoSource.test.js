@@ -7,7 +7,29 @@ import {
   isYouTube,
   isPlayable,
   parseYouTubeId,
+  splitPlaybackFields,
 } from '../utils/videoSource';
+
+describe('splitPlaybackFields', () => {
+  const base = { title: 'T', source: 'youtube', sourceId: 'abc', sourceUrl: null };
+
+  it('moves playback fields off Pro videos', () => {
+    const { catalog, playback } = splitPlaybackFields({ ...base, isPremium: true });
+    expect(catalog).toEqual({ title: 'T', isPremium: true });
+    expect(playback).toEqual({ source: 'youtube', sourceId: 'abc' });
+  });
+
+  it('treats a missing isPremium as Pro (matches firestore.rules)', () => {
+    const { catalog, playback } = splitPlaybackFields({ ...base, muxPlaybackId: 'm1' });
+    expect(catalog).toEqual({ title: 'T' });
+    expect(playback).toEqual({ source: 'youtube', sourceId: 'abc', muxPlaybackId: 'm1' });
+  });
+
+  it('leaves free videos whole', () => {
+    const video = { ...base, isPremium: false };
+    expect(splitPlaybackFields(video)).toEqual({ catalog: video, playback: null });
+  });
+});
 
 describe('videoSource', () => {
   describe('getSource', () => {

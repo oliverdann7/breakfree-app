@@ -8,10 +8,11 @@ import {
   addDoc,
   deleteDoc,
   doc,
+  writeBatch,
 } from 'firebase/firestore';
-import { db } from '../../services/firebase';
+import { auth, db } from '../../services/firebase';
 import { useAppSelector } from '../../store/hooks';
-import { parseYouTubeId } from '../../utils/videoSource';
+import { parseYouTubeId, splitPlaybackFields } from '../../utils/videoSource';
 import Icon from './Icons';
 
 const TABS = [
@@ -26,13 +27,34 @@ const VIDEO_CATEGORIES = ['Zihin', 'Sağlık', 'Beslenme', 'Hareket', 'Uyku'];
 
 function AdminGate({ children }) {
   const { user } = useAppSelector((s) => s.auth);
-  // Admin claim is normally read from getIdTokenResult().claims.admin.
-  // For the scaffold, accept env-set allowlist of UIDs.
-  const allowed = (process.env.EXPO_PUBLIC_ADMIN_UIDS || '').split(',').map((s) => s.trim());
-  const isAdmin = user && allowed.includes(user.uid);
+  // Gate on the same `isAdmin` custom claim firestore.rules enforces, so the UI
+  // only opens for accounts whose writes will actually be accepted. Grant it
+  // with functions/scripts/setAdmin.js. Forcing a token refresh picks up a
+  // claim granted since the last sign-in.
+  const [isAdmin, setIsAdmin] = useState(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    const current = auth?.currentUser;
+    if (!user || !current) {
+      setIsAdmin(false);
+      return undefined;
+    }
+    setIsAdmin(null);
+    current
+      .getIdTokenResult(true)
+      .then((result) => !cancelled && setIsAdmin(result.claims.isAdmin === true))
+      .catch(() => !cancelled && setIsAdmin(false));
+    return () => {
+      cancelled = true;
+    };
+  }, [user]);
 
   if (!user) {
     return <Locked message="Sign in to access admin." />;
+  }
+  if (isAdmin === null) {
+    return <Locked message="Checking admin access…" />;
   }
   if (!isAdmin) {
     return <Locked message={`Forbidden — ${user.email} is not an admin.`} />;
@@ -115,7 +137,14 @@ function AddVideoForm({ onSaved, onCancel }) {
 
     setSaving(true);
     try {
-      await addDoc(collection(db, 'videos'), video);
+      // Pro videos: playback fields go to the gated playback/current subdoc,
+      // never onto the catalog doc every signed-in user can read.
+      const { catalog, playback } = splitPlaybackFields(video);
+      const videoRef = doc(collection(db, 'videos'));
+      const batch = writeBatch(db);
+      batch.set(videoRef, catalog);
+      if (playback) batch.set(doc(videoRef, 'playback', 'current'), playback);
+      await batch.commit();
       onSaved();
     } catch (err) {
       setError(err.message);

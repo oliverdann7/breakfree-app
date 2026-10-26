@@ -4,15 +4,15 @@ Firebase Cloud Functions backing the Phase 2 + Phase 3 features.
 
 ## Functions
 
-| Name | Type | Purpose |
-| --- | --- | --- |
-| `mintAgoraToken` | Callable | Mint short-lived Agora RTC token for live talks. |
-| `revenueCatWebhook` | HTTPS | Receive RevenueCat subscription events → mirror to Firestore. |
-| `onMetricUpdated` | Firestore trigger | Recompute leaderboard when a participant's progress changes. |
-| `recomputeLeaderboard` | Callable (admin) | Manual leaderboard rebuild. |
-| `scheduledBackup` | Cron (24h) | Daily Firestore export to Cloud Storage. |
-| `onNotificationCreated` | Firestore trigger | Fan out Expo push for new in-app notifications. |
-| `processPrivacyRequest` | Firestore trigger | Fulfill KVKK/GDPR export / delete requests. |
+| Name                    | Type              | Purpose                                                       |
+| ----------------------- | ----------------- | ------------------------------------------------------------- |
+| `mintAgoraToken`        | Callable          | Mint short-lived Agora RTC token for live talks.              |
+| `revenueCatWebhook`     | HTTPS             | Receive RevenueCat subscription events → mirror to Firestore. |
+| `onMetricUpdated`       | Firestore trigger | Recompute leaderboard when a participant's progress changes.  |
+| `recomputeLeaderboard`  | Callable (admin)  | Manual leaderboard rebuild.                                   |
+| `scheduledBackup`       | Cron (24h)        | Daily Firestore export to Cloud Storage.                      |
+| `onNotificationCreated` | Firestore trigger | Fan out Expo push for new in-app notifications.               |
+| `processPrivacyRequest` | Firestore trigger | Fulfill KVKK/GDPR export / delete requests.                   |
 
 ## Setup
 
@@ -34,6 +34,20 @@ firebase functions:config:set revenuecat.webhook_token="..."
 # Daily backup destination
 firebase functions:config:set backup.bucket="gs://breakfree-backups"
 ```
+
+## Admin access
+
+Admin-only operations (Firestore rules `isAdmin()`, `recomputeLeaderboard`, the
+web `/admin` page) all check one custom claim: `isAdmin: true`. Grant or revoke
+it with:
+
+```bash
+GOOGLE_APPLICATION_CREDENTIALS=/path/to/service-account.json \
+  node scripts/setAdmin.js grant <uid-or-email>
+node scripts/setAdmin.js revoke <uid-or-email>
+```
+
+The user must sign out and back in for the new claim to reach their ID token.
 
 ## Deploy
 

@@ -106,3 +106,31 @@ export function isPlayable(video) {
   if (isYouTube(video)) return Boolean(getSourceId(video));
   return Boolean(getStreamUrl(video));
 }
+
+// Playback fields are what actually lets someone stream a video. The `videos`
+// catalog doc is readable by every signed-in user, so for Pro videos these
+// fields live in `videos/{id}/playback/current` instead, which firestore.rules
+// only serves to Pro subscribers once config/premium.enforced is on.
+export const PLAYBACK_FIELDS = ['source', 'sourceId', 'sourceUrl', 'muxPlaybackId'];
+
+/** Videos are Pro unless explicitly marked free (matches firestore.rules). */
+export function isProVideo(video) {
+  return video?.isPremium !== false;
+}
+
+/**
+ * Split a video into the public catalog doc and its playback fields.
+ * Free videos keep everything on the catalog doc (playback is null).
+ */
+export function splitPlaybackFields(video) {
+  if (!isProVideo(video)) return { catalog: video, playback: null };
+  const catalog = { ...video };
+  const playback = {};
+  for (const key of PLAYBACK_FIELDS) {
+    if (key in catalog) {
+      if (catalog[key] != null) playback[key] = catalog[key];
+      delete catalog[key];
+    }
+  }
+  return { catalog, playback };
+}

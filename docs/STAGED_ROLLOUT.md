@@ -4,15 +4,16 @@ How we ship to production. Mirrors Phase 3 Sprint 13 §3.4.
 
 ## Cadence
 
-| Phase | % users | Duration | Watch for |
-| --- | --- | --- | --- |
-| Internal | 100% of testers (≤ 100 ppl) | 3 days | Smoke, crash rate, qualitative bugs |
-| TestFlight External / Play Open | 10% | 24h | Crash-free > 99.5%, no Sev 1 issues |
-| Production | 10% | 24h | Crash, retention, ANR |
-| Production | 50% | 24h | Same + revenue parity |
-| Production | 100% | — | Done |
+| Phase                           | % users                     | Duration | Watch for                           |
+| ------------------------------- | --------------------------- | -------- | ----------------------------------- |
+| Internal                        | 100% of testers (≤ 100 ppl) | 3 days   | Smoke, crash rate, qualitative bugs |
+| TestFlight External / Play Open | 10%                         | 24h      | Crash-free > 99.5%, no Sev 1 issues |
+| Production                      | 10%                         | 24h      | Crash, retention, ANR               |
+| Production                      | 50%                         | 24h      | Same + revenue parity               |
+| Production                      | 100%                        | —        | Done                                |
 
 Each gate requires green on:
+
 - Sentry crash-free sessions ≥ 99.5%
 - Average rating ≥ 4.4 stars (no drop > 0.2)
 - Payments success rate ≥ 99%
@@ -22,15 +23,18 @@ Each gate requires green on:
 ## How to gate in stores
 
 ### App Store Connect (iOS)
+
 - App Store Connect → My Apps → BreakFree → Distribution → Phased Release.
 - Phased Release auto-ramps 1% → 100% over 7 days. We override with manual pauses at the percentages above.
 - Pause via "Pause Release" if any gate breaks.
 
 ### Google Play (Android)
+
 - Play Console → Production → Manage Releases → Staged rollout %.
 - Halt rollout via "Halt rollout" button.
 
 ### Web (Vercel)
+
 - Atomic deploys; rollback is one click on previous deployment.
 - For graduated UI changes, ship behind `featureFlags.*` and flip via Remote Config (Firebase) without redeploying.
 

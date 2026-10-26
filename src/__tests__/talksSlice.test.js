@@ -211,7 +211,7 @@ describe('talksSlice', () => {
     };
     const state = talksReducer(existing, {
       type: 'talks/join/fulfilled',
-      payload: 't1',
+      payload: { talkId: 't1', counted: true },
     });
     expect(state.allTalks[0].listeners).toBe(11);
   });
@@ -224,9 +224,23 @@ describe('talksSlice', () => {
     };
     const state = talksReducer(existing, {
       type: 'talks/join/fulfilled',
-      payload: 't1',
+      payload: { talkId: 't1', counted: true },
     });
     expect(state.currentTalk.listeners).toBe(6);
     expect(state.allTalks[0].listeners).toBe(6);
+  });
+
+  it('does not count a re-join', () => {
+    const existing = {
+      ...initialState,
+      allTalks: [{ talkId: 't1', listeners: 5 }],
+      currentTalk: { talkId: 't1', listeners: 5 },
+    };
+    const state = talksReducer(existing, {
+      type: 'talks/join/fulfilled',
+      payload: { talkId: 't1', counted: false },
+    });
+    expect(state.currentTalk.listeners).toBe(5);
+    expect(state.allTalks[0].listeners).toBe(5);
   });
 });

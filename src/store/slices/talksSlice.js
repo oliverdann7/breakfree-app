@@ -8,8 +8,8 @@ import {
   query,
   orderBy,
   limit,
-  updateDoc,
   increment,
+  writeBatch,
 } from 'firebase/firestore';
 import { db } from '../../services/firebase';
 
@@ -140,15 +140,28 @@ export const seedTalks = createAsyncThunk('talks/seed', async (_, { rejectWithVa
   }
 });
 
-export const joinTalk = createAsyncThunk('talks/join', async (talkId, { rejectWithValue }) => {
-  try {
-    if (!db) throw new Error('Firebase not configured');
-    await updateDoc(doc(db, 'talks', talkId), { listeners: increment(1) });
-    return talkId;
-  } catch (error) {
-    return rejectWithValue(error.message);
+// Joining writes the caller's talks_participants record and bumps the listener
+// counter in one batch — firestore.rules only lets the counter move alongside a
+// newly created record, so each user counts once. Re-joining is a no-op.
+export const joinTalk = createAsyncThunk(
+  'talks/join',
+  async (talkId, { getState, rejectWithValue }) => {
+    try {
+      if (!db) throw new Error('Firebase not configured');
+      const uid = getState().auth?.user?.uid;
+      if (!uid) throw new Error('Not signed in');
+      const participantRef = doc(db, 'talks_participants', `${talkId}_${uid}`);
+      if ((await getDoc(participantRef)).exists()) return { talkId, counted: false };
+      const batch = writeBatch(db);
+      batch.set(participantRef, { uid, talkId, joinedAt: Date.now() });
+      batch.update(doc(db, 'talks', talkId), { listeners: increment(1) });
+      await batch.commit();
+      return { talkId, counted: true };
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
   }
-});
+);
 
 const talksSlice = createSlice({
   name: 'talks',
@@ -225,9 +238,11 @@ const talksSlice = createSlice({
         state.seeded = true;
       })
       .addCase(joinTalk.fulfilled, (state, action) => {
-        const t = state.allTalks.find((t) => t.talkId === action.payload);
+        const { talkId, counted } = action.payload;
+        if (!counted) return;
+        const t = state.allTalks.find((t) => t.talkId === talkId);
         if (t) t.listeners += 1;
-        if (state.currentTalk?.talkId === action.payload) {
+        if (state.currentTalk?.talkId === talkId) {
           state.currentTalk.listeners += 1;
         }
       });

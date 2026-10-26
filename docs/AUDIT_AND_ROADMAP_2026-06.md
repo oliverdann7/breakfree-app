@@ -19,13 +19,13 @@
 
 ### 1.2 Critical gaps 🔴 (block real launch)
 
-| # | Gap | Evidence |
-|---|-----|----------|
-| C1 | **Health data is always mock** — no native HealthKit/Google Fit modules installed; `healthService.js` is a stub | `src/services/healthService.js` |
-| C2 | **Live audio doesn't actually play** — Agora token minting works server-side, but the native Agora SDK is not in the app; no EAS dev build exists (`extra.eas.projectId` empty in `app.json`) | `functions/src/agoraToken.js`, `app.json` |
-| C3 | **Payments are mock** — PremiumScreen uses a local mock purchase; RevenueCat SDK not integrated client-side; Stripe/RevenueCat accounts + webhook secret unverified | `src/store/premiumSlice.js`, `functions/src/revenueCatWebhook.js` |
-| C4 | **i18n built but unused** — 226-line tr/en locale files exist, but only ProfileScreen calls `useTranslation()`; ~95% of strings hardcoded Turkish. Blocks EN expansion and proper TR consistency | `src/i18n/` |
-| C5 | **No production deploy automation** — no workflow deploys functions, firestore rules, or web; rules could drift from what's deployed | `.github/workflows/` |
+| #   | Gap                                                                                                                                                                                              | Evidence                                                          |
+| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------- |
+| C1  | **Health data is always mock** — no native HealthKit/Google Fit modules installed; `healthService.js` is a stub                                                                                  | `src/services/healthService.js`                                   |
+| C2  | **Live audio doesn't actually play** — Agora token minting works server-side, but the native Agora SDK is not in the app; no EAS dev build exists (`extra.eas.projectId` empty in `app.json`)    | `functions/src/agoraToken.js`, `app.json`                         |
+| C3  | **Payments are mock** — PremiumScreen uses a local mock purchase; RevenueCat SDK not integrated client-side; Stripe/RevenueCat accounts + webhook secret unverified                              | `src/store/premiumSlice.js`, `functions/src/revenueCatWebhook.js` |
+| C4  | **i18n built but unused** — 226-line tr/en locale files exist, but only ProfileScreen calls `useTranslation()`; ~95% of strings hardcoded Turkish. Blocks EN expansion and proper TR consistency | `src/i18n/`                                                       |
+| C5  | **No production deploy automation** — no workflow deploys functions, firestore rules, or web; rules could drift from what's deployed                                                             | `.github/workflows/`                                              |
 
 ### 1.3 High-priority issues 🟡
 
@@ -50,7 +50,7 @@
 
 ### 1.5 Docs vs reality
 
-CHANGELOG marks Phases 1–3 "complete", but Phase 2/3 completion means *code exists*, not *validated in the real world*. Everything requiring native builds, third-party accounts (Agora, RevenueCat, Stripe, Apple/Google sign-in credentials), or real users is unverified. The roadmap below is sequenced to close exactly that gap.
+CHANGELOG marks Phases 1–3 "complete", but Phase 2/3 completion means _code exists_, not _validated in the real world_. Everything requiring native builds, third-party accounts (Agora, RevenueCat, Stripe, Apple/Google sign-in credentials), or real users is unverified. The roadmap below is sequenced to close exactly that gap.
 
 ---
 
@@ -59,7 +59,8 @@ CHANGELOG marks Phases 1–3 "complete", but Phase 2/3 completion means *code ex
 Six phases, ordered by dependency. Each phase has an exit gate — do not start the next phase's headline work until the gate passes. Parallel tracks marked (∥) can run alongside.
 
 ### Phase 0 — Make it real (Weeks 1–3): native builds, accounts, deploys
-*Nothing else matters until the app runs on a real phone with real services.*
+
+_Nothing else matters until the app runs on a real phone with real services._
 
 1. **EAS dev build**: `eas init` (fill `extra.eas.projectId`), create iOS/Android dev clients. Add native modules: `react-native-agora`, `react-native-health` / `react-native-google-fit` (or `expo-health-connect`), `@react-native-google-signin/google-signin`, `expo-apple-authentication`, RevenueCat `react-native-purchases`, `expo-sqlite`.
 2. **Third-party accounts wired end-to-end**:
@@ -93,7 +94,7 @@ Six phases, ordered by dependency. Each phase has an exit gate — do not start 
 
 ### Phase 3 — Content hub (Weeks 8–14): become THE wellness content destination for Turkey
 
-*This is the product differentiator. Everything before was plumbing.*
+_This is the product differentiator. Everything before was plumbing._
 
 1. **Editorial content system**: extend the existing `/admin` CMS into a real content pipeline — articles, programs (multi-week plans), video series, talk recordings. Firestore `content` collection with categories matching Turkish wellness verticals (beslenme, hareket, zihin sağlığı, uyku, bağımlılıkla mücadele).
 2. **Talk recordings & replay**: Agora cloud recording → Storage/Mux → playback in VideoPlayer; premium-gated replays (the monetization hook).

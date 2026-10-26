@@ -4,6 +4,7 @@
 > codebase and checked where implemented (premium/challenges/health/mentor/
 > notifications slices, offline store, Cloud Functions, rate limiting). Notes
 > on items satisfied differently or deferred to a native/external step:
+>
 > - _Real-time chat / messaging (Socket.io)_ — implemented with Firestore
 >   listeners (mentor messaging) rather than Socket.io; same capability.
 > - _Live audio host controls_ (mute/kick/record/end), _Host-listener

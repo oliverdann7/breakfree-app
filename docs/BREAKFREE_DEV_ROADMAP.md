@@ -5,6 +5,7 @@
 > scope is code-complete (188+ unit tests, Maestro E2E, Cloud Functions, CI).
 > A few checked items are satisfied by an **in-repo equivalent** or are
 > **deferred to an external/native step** rather than literally built here:
+>
 > - _Figma file_ — design tokens live in `src/constants/designTokens.js`; the
 >   Figma workspace itself is an external design-tool artifact.
 > - _Component tests (Storybook snapshots)_ — component tests exist via React
