@@ -1,5 +1,5 @@
-const functions = require('firebase-functions');
-const admin = require('firebase-admin');
+const functions = require('firebase-functions/v1');
+const { getFirestore } = require('firebase-admin/firestore');
 
 // When a notification doc is created at users/{uid}/notifications/{id},
 // fan out an Expo push to the user's stored pushToken (if any).
@@ -9,7 +9,7 @@ exports.onNotificationCreated = functions.firestore
     const notification = snap.data();
     if (notification?.silent) return null;
 
-    const userSnap = await admin.firestore().doc(`users/${context.params.uid}`).get();
+    const userSnap = await getFirestore().doc(`users/${context.params.uid}`).get();
     const token = userSnap.data()?.pushToken;
     if (!token) return null;
 

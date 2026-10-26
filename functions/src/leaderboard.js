@@ -1,5 +1,5 @@
-const functions = require('firebase-functions');
-const admin = require('firebase-admin');
+const functions = require('firebase-functions/v1');
+const { getFirestore, FieldValue } = require('firebase-admin/firestore');
 
 // Triggered when a challenge participant's progress changes.
 // Updates the cached leaderboard doc for fast reads from the app.
@@ -26,7 +26,7 @@ exports.recomputeLeaderboard = functions.https.onCall(async (data, context) => {
 });
 
 async function recompute(challengeId) {
-  const db = admin.firestore();
+  const db = getFirestore();
   const snap = await db
     .collection('challenge_participants')
     .where('challengeId', '==', challengeId)
@@ -53,6 +53,6 @@ async function recompute(challengeId) {
   await db.doc(`leaderboards/${challengeId}`).set({
     challengeId,
     entries,
-    updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    updatedAt: FieldValue.serverTimestamp(),
   });
 }

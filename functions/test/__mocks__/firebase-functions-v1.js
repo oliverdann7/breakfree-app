@@ -1,7 +1,9 @@
-// Lightweight stand-in for `firebase-functions` used by the unit suite.
+// Lightweight stand-in for `firebase-functions/v1` used by the unit suite.
 // Trigger builders (`onRequest`, `onCall`, `firestore.document().onCreate`,
 // `pubsub.schedule().onRun`, …) just return the raw handler so tests can invoke
-// it directly with synthetic args. `config()` is controllable via __setConfig.
+// it directly with synthetic args. Configuration comes from process.env, as in
+// production; there is deliberately no `config()` (removed in
+// firebase-functions v7), so any regression to it fails the suite.
 
 class HttpsError extends Error {
   constructor(code, message) {
@@ -10,8 +12,6 @@ class HttpsError extends Error {
     this.name = 'HttpsError';
   }
 }
-
-let _config = {};
 
 function documentBuilder() {
   return {
@@ -30,14 +30,9 @@ function scheduleBuilder() {
   return builder;
 }
 
-module.exports = {
-  __setConfig: (cfg) => {
-    _config = cfg || {};
-  },
-  __resetConfig: () => {
-    _config = {};
-  },
-  config: () => _config,
+const functions = {
+  // runWith({ secrets, ... }) returns the same builder surface.
+  runWith: () => functions,
   https: {
     HttpsError,
     onRequest: (handler) => handler,
@@ -50,3 +45,5 @@ module.exports = {
     schedule: () => scheduleBuilder(),
   },
 };
+
+module.exports = functions;

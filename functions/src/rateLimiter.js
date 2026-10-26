@@ -1,5 +1,5 @@
-const admin = require('firebase-admin');
-const functions = require('firebase-functions');
+const { getFirestore } = require('firebase-admin/firestore');
+const functions = require('firebase-functions/v1');
 
 // Fixed-window rate limiter backed by Firestore. Keeps a per-(key,action)
 // counter that resets every `windowSeconds`. Cheap, atomic via a transaction,
@@ -9,7 +9,7 @@ const functions = require('firebase-functions');
 //   await enforceRateLimit(context.auth.uid, 'mintAgoraToken', { max: 30, windowSeconds: 60 });
 async function enforceRateLimit(key, action, { max = 60, windowSeconds = 60 } = {}) {
   if (!key) return; // unauthenticated paths are gated elsewhere
-  const db = admin.firestore();
+  const db = getFirestore();
   const nowSec = Math.floor(Date.now() / 1000);
   const windowStart = nowSec - (nowSec % windowSeconds);
   const ref = db.collection('rate_limits').doc(`${action}__${key}`);

@@ -1,6 +1,6 @@
 // Standalone Jest config for Cloud Functions unit tests. Runs in a Node
 // environment with no Babel transform (the functions are plain CommonJS that
-// Node 20 understands natively). External SDKs are redirected to hand-written
+// Node 22 understands natively). External SDKs are redirected to hand-written
 // mocks so tests never touch the network or real Firebase.
 module.exports = {
   testEnvironment: 'node',
@@ -8,7 +8,9 @@ module.exports = {
   testMatch: ['<rootDir>/test/**/*.test.js'],
   moduleNameMapper: {
     '^firebase-admin$': '<rootDir>/test/__mocks__/firebase-admin.js',
-    '^firebase-functions$': '<rootDir>/test/__mocks__/firebase-functions.js',
+    '^firebase-admin/(app|firestore|auth|storage)$':
+      '<rootDir>/test/__mocks__/firebase-admin-$1.js',
+    '^firebase-functions/v1$': '<rootDir>/test/__mocks__/firebase-functions-v1.js',
     '^agora-token$': '<rootDir>/test/__mocks__/agora-token.js',
     '^google-auth-library$': '<rootDir>/test/__mocks__/google-auth-library.js',
   },
