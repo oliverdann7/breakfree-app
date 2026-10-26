@@ -5,7 +5,15 @@ const {
   assertSucceeds,
   assertFails,
 } = require('@firebase/rules-unit-testing');
-const { doc, getDoc, setDoc, updateDoc, deleteDoc, increment } = require('firebase/firestore');
+const {
+  doc,
+  getDoc,
+  setDoc,
+  updateDoc,
+  deleteDoc,
+  increment,
+  writeBatch,
+} = require('firebase/firestore');
 
 const ALICE = 'alice-uid';
 const BOB = 'bob-uid';
@@ -17,6 +25,13 @@ function db(uid, claims) {
   return uid
     ? testEnv.authenticatedContext(uid, claims).firestore()
     : testEnv.unauthenticatedContext().firestore();
+}
+
+// Counter + per-user record written atomically, as the app does.
+function batchWrite(firestore, ops) {
+  const batch = writeBatch(firestore);
+  ops(batch);
+  return batch.commit();
 }
 
 // Write fixture docs with rules disabled.
@@ -66,14 +81,49 @@ describe('posts', () => {
     await assertFails(getDoc(doc(db(), 'posts/p1')));
   });
 
-  it('any signed-in user can bump likes by exactly one', async () => {
+  it('a like bumps the counter by one together with creating the like record', async () => {
     await seed('posts/p1', valid);
-    await assertSucceeds(updateDoc(doc(db(BOB), 'posts/p1'), { likes: increment(1) }));
+    const bob = db(BOB);
+    await assertSucceeds(
+      batchWrite(bob, (b) => {
+        b.set(doc(bob, `liked_posts/${BOB}_p1`), { uid: BOB, postId: 'p1', createdAt: 1 });
+        b.update(doc(bob, 'posts/p1'), { likes: increment(1) });
+      })
+    );
+  });
+
+  it('rejects a bare counter bump with no like record (no repeat inflation)', async () => {
+    await seed('posts/p1', valid);
+    await assertFails(updateDoc(doc(db(BOB), 'posts/p1'), { likes: increment(1) }));
+  });
+
+  it('rejects bumping again once the like record already exists', async () => {
+    await seed('posts/p1', { ...valid, likes: 1 });
+    await seed(`liked_posts/${BOB}_p1`, { uid: BOB, postId: 'p1' });
+    await assertFails(updateDoc(doc(db(BOB), 'posts/p1'), { likes: increment(1) }));
+  });
+
+  it('an unlike decrements together with deleting the like record', async () => {
+    await seed('posts/p1', { ...valid, likes: 1 });
+    await seed(`liked_posts/${BOB}_p1`, { uid: BOB, postId: 'p1' });
+    const bob = db(BOB);
+    await assertSucceeds(
+      batchWrite(bob, (b) => {
+        b.delete(doc(bob, `liked_posts/${BOB}_p1`));
+        b.update(doc(bob, 'posts/p1'), { likes: increment(-1) });
+      })
+    );
   });
 
   it('rejects like bumps larger than one', async () => {
     await seed('posts/p1', valid);
-    await assertFails(updateDoc(doc(db(BOB), 'posts/p1'), { likes: increment(50) }));
+    const bob = db(BOB);
+    await assertFails(
+      batchWrite(bob, (b) => {
+        b.set(doc(bob, `liked_posts/${BOB}_p1`), { uid: BOB, postId: 'p1' });
+        b.update(doc(bob, 'posts/p1'), { likes: increment(50) });
+      })
+    );
   });
 
   it('non-authors cannot edit post text', async () => {
@@ -135,10 +185,29 @@ describe('talks', () => {
     await assertFails(setDoc(doc(db(ALICE), 'talks/t1'), { title: 'x'.repeat(201) }));
   });
 
-  it('listeners can be bumped by one, not more', async () => {
+  it('joining bumps listeners by one together with the participant record', async () => {
     await seed('talks/t1', { title: 'Canlı', status: 'live', listeners: 3 });
-    await assertSucceeds(updateDoc(doc(db(BOB), 'talks/t1'), { listeners: increment(1) }));
-    await assertFails(updateDoc(doc(db(BOB), 'talks/t1'), { listeners: increment(10) }));
+    const bob = db(BOB);
+    await assertSucceeds(
+      batchWrite(bob, (b) => {
+        b.set(doc(bob, `talks_participants/t1_${BOB}`), { uid: BOB, talkId: 't1', joinedAt: 1 });
+        b.update(doc(bob, 'talks/t1'), { listeners: increment(1) });
+      })
+    );
+    // Already joined: a second bump has no new record to pair with.
+    await assertFails(updateDoc(doc(bob, 'talks/t1'), { listeners: increment(1) }));
+  });
+
+  it('rejects bare or oversized listener bumps', async () => {
+    await seed('talks/t1', { title: 'Canlı', status: 'live', listeners: 3 });
+    const bob = db(BOB);
+    await assertFails(updateDoc(doc(bob, 'talks/t1'), { listeners: increment(1) }));
+    await assertFails(
+      batchWrite(bob, (b) => {
+        b.set(doc(bob, `talks_participants/t1_${BOB}`), { uid: BOB, talkId: 't1' });
+        b.update(doc(bob, 'talks/t1'), { listeners: increment(10) });
+      })
+    );
   });
 
   it('non-admins cannot edit other talk fields or delete', async () => {
@@ -167,16 +236,89 @@ describe('liked_posts', () => {
       setDoc(doc(db(BOB), `liked_posts/${ALICE}_p1`), { uid: ALICE, postId: 'p1' })
     );
   });
+
+  it('doc id must be `${uid}_${postId}`', async () => {
+    await assertFails(
+      setDoc(doc(db(ALICE), `liked_posts/${ALICE}_p2`), { uid: ALICE, postId: 'p1' })
+    );
+  });
+
+  it('owner can check for a like record that does not exist yet', async () => {
+    await assertSucceeds(getDoc(doc(db(ALICE), `liked_posts/${ALICE}_p1`)));
+    await assertFails(getDoc(doc(db(BOB), `liked_posts/${ALICE}_p1`)));
+  });
+});
+
+describe('talks_participants', () => {
+  it('owner can probe their missing join record; key must match the body', async () => {
+    await assertSucceeds(getDoc(doc(db(ALICE), `talks_participants/t1_${ALICE}`)));
+    await assertFails(getDoc(doc(db(BOB), `talks_participants/t1_${ALICE}`)));
+    await assertFails(
+      setDoc(doc(db(ALICE), `talks_participants/t2_${ALICE}`), { uid: ALICE, talkId: 't1' })
+    );
+  });
 });
 
 describe('videos (read-only catalog)', () => {
+  const adminDb = () => db('admin-uid', { isAdmin: true });
+
   it('signed-in users read, nobody but admin writes', async () => {
     await seed('videos/v1', { title: 'Nefes', publishedAt: 1 });
     await assertSucceeds(getDoc(doc(db(ALICE), 'videos/v1')));
     await assertFails(getDoc(doc(db(), 'videos/v1')));
     await assertFails(setDoc(doc(db(ALICE), 'videos/v2'), { title: 'spam' }));
+    await assertSucceeds(setDoc(doc(adminDb(), 'videos/v2'), { title: 'yeni' }));
+  });
+
+  it('Pro catalog docs may not carry playback fields; free ones may', async () => {
+    await assertFails(
+      setDoc(doc(adminDb(), 'videos/v3'), { title: 'Pro', isPremium: true, sourceId: 'abc' })
+    );
+    // Missing isPremium means Pro.
+    await assertFails(setDoc(doc(adminDb(), 'videos/v3'), { title: 'Pro', muxPlaybackId: 'm' }));
     await assertSucceeds(
-      setDoc(doc(db('admin-uid', { isAdmin: true }), 'videos/v2'), { title: 'yeni' })
+      setDoc(doc(adminDb(), 'videos/v4'), { title: 'Free', isPremium: false, sourceId: 'abc' })
+    );
+    await assertSucceeds(setDoc(doc(adminDb(), 'videos/v3/playback/current'), { sourceId: 'abc' }));
+    await assertFails(setDoc(doc(db(ALICE), 'videos/v3/playback/current'), { sourceId: 'x' }));
+  });
+
+  describe('Pro playback gating', () => {
+    beforeEach(async () => {
+      await seed('videos/pro', { title: 'Pro', isPremium: true });
+      await seed('videos/pro/playback/current', { source: 'mux', sourceId: 'secret' });
+      await seed('videos/free', { title: 'Free', isPremium: false });
+      await seed('videos/free/playback/current', { source: 'youtube', sourceId: 'open' });
+      await seed(`users/${BOB}/subscription/current`, { status: 'active' });
+    });
+
+    it('everyone signed in can play while premium is not enforced (pre-launch)', async () => {
+      await assertSucceeds(getDoc(doc(db(ALICE), 'videos/pro/playback/current')));
+      await assertFails(getDoc(doc(db(), 'videos/pro/playback/current')));
+    });
+
+    it('once enforced, only active Pro subscribers read Pro playback', async () => {
+      await seed('config/premium', { enforced: true });
+      await assertFails(getDoc(doc(db(ALICE), 'videos/pro/playback/current')));
+      await assertSucceeds(getDoc(doc(db(BOB), 'videos/pro/playback/current')));
+      await assertSucceeds(getDoc(doc(db(ALICE), 'videos/free/playback/current')));
+    });
+
+    it('a cancelled subscription loses access', async () => {
+      await seed('config/premium', { enforced: true });
+      await seed(`users/${BOB}/subscription/current`, { status: 'cancelled' });
+      await assertFails(getDoc(doc(db(BOB), 'videos/pro/playback/current')));
+    });
+  });
+});
+
+describe('config', () => {
+  it('signed-in users read; only admins write', async () => {
+    await seed('config/premium', { enforced: false });
+    await assertSucceeds(getDoc(doc(db(ALICE), 'config/premium')));
+    await assertFails(setDoc(doc(db(ALICE), 'config/premium'), { enforced: false }));
+    await assertSucceeds(
+      setDoc(doc(db('admin-uid', { isAdmin: true }), 'config/premium'), { enforced: true })
     );
   });
 });
@@ -261,14 +403,31 @@ describe('daily_plans', () => {
 });
 
 describe('challenges', () => {
-  it('participantCount bumps by one only; content is admin-only', async () => {
+  it('participantCount moves only with a new participant record; content is admin-only', async () => {
     await seed('challenges/c1', { title: '10k adım', participantCount: 5, endDate: 9 });
-    await assertSucceeds(
-      updateDoc(doc(db(ALICE), 'challenges/c1'), { participantCount: increment(1) })
-    );
+    const alice = db(ALICE);
+    await assertFails(updateDoc(doc(alice, 'challenges/c1'), { participantCount: increment(1) }));
     await assertFails(
-      updateDoc(doc(db(ALICE), 'challenges/c1'), { participantCount: increment(100) })
+      batchWrite(alice, (b) => {
+        b.set(doc(alice, `challenge_participants/c1_${ALICE}`), {
+          uid: ALICE,
+          challengeId: 'c1',
+          currentProgress: 0,
+        });
+        b.update(doc(alice, 'challenges/c1'), { participantCount: increment(100) });
+      })
     );
+    await assertSucceeds(
+      batchWrite(alice, (b) => {
+        b.set(doc(alice, `challenge_participants/c1_${ALICE}`), {
+          uid: ALICE,
+          challengeId: 'c1',
+          currentProgress: 0,
+        });
+        b.update(doc(alice, 'challenges/c1'), { participantCount: increment(1) });
+      })
+    );
+    await assertFails(updateDoc(doc(alice, 'challenges/c1'), { participantCount: increment(1) }));
     await assertFails(updateDoc(doc(db(ALICE), 'challenges/c1'), { title: 'defaced' }));
     await assertFails(setDoc(doc(db(ALICE), 'challenges/c2'), { title: 'sahte' }));
   });
@@ -302,6 +461,44 @@ describe('challenge_participants', () => {
       })
     );
   });
+
+  it('clients can never change progress after joining (leaderboard integrity)', async () => {
+    await seed(`challenge_participants/c1_${ALICE}`, {
+      uid: ALICE,
+      challengeId: 'c1',
+      currentProgress: 0,
+      completed: false,
+    });
+    await assertFails(
+      updateDoc(doc(db(ALICE), `challenge_participants/c1_${ALICE}`), { currentProgress: 9999 })
+    );
+    await assertFails(
+      updateDoc(doc(db(ALICE), `challenge_participants/c1_${ALICE}`), { completed: true })
+    );
+  });
+
+  it('rejects a join pre-marked completed or keyed to another challenge', async () => {
+    await assertFails(
+      setDoc(doc(db(ALICE), `challenge_participants/c1_${ALICE}`), {
+        uid: ALICE,
+        challengeId: 'c1',
+        currentProgress: 0,
+        completed: true,
+      })
+    );
+    await assertFails(
+      setDoc(doc(db(ALICE), `challenge_participants/c2_${ALICE}`), {
+        uid: ALICE,
+        challengeId: 'c1',
+        currentProgress: 0,
+      })
+    );
+  });
+
+  it('owner can probe for a participation record that does not exist yet', async () => {
+    await assertSucceeds(getDoc(doc(db(ALICE), `challenge_participants/c1_${ALICE}`)));
+    await assertFails(getDoc(doc(db(BOB), `challenge_participants/c1_${ALICE}`)));
+  });
 });
 
 describe('leaderboards', () => {
@@ -325,19 +522,30 @@ describe('user_status', () => {
 });
 
 describe('write-only drop boxes', () => {
-  it('feedback: signed-in create within bounds, no reads', async () => {
+  it('feedback: signed-in create within bounds, only admins read/delete', async () => {
     await assertSucceeds(
       setDoc(doc(db(ALICE), 'feedback/f1'), { uid: ALICE, type: 'idea', message: 'Harika app' })
     );
     await assertFails(setDoc(doc(db(ALICE), 'feedback/f2'), { message: 'x'.repeat(2001) }));
     await assertFails(getDoc(doc(db(ALICE), 'feedback/f1')));
+    await assertFails(deleteDoc(doc(db(ALICE), 'feedback/f1')));
+    const admin = db('admin-uid', { isAdmin: true });
+    await assertSucceeds(getDoc(doc(admin, 'feedback/f1')));
+    await assertFails(updateDoc(doc(admin, 'feedback/f1'), { message: 'edited' }));
+    await assertSucceeds(deleteDoc(doc(admin, 'feedback/f1')));
   });
 
-  it('error_logs: signed-in create, no reads', async () => {
+  it('error_logs: signed-in create, only admins read', async () => {
     await assertSucceeds(
       setDoc(doc(db(ALICE), 'error_logs/e1'), { message: 'TypeError: boom', name: 'TypeError' })
     );
     await assertFails(getDoc(doc(db(ALICE), 'error_logs/e1')));
+    await assertSucceeds(getDoc(doc(db('admin-uid', { isAdmin: true }), 'error_logs/e1')));
+  });
+
+  it('the legacy `admin` claim name grants nothing', async () => {
+    await seed('feedback/f1', { message: 'x' });
+    await assertFails(getDoc(doc(db('old-admin', { admin: true }), 'feedback/f1')));
   });
 });
 

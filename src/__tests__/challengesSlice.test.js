@@ -71,11 +71,25 @@ describe('challengesSlice', () => {
     };
     const state = challengesReducer(existing, {
       type: 'challenges/join/fulfilled',
-      payload: 'c1',
+      payload: { challengeId: 'c1', counted: true },
     });
     expect(state.challenges[0].participantCount).toBe(11);
     expect(state.userParticipation.c1.joinedAt).toBeDefined();
     expect(state.userParticipation.c1.currentProgress).toBe(0);
     expect(state.userParticipation.c1.completed).toBe(false);
+  });
+
+  it('leaves count and progress alone when the user had already joined', () => {
+    const existing = {
+      ...initialState,
+      challenges: [{ id: 'c1', title: 'Walkathon', participantCount: 10 }],
+      userParticipation: { c1: { joinedAt: 1, currentProgress: 7, completed: false } },
+    };
+    const state = challengesReducer(existing, {
+      type: 'challenges/join/fulfilled',
+      payload: { challengeId: 'c1', counted: false },
+    });
+    expect(state.challenges[0].participantCount).toBe(10);
+    expect(state.userParticipation.c1.currentProgress).toBe(7);
   });
 });

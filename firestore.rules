@@ -20,13 +20,22 @@ service cloud.firestore {
     function isNonEmptyString(value, max) {
       return value is string && value.size() > 0 && value.size() <= max;
     }
-    // Shared counters may only move by exactly 1 in either direction and can
-    // never go negative — blocks bulk inflation like likes: increment(9999).
-    function bumpedByOne(field) {
+    // Shared counters move by exactly 1, never go negative, and only together
+    // with the caller's own per-user record at `recordPath` in the same batch:
+    // +1 must create the record, -1 must delete it. One user therefore counts
+    // at most once — blocks both increment(9999) and a thousand increment(1)s.
+    function counterTracksRecord(field, recordPath) {
+      let delta = request.resource.data[field] - resource.data.get(field, 0);
       return request.resource.data[field] is int
         && request.resource.data[field] >= 0
-        && (request.resource.data[field] - resource.data.get(field, 0) == 1
-            || request.resource.data[field] - resource.data.get(field, 0) == -1);
+        && ((delta == 1 && !exists(recordPath) && existsAfter(recordPath))
+            || (delta == -1 && exists(recordPath) && !existsAfter(recordPath)));
+    }
+    // Per-user records keyed `${uid}_${x}` / `${x}_${uid}`: lets the owner
+    // probe whether their record exists (a get on a missing doc has no
+    // resource.data, so ownsResource() alone would deny it).
+    function missingOwnRecord(id, pattern) {
+      return isSignedIn() && resource == null && id.matches(pattern);
     }
     // The document the client writes carries its own uid and it matches the
     // caller — the ownership claim other rules rely on can't be forged.
@@ -35,6 +44,21 @@ service cloud.firestore {
     }
     function ownsResource() {
       return isSignedIn() && resource.data.uid == request.auth.uid;
+    }
+    function PLAYBACK_FIELDS() {
+      return ['source', 'sourceId', 'sourceUrl', 'muxPlaybackId'];
+    }
+    // Server-side launch switch for Pro gating: set config/premium
+    // { enforced: true } when in-app purchases go live (together with the
+    // EXPO_PUBLIC_FF_PREMIUM client flag).
+    function premiumEnforced() {
+      return exists(/databases/$(database)/documents/config/premium)
+        && get(/databases/$(database)/documents/config/premium).data.get('enforced', false) == true;
+    }
+    // Subscription doc is written only by the RevenueCat webhook.
+    function hasActivePro() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)/subscription/current)
+        .data.get('status', '') == 'active';
     }
 
     match /users/{userId} {
@@ -97,10 +121,12 @@ service cloud.firestore {
         && request.resource.data.get('status', 'scheduled') in ['scheduled', 'live', 'ended']
         && request.resource.data.get('listeners', 0) == 0
         && request.resource.data.keys().size() <= 30;
-      // Admins may fully edit/remove a talk; any signed-in user may bump the
-      // live listener counter by one when they join (see talksSlice.joinTalk).
+      // Admins may fully edit/remove a talk; a signed-in user may move the
+      // listener counter by one only alongside creating (join) or deleting
+      // (leave) their talks_participants record (see talksSlice.joinTalk).
       allow update: if isAdmin()
-        || (isSignedIn() && onlyChanges(['listeners']) && bumpedByOne('listeners'));
+        || (isSignedIn() && onlyChanges(['listeners']) && counterTracksRecord('listeners',
+          /databases/$(database)/documents/talks_participants/$(talk + '_' + request.auth.uid)));
       allow delete: if isAdmin();
     }
 
@@ -112,12 +138,14 @@ service cloud.firestore {
         && request.resource.data.get('likes', 0) == 0
         && request.resource.data.keys().size() <= 20;
       // Author may edit their own post (text stays bounded); anyone signed in
-      // may move only the like counter by one (see communitySlice.toggleLike).
+      // may move only the like counter by one, in the same batch that creates
+      // or deletes their liked_posts record (see communitySlice.toggleLike).
       allow update: if isSignedIn() && (
         (resource.data.authorUid == request.auth.uid
           && request.resource.data.authorUid == resource.data.authorUid
           && isNonEmptyString(request.resource.data.text, 2000))
-        || (onlyChanges(['likes']) && bumpedByOne('likes'))
+        || (onlyChanges(['likes']) && counterTracksRecord('likes',
+          /databases/$(database)/documents/liked_posts/$(request.auth.uid + '_' + post)))
       );
       allow delete: if isSignedIn() && resource.data.authorUid == request.auth.uid;
 
@@ -136,19 +164,39 @@ service cloud.firestore {
     }
 
     // Like records are keyed `${uid}_${postId}` and carry a `uid` field. A user
-    // may only read or mutate their own like documents.
+    // may only read or mutate their own like documents; the key must match the
+    // body so the posts rule above can find the record by path.
     match /liked_posts/{id} {
-      allow read: if ownsResource();
+      allow read: if ownsResource() || missingOwnRecord(id, request.auth.uid + '_.+');
       allow create: if writesOwnUid()
-        && request.resource.data.postId is string;
+        && request.resource.data.postId is string
+        && id == request.auth.uid + '_' + request.resource.data.postId;
       allow delete: if ownsResource();
     }
 
     // Exclusive content catalog: seeded/managed out-of-band (seed script with
-    // admin credentials, console, or Cloud Functions). Clients only read.
+    // admin credentials, console, AdminPage). Every signed-in user can browse
+    // the catalog (titles, thumbnails, which videos are Pro), so a Pro video's
+    // playback fields must NOT live on this doc — they go in the
+    // playback/current subdoc below. Videos are Pro unless isPremium == false.
     match /videos/{video} {
       allow read: if isSignedIn();
-      allow write: if isAdmin();
+      allow write: if isAdmin()
+        && (request.resource == null
+          || request.resource.data.get('isPremium', true) == false
+          || !request.resource.data.keys().hasAny(PLAYBACK_FIELDS()));
+
+      // Playback fields (source, sourceId, sourceUrl, muxPlaybackId) for the
+      // video. Readable for free videos, for active Pro subscribers, and for
+      // everyone while config/premium.enforced is not true (pre-launch, the
+      // app's premiumSubscription flag is also off and nothing is locked).
+      match /playback/{doc} {
+        allow read: if isSignedIn() && (
+          get(/databases/$(database)/documents/videos/$(video)).data.get('isPremium', true) == false
+          || !premiumEnforced()
+          || hasActivePro());
+        allow write: if isAdmin();
+      }
     }
 
     match /mentors/{mentorId} {
@@ -194,27 +242,48 @@ service cloud.firestore {
       allow update: if ownsResource() && request.resource.data.uid == resource.data.uid;
     }
 
+    // Join records keyed `${talkId}_${uid}`; their existence is what lets the
+    // talk's listener counter move (counterTracksRecord above).
     match /talks_participants/{id} {
-      allow read: if ownsResource();
-      allow create: if writesOwnUid();
+      allow read: if ownsResource() || missingOwnRecord(id, '.+_' + request.auth.uid);
+      allow create: if writesOwnUid()
+        && request.resource.data.talkId is string
+        && id == request.resource.data.talkId + '_' + request.auth.uid
+        && request.resource.data.keys().size() <= 10;
+      allow delete: if ownsResource();
     }
 
     match /challenges/{challengeId} {
       allow read: if isSignedIn();
-      // Any signed-in user may bump the participant counter by one when they
-      // join (see challengesSlice.joinChallenge); content changes are admin.
+      // A signed-in user may move the participant counter by one only together
+      // with creating/deleting their challenge_participants record (see
+      // challengesSlice.joinChallenge); content changes are admin.
       allow update: if isAdmin()
-        || (isSignedIn() && onlyChanges(['participantCount']) && bumpedByOne('participantCount'));
+        || (isSignedIn() && onlyChanges(['participantCount']) && counterTracksRecord('participantCount',
+          /databases/$(database)/documents/challenge_participants/$(challengeId + '_' + request.auth.uid)));
       allow create, delete: if isAdmin();
     }
 
     // Participation records are keyed `${challengeId}_${uid}` and carry uid.
+    // currentProgress/completed feed the public leaderboard (functions/src/
+    // leaderboard.js), so clients may never set them: a user joins at zero and
+    // only server code (admin SDK) advances progress.
     match /challenge_participants/{id} {
-      allow read: if ownsResource();
+      allow read: if ownsResource() || missingOwnRecord(id, '.+_' + request.auth.uid);
       allow create: if writesOwnUid()
-        && request.resource.data.get('currentProgress', 0) == 0;
-      allow update: if ownsResource()
-        && request.resource.data.uid == resource.data.uid;
+        && request.resource.data.challengeId is string
+        && id == request.resource.data.challengeId + '_' + request.auth.uid
+        && request.resource.data.get('currentProgress', 0) == 0
+        && request.resource.data.get('completed', false) == false
+        && request.resource.data.keys().size() <= 10;
+      allow update: if false;
+      allow delete: if ownsResource();
+    }
+
+    // App-wide server switches (e.g. config/premium.enforced). Admin-managed.
+    match /config/{doc} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
     }
 
     // Computed by the leaderboard Cloud Function (admin SDK); read-only here.
@@ -229,18 +298,20 @@ service cloud.firestore {
       allow write: if isOwner(userId) && request.resource.data.uid == userId;
     }
 
-    // Write-only drop boxes: clients file feedback/errors, only ops reads them
-    // (console/admin SDK). No client reads, edits, or deletes.
+    // Write-only drop boxes: clients file feedback/errors; only admins (the
+    // web AdminPage, or console/admin SDK) read and triage them. Nobody edits.
     match /feedback/{id} {
       allow create: if isSignedIn()
         && isNonEmptyString(request.resource.data.message, 2000);
-      allow read, update, delete: if false;
+      allow read, delete: if isAdmin();
+      allow update: if false;
     }
 
     match /error_logs/{id} {
       allow create: if isSignedIn()
         && isNonEmptyString(request.resource.data.message, 5000);
-      allow read, update, delete: if false;
+      allow read, delete: if isAdmin();
+      allow update: if false;
     }
   }
 }

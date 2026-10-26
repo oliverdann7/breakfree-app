@@ -88,11 +88,26 @@ const VIDEOS = [
   },
 ];
 
+// Pro videos keep playback fields in a gated subdoc (firestore.rules,
+// utils/videoSource.splitPlaybackFields); free videos keep them inline.
+const PLAYBACK_FIELDS = ['source', 'sourceId', 'sourceUrl', 'muxPlaybackId'];
+
 async function seed() {
   console.log('Seeding videos collection...');
   for (const video of VIDEOS) {
     const { videoId, ...data } = video;
-    await setDoc(doc(collection(db, 'videos'), videoId), data);
+    const ref = doc(collection(db, 'videos'), videoId);
+    if (data.isPremium === false) {
+      await setDoc(ref, data);
+    } else {
+      const playback = {};
+      for (const key of PLAYBACK_FIELDS) {
+        if (data[key] != null) playback[key] = data[key];
+        delete data[key];
+      }
+      await setDoc(ref, data);
+      await setDoc(doc(ref, 'playback', 'current'), playback);
+    }
     console.log(`  ✓ ${video.title}`);
   }
   console.log(`Done! ${VIDEOS.length} videos written to Firestore.`);

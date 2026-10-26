@@ -28,9 +28,15 @@ describe('recomputeLeaderboard (callable)', () => {
     ).rejects.toMatchObject({ code: 'permission-denied' });
   });
 
+  it('refuses the legacy `admin` claim name (only `isAdmin` counts)', async () => {
+    await expect(
+      recomputeLeaderboard({ challengeId: 'c1' }, { auth: { token: { admin: true } } })
+    ).rejects.toMatchObject({ code: 'permission-denied' });
+  });
+
   it('requires a challengeId', async () => {
     await expect(
-      recomputeLeaderboard({}, { auth: { token: { admin: true } } })
+      recomputeLeaderboard({}, { auth: { token: { isAdmin: true } } })
     ).rejects.toMatchObject({ code: 'invalid-argument' });
   });
 
@@ -43,7 +49,7 @@ describe('recomputeLeaderboard (callable)', () => {
 
     const result = await recomputeLeaderboard(
       { challengeId: 'c1' },
-      { auth: { token: { admin: true } } }
+      { auth: { token: { isAdmin: true } } }
     );
 
     expect(result).toEqual({ ok: true, challengeId: 'c1' });

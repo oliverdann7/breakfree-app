@@ -3,15 +3,13 @@ import {
   collection,
   getDocs,
   addDoc,
-  updateDoc,
   doc,
-  deleteDoc,
   query,
   orderBy,
   limit,
   getDoc,
   increment,
-  setDoc,
+  writeBatch,
 } from 'firebase/firestore';
 import { db } from '../../services/firebase';
 
@@ -79,13 +77,17 @@ export const toggleLike = createAsyncThunk(
       if (!db) throw new Error('Firebase not configured');
       const likeRef = doc(db, 'liked_posts', `${uid}_${postId}`);
       const postRef = doc(db, 'posts', postId);
+      // One atomic batch: firestore.rules only lets the counter move together
+      // with creating/deleting this user's like record, so a user counts once.
+      const batch = writeBatch(db);
       if (currentlyLiked) {
-        await deleteDoc(likeRef);
-        await updateDoc(postRef, { likes: increment(-1) });
+        batch.delete(likeRef);
+        batch.update(postRef, { likes: increment(-1) });
       } else {
-        await setDoc(likeRef, { uid, postId, createdAt: Date.now() });
-        await updateDoc(postRef, { likes: increment(1) });
+        batch.set(likeRef, { uid, postId, createdAt: Date.now() });
+        batch.update(postRef, { likes: increment(1) });
       }
+      await batch.commit();
       return { postId, liked: !currentlyLiked, delta: currentlyLiked ? -1 : 1 };
     } catch (error) {
       return rejectWithValue(error.message);

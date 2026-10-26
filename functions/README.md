@@ -35,6 +35,20 @@ firebase functions:config:set revenuecat.webhook_token="..."
 firebase functions:config:set backup.bucket="gs://breakfree-backups"
 ```
 
+## Admin access
+
+Admin-only operations (Firestore rules `isAdmin()`, `recomputeLeaderboard`, the
+web `/admin` page) all check one custom claim: `isAdmin: true`. Grant or revoke
+it with:
+
+```bash
+GOOGLE_APPLICATION_CREDENTIALS=/path/to/service-account.json \
+  node scripts/setAdmin.js grant <uid-or-email>
+node scripts/setAdmin.js revoke <uid-or-email>
+```
+
+The user must sign out and back in for the new claim to reach their ID token.
+
 ## Deploy
 
 ```bash

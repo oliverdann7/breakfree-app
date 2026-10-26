@@ -135,6 +135,9 @@ export default function VideoPlayerScreen({ route, navigation }) {
     }
 
     if (!isPlayable(video)) {
+      // Pro catalog entries arrive without playback fields; wait for
+      // fetchVideoById to merge them before declaring the video unavailable.
+      if (!currentVideo) return <ActivityIndicator color={colors.cyan} size="large" />;
       return (
         <View style={styles.playerPlaceholder}>
           <Icon name="film" size={40} color={colors.cyan} style={{ opacity: 0.6 }} />
