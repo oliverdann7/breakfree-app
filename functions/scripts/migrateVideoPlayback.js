@@ -15,15 +15,15 @@
  * and before setting config/premium { enforced: true }.
  */
 
-const admin = require('firebase-admin');
+const { initializeApp } = require('firebase-admin/app');
+const { getFirestore, FieldValue } = require('firebase-admin/firestore');
 
 const PLAYBACK_FIELDS = ['source', 'sourceId', 'sourceUrl', 'muxPlaybackId'];
 
 async function main() {
   const apply = process.argv.includes('--apply');
-  admin.initializeApp();
-  const db = admin.firestore();
-  const { FieldValue } = admin.firestore;
+  initializeApp();
+  const db = getFirestore();
 
   const snap = await db.collection('videos').get();
   let moved = 0;

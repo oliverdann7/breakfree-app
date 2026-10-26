@@ -1,6 +1,6 @@
-const admin = require('firebase-admin');
+const { initializeApp } = require('firebase-admin/app');
 
-admin.initializeApp();
+initializeApp();
 
 // Re-export each function module so Firebase CLI picks them up at deploy time.
 exports.mintAgoraToken = require('./src/agoraToken').mintAgoraToken;

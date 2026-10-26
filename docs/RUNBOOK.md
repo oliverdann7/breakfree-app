@@ -57,7 +57,7 @@ Acknowledge in PagerDuty within 5 min. Post `:eyes:` in `#bf-oncall` Slack.
 
 1. Agora dashboard → channel quality.
 2. Verify `mintAgoraToken` 200s in Functions logs.
-3. Cert rotated? Re-set `firebase functions:config:set agora.app_certificate=...` and redeploy.
+3. Cert rotated? Re-set `firebase functions:secrets:set AGORA_APP_CERT` and redeploy `mintAgoraToken`.
 
 ### Payments failing
 

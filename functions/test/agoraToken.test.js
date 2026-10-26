@@ -1,5 +1,4 @@
 const admin = require('firebase-admin');
-const functions = require('firebase-functions');
 const agora = require('agora-token');
 const { mintAgoraToken } = require('../src/agoraToken');
 
@@ -18,12 +17,16 @@ function allowRateLimit() {
 describe('mintAgoraToken', () => {
   beforeEach(() => {
     admin.__reset();
-    functions.__setConfig({ agora: { app_id: 'app123', app_certificate: 'cert456' } });
+    process.env.AGORA_APP_ID = 'app123';
+    process.env.AGORA_APP_CERT = 'cert456';
     agora.RtcTokenBuilder.buildTokenWithUserAccount.mockClear();
     allowRateLimit();
   });
 
-  afterEach(() => functions.__resetConfig());
+  afterEach(() => {
+    delete process.env.AGORA_APP_ID;
+    delete process.env.AGORA_APP_CERT;
+  });
 
   it('rejects unauthenticated callers', async () => {
     await expect(mintAgoraToken({ channelName: 'c' }, {})).rejects.toMatchObject({
@@ -38,7 +41,7 @@ describe('mintAgoraToken', () => {
   });
 
   it('fails when Agora credentials are not configured', async () => {
-    functions.__setConfig({});
+    delete process.env.AGORA_APP_CERT;
     await expect(
       mintAgoraToken({ channelName: 'c' }, { auth: { uid: 'u1' } })
     ).rejects.toMatchObject({ code: 'failed-precondition' });

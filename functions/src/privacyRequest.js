@@ -1,5 +1,7 @@
-const functions = require('firebase-functions');
-const admin = require('firebase-admin');
+const functions = require('firebase-functions/v1');
+const { getFirestore, FieldValue } = require('firebase-admin/firestore');
+const { getAuth } = require('firebase-admin/auth');
+const { getStorage } = require('firebase-admin/storage');
 
 // KVKK / GDPR — when a user submits a privacy request, fulfill it server-side.
 // type = 'export' → assemble JSON of all user-owned docs to Storage and email link.
@@ -9,7 +11,7 @@ exports.processPrivacyRequest = functions.firestore
   .onCreate(async (snap, context) => {
     const { uid } = context.params;
     const request = snap.data();
-    const db = admin.firestore();
+    const db = getFirestore();
 
     try {
       if (request.type === 'export') {
@@ -23,7 +25,7 @@ exports.processPrivacyRequest = functions.firestore
           data.collections[sub] = subSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
         }
 
-        const bucket = admin.storage().bucket();
+        const bucket = getStorage().bucket();
         const file = bucket.file(`privacy_exports/${uid}/${Date.now()}.json`);
         await file.save(JSON.stringify(data, null, 2), {
           contentType: 'application/json',
@@ -37,10 +39,10 @@ exports.processPrivacyRequest = functions.firestore
       } else if (request.type === 'delete') {
         // Soft-tombstone first; nightly job purges after 30d cooling-off.
         await db.doc(`users/${uid}`).update({
-          deletionRequestedAt: admin.firestore.FieldValue.serverTimestamp(),
+          deletionRequestedAt: FieldValue.serverTimestamp(),
           accountStatus: 'pending_deletion',
         });
-        await admin.auth().updateUser(uid, { disabled: true });
+        await getAuth().updateUser(uid, { disabled: true });
         await snap.ref.update({ status: 'pending_cooloff', completedAt: Date.now() });
       } else {
         await snap.ref.update({ status: 'error', error: 'Unknown request type' });

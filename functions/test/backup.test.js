@@ -1,4 +1,3 @@
-const functions = require('firebase-functions');
 const { __requestMock } = require('google-auth-library');
 const { scheduledBackup } = require('../src/backup');
 
@@ -7,7 +6,6 @@ describe('scheduledBackup', () => {
   let logSpy;
 
   beforeEach(() => {
-    functions.__resetConfig();
     __requestMock.mockClear();
     warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
     logSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
@@ -28,7 +26,7 @@ describe('scheduledBackup', () => {
   });
 
   it('triggers a Firestore export to the configured bucket', async () => {
-    functions.__setConfig({ backup: { bucket: 'gs://bf-backups' } });
+    process.env.BACKUP_BUCKET = 'gs://bf-backups';
     const result = await scheduledBackup();
     expect(result).toBeNull();
     expect(__requestMock).toHaveBeenCalledTimes(1);

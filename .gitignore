@@ -42,6 +42,7 @@ serviceAccountKey.json
 .env.production
 # Allow the example template
 !.env.local.example
+!functions/.env.example
 
 # OS
 .DS_Store
