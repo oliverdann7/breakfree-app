@@ -1,5 +1,5 @@
-const functions = require('firebase-functions');
-const admin = require('firebase-admin');
+const functions = require('firebase-functions/v1');
+const { getFirestore, FieldValue } = require('firebase-admin/firestore');
 const crypto = require('crypto');
 
 const VALID_TYPES = new Set([
@@ -30,73 +30,75 @@ const safeEqual = (a, b) => {
 };
 
 // HTTPS endpoint receiving RevenueCat webhook events.
-// Secure via Authorization: Bearer <REVENUECAT_WEBHOOK_TOKEN> shared secret.
-exports.revenueCatWebhook = functions.https.onRequest(async (req, res) => {
-  if (req.method !== 'POST') {
-    return res.status(405).send('Method not allowed');
-  }
+// Secure via Authorization: Bearer <REVENUECAT_WEBHOOK_TOKEN> shared secret,
+// stored in Secret Manager (firebase functions:secrets:set REVENUECAT_WEBHOOK_TOKEN).
+exports.revenueCatWebhook = functions
+  .runWith({ secrets: ['REVENUECAT_WEBHOOK_TOKEN'] })
+  .https.onRequest(async (req, res) => {
+    if (req.method !== 'POST') {
+      return res.status(405).send('Method not allowed');
+    }
 
-  const token =
-    functions.config().revenuecat?.webhook_token || process.env.REVENUECAT_WEBHOOK_TOKEN;
-  const auth = req.get('Authorization') || '';
-  if (!token || !safeEqual(auth, `Bearer ${token}`)) {
-    return res.status(401).send('Unauthorized');
-  }
+    const token = process.env.REVENUECAT_WEBHOOK_TOKEN;
+    const auth = req.get('Authorization') || '';
+    if (!token || !safeEqual(auth, `Bearer ${token}`)) {
+      return res.status(401).send('Unauthorized');
+    }
 
-  const event = req.body?.event;
-  if (!event || !VALID_TYPES.has(event.type)) {
-    return res.status(400).send('Invalid event');
-  }
+    const event = req.body?.event;
+    if (!event || !VALID_TYPES.has(event.type)) {
+      return res.status(400).send('Invalid event');
+    }
 
-  const uid = event.app_user_id;
-  if (typeof uid !== 'string' || uid.length === 0 || uid.length > 256) {
-    return res.status(400).send('Invalid app_user_id');
-  }
-  if (!VALID_UID.test(uid)) {
-    // Authenticated but unmappable — e.g. a RevenueCat anonymous id
-    // ($RCAnonymousID:...) from a purchase made before sign-in, or any id
-    // that isn't one of our Firebase uids. There is no user doc to update,
-    // and a 4xx would make RevenueCat retry the delivery forever, so
-    // acknowledge and skip. The path-safety property holds either way:
-    // nothing outside VALID_UID ever reaches the Firestore path below.
-    return res.status(200).send('Ignored: unmappable app_user_id');
-  }
+    const uid = event.app_user_id;
+    if (typeof uid !== 'string' || uid.length === 0 || uid.length > 256) {
+      return res.status(400).send('Invalid app_user_id');
+    }
+    if (!VALID_UID.test(uid)) {
+      // Authenticated but unmappable — e.g. a RevenueCat anonymous id
+      // ($RCAnonymousID:...) from a purchase made before sign-in, or any id
+      // that isn't one of our Firebase uids. There is no user doc to update,
+      // and a 4xx would make RevenueCat retry the delivery forever, so
+      // acknowledge and skip. The path-safety property holds either way:
+      // nothing outside VALID_UID ever reaches the Firestore path below.
+      return res.status(200).send('Ignored: unmappable app_user_id');
+    }
 
-  const {
-    product_id: productId,
-    expiration_at_ms: expirationAtMs,
-    purchased_at_ms: purchasedAtMs,
-  } = event;
-  if (
-    productId != null &&
-    (typeof productId !== 'string' || !productId || productId.length > 200)
-  ) {
-    return res.status(400).send('Invalid product_id');
-  }
-  if (expirationAtMs != null && !isMillis(expirationAtMs)) {
-    return res.status(400).send('Invalid expiration_at_ms');
-  }
-  if (purchasedAtMs != null && !isMillis(purchasedAtMs)) {
-    return res.status(400).send('Invalid purchased_at_ms');
-  }
+    const {
+      product_id: productId,
+      expiration_at_ms: expirationAtMs,
+      purchased_at_ms: purchasedAtMs,
+    } = event;
+    if (
+      productId != null &&
+      (typeof productId !== 'string' || !productId || productId.length > 200)
+    ) {
+      return res.status(400).send('Invalid product_id');
+    }
+    if (expirationAtMs != null && !isMillis(expirationAtMs)) {
+      return res.status(400).send('Invalid expiration_at_ms');
+    }
+    if (purchasedAtMs != null && !isMillis(purchasedAtMs)) {
+      return res.status(400).send('Invalid purchased_at_ms');
+    }
 
-  const isActive = !['CANCELLATION', 'EXPIRATION', 'BILLING_ISSUE'].includes(event.type);
+    const isActive = !['CANCELLATION', 'EXPIRATION', 'BILLING_ISSUE'].includes(event.type);
 
-  const update = {
-    status: isActive ? 'active' : 'cancelled',
-    renewAt: expirationAtMs ?? null,
-    startedAt: purchasedAtMs ?? Date.now(),
-    provider: 'revenuecat',
-    lastEvent: event.type,
-    updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-  };
-  // Events without a product_id (e.g. some cancellations) keep the existing
-  // planId via merge — writing `planId: undefined` would make Firestore throw.
-  if (productId) {
-    update.planId = productId;
-  }
+    const update = {
+      status: isActive ? 'active' : 'cancelled',
+      renewAt: expirationAtMs ?? null,
+      startedAt: purchasedAtMs ?? Date.now(),
+      provider: 'revenuecat',
+      lastEvent: event.type,
+      updatedAt: FieldValue.serverTimestamp(),
+    };
+    // Events without a product_id (e.g. some cancellations) keep the existing
+    // planId via merge — writing `planId: undefined` would make Firestore throw.
+    if (productId) {
+      update.planId = productId;
+    }
 
-  await admin.firestore().doc(`users/${uid}/subscription/current`).set(update, { merge: true });
+    await getFirestore().doc(`users/${uid}/subscription/current`).set(update, { merge: true });
 
-  return res.status(200).send('OK');
-});
+    return res.status(200).send('OK');
+  });

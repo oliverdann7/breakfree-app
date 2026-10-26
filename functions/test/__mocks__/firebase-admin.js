@@ -1,7 +1,8 @@
-// Lightweight stand-in for `firebase-admin`. Exposes the jest.fn()s the
-// functions touch (`firestore().doc/collection/runTransaction`, `auth()`,
-// `storage()`) via `admin.__api` so each test can program return values and
-// assert on calls. Call `admin.__reset()` in beforeEach.
+// Shared state behind the firebase-admin mocks. The functions use the modular
+// API (firebase-admin/app, /firestore, /auth, /storage — v14 has no namespaced
+// API); the sibling firebase-admin-*.js mocks re-export these jest.fn()s, and
+// tests reach them via `require('firebase-admin').__api` to program return
+// values and assert on calls. Call `admin.__reset()` in beforeEach.
 
 const firestoreApi = {
   doc: jest.fn(),

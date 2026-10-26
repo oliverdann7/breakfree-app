@@ -22,18 +22,26 @@ npm install
 firebase use <project-id>
 ```
 
-Required env / config:
+Runtime: Node 22, `firebase-functions` v7 (v1 trigger API via
+`firebase-functions/v1`), `firebase-admin` v14 (modular API only:
+`firebase-admin/app`, `/firestore`, `/auth`, `/storage`).
+
+Configuration — `functions.config()` / `functions:config:set` no longer exist:
 
 ```bash
-# Agora live audio
-firebase functions:config:set agora.app_id="..." agora.app_certificate="..."
+# Non-secret values: copy the example and fill it in. The Firebase CLI loads
+# functions/.env (or .env.<project-id>) into process.env at deploy time.
+cp .env.example .env        # AGORA_APP_ID, BACKUP_BUCKET
 
-# RevenueCat webhook auth
-firebase functions:config:set revenuecat.webhook_token="..."
-
-# Daily backup destination
-firebase functions:config:set backup.bucket="gs://breakfree-backups"
+# Secrets live in Secret Manager and are bound per function via runWith():
+firebase functions:secrets:set AGORA_APP_CERT
+firebase functions:secrets:set REVENUECAT_WEBHOOK_TOKEN
 ```
+
+**Migrating an existing project** that used `functions:config:set`: copy the
+old values out first (e.g. `firebase functions:config:get`, if your CLI version
+still has it), put them in `.env` / Secret Manager as above, then deploy. The
+secrets must exist before the deploy, or it fails.
 
 ## Admin access
 

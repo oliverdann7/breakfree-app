@@ -13,7 +13,8 @@
  * to refresh) before the change takes effect on their client.
  */
 
-const admin = require('firebase-admin');
+const { initializeApp } = require('firebase-admin/app');
+const { getAuth } = require('firebase-admin/auth');
 
 async function main() {
   const [action, who] = process.argv.slice(2);
@@ -22,8 +23,8 @@ async function main() {
     process.exit(1);
   }
 
-  admin.initializeApp();
-  const auth = admin.auth();
+  initializeApp();
+  const auth = getAuth();
   const user = who.includes('@') ? await auth.getUserByEmail(who) : await auth.getUser(who);
 
   // Merge so other claims on the account are preserved.

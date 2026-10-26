@@ -1,14 +1,14 @@
-const functions = require('firebase-functions');
+const functions = require('firebase-functions/v1');
 // Daily Firestore export to Cloud Storage. Requires:
 // - Firestore Admin API enabled
 // - service account roles/datastore.importExportAdmin
-// - BACKUP_BUCKET env / config (gs://bucket-name)
+// - BACKUP_BUCKET in functions/.env (gs://bucket-name)
 exports.scheduledBackup = functions.pubsub
   .schedule('every 24 hours')
   .timeZone('Europe/Istanbul')
   .onRun(async () => {
     const projectId = process.env.GCLOUD_PROJECT;
-    const bucket = functions.config().backup?.bucket || process.env.BACKUP_BUCKET;
+    const bucket = process.env.BACKUP_BUCKET;
     if (!bucket) {
       console.warn('BACKUP_BUCKET not configured, skipping backup.');
       return null;

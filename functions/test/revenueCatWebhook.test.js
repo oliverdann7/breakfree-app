@@ -1,5 +1,4 @@
 const admin = require('firebase-admin');
-const functions = require('firebase-functions');
 const { revenueCatWebhook } = require('../src/revenueCatWebhook');
 
 const TOKEN = 'shhh-secret';
@@ -24,12 +23,14 @@ describe('revenueCatWebhook', () => {
 
   beforeEach(() => {
     admin.__reset();
-    functions.__setConfig({ revenuecat: { webhook_token: TOKEN } });
+    process.env.REVENUECAT_WEBHOOK_TOKEN = TOKEN;
     setMock = jest.fn().mockResolvedValue(undefined);
     admin.__api.firestoreApi.doc.mockReturnValue({ set: setMock });
   });
 
-  afterEach(() => functions.__resetConfig());
+  afterEach(() => {
+    delete process.env.REVENUECAT_WEBHOOK_TOKEN;
+  });
 
   it('rejects non-POST methods with 405', async () => {
     const res = mockRes();
@@ -169,8 +170,17 @@ describe('revenueCatWebhook', () => {
     expect(res.status).toHaveBeenCalledWith(200);
   });
 
-  it('honours the token from process.env when config is absent', async () => {
-    functions.__resetConfig();
+  it('rejects every request when the secret is not configured', async () => {
+    delete process.env.REVENUECAT_WEBHOOK_TOKEN;
+    const res = mockRes();
+    await revenueCatWebhook(
+      mockReq({ token: 'undefined', body: { event: { type: 'RENEWAL', app_user_id: 'u3' } } }),
+      res
+    );
+    expect(res.status).toHaveBeenCalledWith(401);
+  });
+
+  it('reads the token from the REVENUECAT_WEBHOOK_TOKEN secret (process.env)', async () => {
     process.env.REVENUECAT_WEBHOOK_TOKEN = 'env-token';
     const res = mockRes();
     await revenueCatWebhook(

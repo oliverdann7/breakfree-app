@@ -1,15 +1,9 @@
 {
   // Production-dependency audit gate for Cloud Functions (Functions CI). Fails
-  // on any high/critical advisory EXCEPT the allowlisted ones below. Delete
-  // entries as soon as `npm audit --omit=dev` stops reporting them.
+  // on any high/critical advisory. If one ever has no fix, allowlist its GHSA
+  // id here with a comment saying why and when it clears (see ../audit-ci.jsonc).
   "$schema": "https://github.com/IBM/audit-ci/raw/main/docs/schema.json",
   "high": true,
   "skip-dev": true,
-  "allowlist": [
-    // node-forge: no patched release exists. Reaches us through firebase-admin
-    // <=14.3; firebase-admin 14.5+ drops it but requires Node 22, so this clears
-    // with the planned Node 20 -> 22 / firebase-admin 14 / firebase-functions
-    // upgrade (Node 20 is already past end of life).
-    "GHSA-86w9-cpqp-85rv",
-  ],
+  "allowlist": [],
 }
